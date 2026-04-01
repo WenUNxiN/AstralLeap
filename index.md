@@ -11,7 +11,7 @@ hero:
     alt: logo
   actions:
     - theme: brand
-      text: Markdown Examples
+      text: 查看文档
       link: /markdown-examples
     - theme: alt
       text: API Examples
