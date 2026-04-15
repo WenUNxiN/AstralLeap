@@ -100,6 +100,13 @@
       #bd34fe 50%,
       #47caff 50%);
   --vp-home-hero-image-filter: blur(44px);
+  
+  /* Custom card styles */
+  --vp-card-bg: var(--vp-c-white);
+  --vp-card-border: var(--vp-c-gray-2);
+  --vp-card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --vp-card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --vp-card-border-radius: 8px;
 }
 
 @media (min-width: 640px) {
@@ -111,6 +118,92 @@
 @media (min-width: 960px) {
   :root {
     --vp-home-hero-image-filter: blur(68px);
+  }
+}
+
+/* Card styles */
+.VPHomeFeatures .VPHomeFeatures_item {
+  background-color: var(--vp-card-bg);
+  border: 1px solid var(--vp-card-border);
+  border-radius: var(--vp-card-border-radius);
+  box-shadow: var(--vp-card-shadow);
+  transition: all 0.3s ease;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.VPHomeFeatures .VPHomeFeatures_item:hover {
+  box-shadow: var(--vp-card-shadow-hover);
+  transform: translateY(-4px);
+}
+
+/* Sidebar styles */
+.VPSidebar {
+  background-color: var(--vp-c-background);
+  border-right: 1px solid var(--vp-c-divider);
+}
+
+.VPSidebarItem {
+  transition: all 0.2s ease;
+}
+
+.VPSidebarItem:hover {
+  background-color: var(--vp-c-bg-soft);
+}
+
+.VPSidebarItem.is-active {
+  color: var(--vp-c-brand-1);
+  font-weight: 500;
+}
+
+/* Button styles */
+.VPButton {
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.VPButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom block styles */
+.VPCustomBlock {
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+/* Code block styles */
+.VPContent code {
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.9em;
+}
+
+/* Table styles */
+.VPContent table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.VPContent table th,
+.VPContent table td {
+  border: 1px solid var(--vp-c-divider);
+  padding: 12px;
+  text-align: left;
+}
+
+.VPContent table th {
+  background-color: var(--vp-c-bg-soft);
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .VPHomeFeatures .VPHomeFeatures_item {
+    padding: 16px;
   }
 }
 
