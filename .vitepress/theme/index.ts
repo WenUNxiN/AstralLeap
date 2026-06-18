@@ -26,6 +26,40 @@ export default {
           }
         }),
         h('span', '星跃 | Astral Leap')
+      ]),
+      'layout-bottom': () => h('div', {
+        class: 'visitor-counter',
+        style: {
+          textAlign: 'center',
+          padding: '20px',
+          fontSize: '14px',
+          color: 'var(--vp-c-text-2)'
+        }
+      }, [
+        h('script', {
+          src: '//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js',
+          async: 'true'
+        }),
+        h('span', {
+          id: 'busuanzi_container_site_pv',
+          style: { marginRight: '20px' }
+        }, [
+          '总访问量：',
+          h('span', {
+            id: 'busuanzi_value_site_pv',
+            style: { fontWeight: 'bold' }
+          })
+        ]),
+        h('span', {
+          id: 'busuanzi_container_site_uv',
+          style: { marginLeft: '20px' }
+        }, [
+          '总访客数：',
+          h('span', {
+            id: 'busuanzi_value_site_uv',
+            style: { fontWeight: 'bold' }
+          })
+        ])
       ])
     })
   },
@@ -39,5 +73,5 @@ export default {
 // // 2. 导入配套的 CSS 样式（此步骤不能省略）
 // import '@escook/vitepress-theme/style.css'
 
-// // 3. 把“导入”的主题“默认导出”即可
+// // 3. 把"导入"的主题"默认导出"即可
 // export default Theme
