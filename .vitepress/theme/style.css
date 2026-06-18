@@ -100,7 +100,7 @@
       #bd34fe 50%,
       #47caff 50%);
   --vp-home-hero-image-filter: blur(44px);
-  
+
   /* Custom card styles */
   --vp-card-bg: var(--vp-c-white);
   --vp-card-border: var(--vp-c-gray-2);

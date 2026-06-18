@@ -14,6 +14,7 @@ export default defineConfig({
     logo: '/logo.png',
     nav: [
       { text: '主页', link: '/' },
+      { text: '论坛', link: '/forum/' },
     ],
 
     sidebar: {
@@ -70,6 +71,23 @@ export default defineConfig({
               items: [
                 { text: '版本更新', link: '/智能手表  星序 - Astral Order/版本更新' },
                 { text: '免责声明', link: '/智能手表  星序 - Astral Order/免责声明' }
+              ]
+            }
+          ]
+        }
+      ],
+      '/forum/': [
+        {
+          text: '星跃论坛',
+          items: [
+            { text: '论坛首页', link: '/forum/' },
+            {
+              text: '热门话题',
+              collapsed: false,
+              items: [
+                { text: '固件更新体验', link: '/forum/posts/firmware-update' },
+                { text: '自定义表盘', link: '/forum/posts/custom-watch-face' },
+                { text: '续航优化技巧', link: '/forum/posts/battery-tips' }
               ]
             }
           ]

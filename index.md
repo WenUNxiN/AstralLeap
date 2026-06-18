@@ -11,8 +11,8 @@ hero:
     alt: logo
   actions:
     - theme: brand
-      text: 查看文档
-      link: /markdown-examples
+      text: 论坛
+      link: /forum/
     - theme: alt
       text: GitHub
       link: https://github.com/WenUNxiN
