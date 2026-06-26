@@ -1,6 +1,9 @@
 <template>
   <div class="blog-categories">
-    <h2 class="section-title">文章分类</h2>
+    <div class="section-header">
+      <h2 class="section-title">文章分类</h2>
+      <span class="total-count">共 {{ totalArticles }} 篇文章</span>
+    </div>
     <div class="category-list">
       <a 
         v-for="cat in categories" 
@@ -24,7 +27,7 @@
 </template>
 
 <script setup>
-import { h } from 'vue'
+import { computed, h } from 'vue'
 
 const frontendIcon = h('path', { d: 'M20 18v-4a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v4' })
 const backendIcon = h('path', { d: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4' })
@@ -56,6 +59,10 @@ const categories = [
     icon: projectIcon
   }
 ]
+
+const totalArticles = computed(() => {
+  return categories.reduce((sum, cat) => sum + cat.count, 0)
+})
 </script>
 
 <style scoped>
@@ -63,10 +70,26 @@ const categories = [
   margin-bottom: 2rem;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
 .section-title {
-  margin: 0 0 1.5rem 0;
+  margin: 0;
   font-size: 1.5rem;
   padding-left: 0.75rem;
+}
+
+.total-count {
+  font-size: 0.875rem;
+  color: var(--vp-c-brand);
+  font-weight: 600;
+  background: rgba(139, 92, 246, 0.1);
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
 }
 
 .category-list {

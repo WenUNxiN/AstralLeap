@@ -10,7 +10,6 @@
           {{ article.category }}
         </span>
         <span class="article-date">{{ article.date }}</span>
-        <span class="article-read-time">🕐 {{ article.readTime }}</span>
       </div>
       <h3 class="article-title">
         <a :href="article.path">{{ article.title }}</a>
@@ -58,6 +57,7 @@ const articles = [
     date: '2024-01-20',
     author: 'Stellan W',
     readTime: '5分钟',
+    views: 3280,
     tags: ['Vue3', 'JavaScript', '前端'],
     path: './posts/vue3-composition-api.html'
   },
@@ -68,6 +68,7 @@ const articles = [
     date: '2024-01-18',
     author: 'Stellan W',
     readTime: '8分钟',
+    views: 1890,
     tags: ['TypeScript', '前端', '类型'],
     path: './posts/typescript-type-gymnastics.html'
   },
@@ -78,6 +79,7 @@ const articles = [
     date: '2024-01-15',
     author: 'Stellan W',
     readTime: '6分钟',
+    views: 2560,
     tags: ['Node.js', '性能', '后端'],
     path: './posts/nodejs-performance.html'
   },
@@ -88,6 +90,7 @@ const articles = [
     date: '2024-01-10',
     author: 'Stellan W',
     readTime: '10分钟',
+    views: 4120,
     tags: ['项目经验', '智能硬件', '架构'],
     path: './posts/smartwatch-project.html'
   }
@@ -149,10 +152,7 @@ const getCategoryColor = (category) => {
   font-size: 0.8rem;
 }
 
-.article-read-time {
-  color: var(--vp-c-text-tertiary);
-  font-size: 0.8rem;
-}
+
 
 .article-title {
   margin: 0 0 0.75rem 0;
