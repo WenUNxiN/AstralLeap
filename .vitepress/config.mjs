@@ -14,80 +14,67 @@ export default defineConfig({
     logo: '/logo.png',
     nav: [
       { text: '主页', link: '/' },
-      { text: '论坛', link: '/forum/' },
+      { text: '博客', link: '/blog/' },
     ],
 
     sidebar: {
-      '/智能手表 星序AstralOrder/': [
+      '/projects/智能手表 星序AstralOrder/': [
         {
           text: '智能手表 星序AstralOrder',
           items: [
-            { text: '项目介绍', link: '/智能手表 星序AstralOrder/智能手表 星序AstralOrder' },
+            { text: '项目介绍', link: '/projects/智能手表 星序AstralOrder/智能手表 星序AstralOrder' },
             {
               text: '用户操作说明',
               collapsed: false,
               items: [
-                { text: '硬件操作', link: '/智能手表 星序AstralOrder/硬件操作' },
-                { text: '手机客户端', link: '/智能手表 星序AstralOrder/手机客户端' },
-                { text: '常见问题', link: '/智能手表 星序AstralOrder/常见问题' }
+                { text: '硬件操作', link: '/projects/智能手表 星序AstralOrder/硬件操作' },
+                { text: '手机客户端', link: '/projects/智能手表 星序AstralOrder/手机客户端' },
+                { text: '常见问题', link: '/projects/智能手表 星序AstralOrder/常见问题' }
               ]
             },
             {
               text: '技术资料',
               collapsed: false,
               items: [
-                { text: '硬件规格', link: '/智能手表 星序AstralOrder/硬件规格' },
-                { text: '软件架构', link: '/智能手表 星序AstralOrder/软件架构' },
-                { text: '开发指南', link: '/智能手表 星序AstralOrder/开发指南' }
+                { text: '硬件规格', link: '/projects/智能手表 星序AstralOrder/硬件规格' },
+                { text: '软件架构', link: '/projects/智能手表 星序AstralOrder/软件架构' },
+                { text: '开发指南', link: '/projects/智能手表 星序AstralOrder/开发指南' }
               ]
             },
             {
               text: '其他说明',
               collapsed: false,
               items: [
-                { text: '版本更新', link: '/智能手表 星序AstralOrder/版本更新' },
-                { text: '免责声明', link: '/智能手表 星序AstralOrder/免责声明' }
+                { text: '版本更新', link: '/projects/智能手表 星序AstralOrder/版本更新' },
+                { text: '免责声明', link: '/projects/智能手表 星序AstralOrder/免责声明' }
               ]
-            }
+            },
+            { text: '讨论区', link: '/projects/智能手表 星序AstralOrder/讨论区' }
           ]
         }
       ],
-      '/新项目/': [
+      '/projects/新项目/': [
         {
           text: '新项目',
           items: [
-            { text: '项目介绍', link: '/新项目/项目介绍' },
-            {
-              text: '其他说明',
-              collapsed: false,
-              items: [
-                { text: '版本更新', link: '/智能手表  星序 - Astral Order/版本更新' },
-                { text: '免责声明', link: '/智能手表  星序 - Astral Order/免责声明' }
-              ]
-            },
-            {
-              text: '其他说明',
-              collapsed: false,
-              items: [
-                { text: '版本更新', link: '/智能手表  星序 - Astral Order/版本更新' },
-                { text: '免责声明', link: '/智能手表  星序 - Astral Order/免责声明' }
-              ]
-            }
+            { text: '项目介绍', link: '/projects/新项目/项目介绍' },
+            { text: '功能说明', link: '/projects/新项目/功能说明' },
+            { text: '讨论区', link: '/projects/新项目/讨论区' }
           ]
         }
       ],
-      '/forum/': [
+      '/blog/': [
         {
-          text: '星跃论坛',
+          text: '技术博客',
           items: [
-            { text: '论坛首页', link: '/forum/' },
+            { text: '博客首页', link: '/blog/' },
             {
-              text: '热门话题',
+              text: '文章分类',
               collapsed: false,
               items: [
-                { text: '固件更新体验', link: '/forum/posts/firmware-update' },
-                { text: '自定义表盘', link: '/forum/posts/custom-watch-face' },
-                { text: '续航优化技巧', link: '/forum/posts/battery-tips' }
+                { text: '前端技术', link: '/blog/categories/frontend' },
+                { text: '后端开发', link: '/blog/categories/backend' },
+                { text: '项目经验', link: '/blog/categories/projects' }
               ]
             }
           ]
