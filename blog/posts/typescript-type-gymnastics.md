@@ -1,6 +1,6 @@
 ---
 title: TypeScript 类型体操入门
-category: 前端技术
+category: 嵌入式软件
 date: 2024-01-18
 author: Stellan W
 views: 1890

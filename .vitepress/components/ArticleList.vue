@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const props = defineProps({
   category: {
@@ -49,65 +49,118 @@ const props = defineProps({
   }
 })
 
-const articles = [
-  {
-    title: 'Vue3 组合式 API 最佳实践',
-    excerpt: '深入探讨 Vue3 组合式 API 的使用模式，包括 setup、ref、reactive、computed 等核心概念的最佳实践。',
-    category: '前端技术',
-    date: '2024-01-20',
-    author: 'Stellan W',
-    readTime: '5分钟',
-    views: 3280,
-    tags: ['Vue3', 'JavaScript', '前端'],
-    path: '/AstralLeap/blog/posts/vue3-composition-api'
-  },
-  {
-    title: 'TypeScript 类型体操入门',
-    excerpt: '从基础到进阶，系统学习 TypeScript 类型系统，掌握类型体操的核心技巧。',
-    category: '前端技术',
-    date: '2024-01-18',
-    author: 'Stellan W',
-    readTime: '8分钟',
-    views: 1890,
-    tags: ['TypeScript', '前端', '类型'],
-    path: '/AstralLeap/blog/posts/typescript-type-gymnastics'
-  },
-  {
-    title: 'Node.js 性能优化实战',
-    excerpt: '分享 Node.js 应用性能优化的实战经验，包括内存管理、异步编程、缓存策略等。',
-    category: '后端开发',
-    date: '2024-01-15',
-    author: 'Stellan W',
-    readTime: '6分钟',
-    views: 2560,
-    tags: ['Node.js', '性能', '后端'],
-    path: '/AstralLeap/blog/posts/nodejs-performance'
-  },
-  {
-    title: '智能手表项目开发总结',
-    excerpt: '回顾智能手表项目的开发历程，分享项目架构设计、技术选型和遇到的挑战。',
-    category: '项目经验',
-    date: '2024-01-10',
-    author: 'Stellan W',
-    readTime: '10分钟',
-    views: 4120,
-    tags: ['项目经验', '智能硬件', '架构'],
-    path: '/AstralLeap/blog/posts/smartwatch-project'
+const allPosts = ref([])
+
+const getFrontmatter = (content) => {
+  if (typeof content !== 'string') return {}
+  const match = content.match(/^---\s*\n([\s\S]*?)\n---\s*/)
+  if (!match) return {}
+  const fm = match[1]
+  const result = {}
+  let currentKey = ''
+  let currentList = []
+  const lines = fm.split('\n')
+  
+  lines.forEach(line => {
+    const trimmed = line.trim()
+    if (trimmed === '') {
+      if (currentKey && currentList.length > 0) {
+        result[currentKey] = currentList
+        currentKey = ''
+        currentList = []
+      }
+      return
+    }
+    
+    if (trimmed.startsWith('- ')) {
+      if (currentKey) {
+        currentList.push(trimmed.substring(2).replace(/^['"]|['"]$/g, ''))
+      }
+      return
+    }
+    
+    if (currentKey && currentList.length > 0) {
+      result[currentKey] = currentList
+      currentKey = ''
+      currentList = []
+    }
+    
+    const colonIndex = line.indexOf(':')
+    if (colonIndex === -1) return
+    
+    const key = line.substring(0, colonIndex).trim()
+    const value = line.substring(colonIndex + 1).trim()
+    
+    if (value === '') {
+      currentKey = key
+      currentList = []
+    } else if (value.startsWith('[') && value.endsWith(']')) {
+      result[key] = value.slice(1, -1).split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''))
+    } else {
+      result[key] = value.replace(/^['"]|['"]$/g, '')
+    }
+  })
+  
+  if (currentKey && currentList.length > 0) {
+    result[currentKey] = currentList
   }
-]
+  
+  return result
+}
+
+const getExcerpt = (content) => {
+  if (typeof content !== 'string') return '暂无摘要'
+  const fmMatch = content.match(/^---\s*\n([\s\S]*?)\n---\s*/)
+  let body = fmMatch ? content.substring(fmMatch[0].length) : content
+  body = body.replace(/```[\s\S]*?```/g, '')
+  body = body.replace(/`[^`]+`/g, '')
+  body = body.replace(/[#*>\-]/g, '')
+  body = body.trim()
+  const sentences = body.split(/。|！|？|\n/)
+  let excerpt = sentences.slice(0, 3).join('。').trim()
+  if (excerpt.length > 120) {
+    excerpt = excerpt.substring(0, 120) + '...'
+  }
+  return excerpt || '暂无摘要'
+}
+
+onMounted(async () => {
+  const postModules = import.meta.glob('../../blog/posts/*.md', { query: '?raw', import: 'default' })
+  const posts = []
+  
+  for (const [path, loadContent] of Object.entries(postModules)) {
+    const content = await loadContent()
+    const frontmatter = getFrontmatter(content)
+    const nameMatch = path.match(/\.\/blog\/posts\/(.+)\.md$/)
+    const slug = nameMatch ? nameMatch[1] : ''
+    
+    posts.push({
+      title: frontmatter.title || '无标题',
+      excerpt: frontmatter.excerpt || getExcerpt(content),
+      category: frontmatter.category || '',
+      date: frontmatter.date || '',
+      author: frontmatter.author || '',
+      tags: frontmatter.tags || [],
+      path: `/AstralLeap/blog/posts/${slug}`
+    })
+  }
+  
+  allPosts.value = posts.sort((a, b) => new Date(b.date) - new Date(a.date))
+})
 
 const filteredArticles = computed(() => {
-  if (!props.category) return articles
-  return articles.filter(a => a.category === props.category)
+  if (!props.category) return allPosts.value
+  return allPosts.value.filter(a => a.category === props.category)
 })
 
 const getCategoryColor = (category) => {
   const colors = {
-    '前端技术': 'linear-gradient(135deg, #8b5cf6, #4f46e5)',
-    '后端开发': 'linear-gradient(135deg, #06b6d4, #0ea5e9)',
-    '项目经验': 'linear-gradient(135deg, #10b981, #059669)'
+    '嵌入式软件': 'linear-gradient(135deg, #8b5cf6, #4f46e5)',
+    '硬件设计': 'linear-gradient(135deg, #06b6d4, #0ea5e9)',
+    '项目复盘': 'linear-gradient(135deg, #10b981, #059669)',
+    '随笔/工具': 'linear-gradient(135deg, #f59e0b, #ef4444)'
   }
-  return colors[category] || colors['前端技术']
+  return colors[category] || colors['嵌入式软件']
 }
 </script>
 
@@ -151,8 +204,6 @@ const getCategoryColor = (category) => {
   color: var(--vp-c-text-tertiary);
   font-size: 0.8rem;
 }
-
-
 
 .article-title {
   margin: 0 0 0.75rem 0;

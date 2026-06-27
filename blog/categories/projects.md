@@ -1,12 +1,12 @@
 ---
-title: 项目经验
+title: 项目复盘
 ---
 
-# 项目经验
+# 项目复盘
 
-项目实践、架构设计、踩坑记录
+软硬结合的项目复盘、从0到1的产品落地记录、踩坑指南
 
-<ArticleList category="项目经验" />
+<ArticleList category="项目复盘" />
 
 <script setup>
 import ArticleList from '../../.vitepress/components/ArticleList.vue'

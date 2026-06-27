@@ -72,9 +72,10 @@ export default defineConfig({
               text: '文章分类',
               collapsed: false,
               items: [
-                { text: '前端技术', link: '/blog/categories/frontend' },
-                { text: '后端开发', link: '/blog/categories/backend' },
-                { text: '项目经验', link: '/blog/categories/projects' }
+                { text: '嵌入式软件', link: '/blog/categories/embedded-sw' },
+                { text: '硬件设计', link: '/blog/categories/hardware-design' },
+                { text: '项目复盘', link: '/blog/categories/projects' },
+                { text: '随笔/工具', link: '/blog/categories/essays-tools' }
               ]
             }
           ]
