@@ -38,7 +38,7 @@ const categories = [
     name: '前端技术',
     desc: 'Vue、React、TypeScript 等前端技术分享',
     count: 2,
-    path: '/blog/categories/frontend',
+    path: '/AstralLeap/blog/categories/frontend',
     gradient: 'linear-gradient(135deg, #8b5cf6, #4f46e5)',
     icon: frontendIcon
   },
@@ -46,7 +46,7 @@ const categories = [
     name: '后端开发',
     desc: 'Node.js、数据库、API 设计等后端技术',
     count: 1,
-    path: '/blog/categories/backend',
+    path: '/AstralLeap/blog/categories/backend',
     gradient: 'linear-gradient(135deg, #06b6d4, #0ea5e9)',
     icon: backendIcon
   },
@@ -54,7 +54,7 @@ const categories = [
     name: '项目经验',
     desc: '项目实践、架构设计、踩坑记录',
     count: 1,
-    path: '/blog/categories/projects',
+    path: '/AstralLeap/blog/categories/projects',
     gradient: 'linear-gradient(135deg, #10b981, #059669)',
     icon: projectIcon
   }

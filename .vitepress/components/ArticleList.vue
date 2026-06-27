@@ -59,7 +59,7 @@ const articles = [
     readTime: '5分钟',
     views: 3280,
     tags: ['Vue3', 'JavaScript', '前端'],
-    path: './posts/vue3-composition-api.html'
+    path: '/AstralLeap/blog/posts/vue3-composition-api'
   },
   {
     title: 'TypeScript 类型体操入门',
@@ -70,7 +70,7 @@ const articles = [
     readTime: '8分钟',
     views: 1890,
     tags: ['TypeScript', '前端', '类型'],
-    path: './posts/typescript-type-gymnastics.html'
+    path: '/AstralLeap/blog/posts/typescript-type-gymnastics'
   },
   {
     title: 'Node.js 性能优化实战',
@@ -81,7 +81,7 @@ const articles = [
     readTime: '6分钟',
     views: 2560,
     tags: ['Node.js', '性能', '后端'],
-    path: './posts/nodejs-performance.html'
+    path: '/AstralLeap/blog/posts/nodejs-performance'
   },
   {
     title: '智能手表项目开发总结',
@@ -92,7 +92,7 @@ const articles = [
     readTime: '10分钟',
     views: 4120,
     tags: ['项目经验', '智能硬件', '架构'],
-    path: './posts/smartwatch-project.html'
+    path: '/AstralLeap/blog/posts/smartwatch-project'
   }
 ]
 
