@@ -19,7 +19,7 @@ tags:
 
 ## 1.1 修改设备树
 
-进入改路径后对改文件进行修改以适配mipi （路径为kernel-6.1/arch/arm64/boot/dts/rockchip/tspi-rk3566-user-v10-linux.dts）
+进入该路径后对该文件进行修改以适配mipi （路径为kernel-6.1/arch/arm64/boot/dts/rockchip/tspi-rk3566-user-v10-linux.dts）
 
 ```C
 / {

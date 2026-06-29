@@ -3,6 +3,7 @@ import { defineConfig } from 'vitepress'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   base: '/AstralLeap/',
+  lang: 'zh-CN',
   title: "星跃 | Astral Leap",
   description: "以星为向，以技为跃",
   head: [
@@ -12,6 +13,13 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     logo: '/logo.png',
+    outline: {
+      label: '页面大纲'
+    },
+    docFooter: {
+      prev: '上一篇',
+      next: '下一篇'
+    },
     search: {
       provider: 'local',
       options: {
