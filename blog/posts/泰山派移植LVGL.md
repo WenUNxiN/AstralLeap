@@ -16,7 +16,6 @@ tags:
 | :---------------------: | :-----: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | 2.4寸MIPI屏幕（带触摸） | 480*640 | [屏幕链接](https://item.taobao.com/item.htm?id=678874170680&mi_id=0000duW3kwnhti38udV4bjqLUHBNF3kEOwoZu59ZdOH1svU&spm=tbpc.boughtlist.suborder_itemtitle.1.61842e8dc0l8YR&skuId=5507656490931) |
 
-
 ## 1.1 修改设备树
 
 进入该路径后对该文件进行修改以适配mipi （路径为kernel-6.1/arch/arm64/boot/dts/rockchip/tspi-rk3566-user-v10-linux.dts）
@@ -187,7 +186,7 @@ tags:
 				swap-rg = <0>;
 				swap-gb = <0>;
 			};
-		};      
+		};    
 		ports {
             #address-cells = <1>;
             #size-cells = <0>;
@@ -227,4 +226,48 @@ tags:
 	status = "okay";
 	connect = <&vp0_out_dsi1>;
 };
+```
+
+
+# 2.1 移植LVGL
+
+1.执行以下命令获取源码
+
+```Shell
+git clone https://github.com/lvgl/lv_port_linux.git
+cd lv_port_linux/
+git submodule update --init --recursive
+```
+
+2.安装交叉编译器
+
+```Shell
+sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+```
+
+3.在lv_port_linux目录中，编写 `toolchain.cmake` ，方便用于指定交叉编译工具
+
+```Shell
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR arm64)
+ 
+set(tools "/usr")
+set(CMAKE_C_COMPILER /usr/bin/aarch64-linux-gnu-gcc)
+set(CMAKE_CXX_COMPILER /usr/bin/aarch64-linux-gnu-g++)
+```
+
+4.指定交叉编译工具之后，为了更加方便执行编译操作，在lv_port_linux目录中，编写一个小脚本 `build.sh`，**添加可执行权限`chmod +x build.sh`。**
+
+```Shell
+rm -rf build
+mkdir -p build
+cd build/
+cmake -DCMAKE_TOOLCHAIN_FILE="../toolchain.cmake" ..
+make -j32
+```
+
+5.如果提示缺少 `libevdev` **库，缺少其它一样按照即可。**
+
+```Shell
+sudo apt install libevdev-dev:arm64
 ```
