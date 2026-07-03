@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Astral Leap 风格方案对比</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+    background: #0f0f15;
+    color: #c0caf5;
+    line-height: 1.6;
+    padding: 40px 20px;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 8px;
+    background: linear-gradient(120deg, #bb9af7, #7dcfff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    text-align: center;
+    color: #565f89;
+    margin-bottom: 48px;
+    font-size: 0.95rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    border-radius: 16px;
+    padding: 28px;
+    position: relative;
+  }
+  .card h2 {
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card .desc {
+    font-size: 0.85rem;
+    color: #565f89;
+    margin-bottom: 20px;
+  }
+
+  /* ========== 方案 A：当前华丽风格 ========== */
+  .style-a {
+    background: rgba(36, 40, 59, 0.6);
+    border: 1px solid rgba(122, 162, 247, 0.15);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .style-a .preview-box {
+    background: rgba(26, 27, 38, 0.7);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(122, 162, 247, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(122, 162, 247, 0.1);
+  }
+  .style-a .code-preview {
+    background: #1a1d2e;
+    border-radius: 10px;
+    padding: 32px 16px 16px;
+    margin-top: 16px;
+    position: relative;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: #a9b1d6;
+    border: 1px solid rgba(122, 162, 247, 0.1);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .style-a .code-preview::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 28px;
+    background: #13151f;
+    border-radius: 10px 10px 0 0;
+    border-bottom: 1px solid rgba(122, 162, 247, 0.1);
+  }
+  .style-a .dots {
+    position: absolute;
+    top: 7px; left: 12px;
+    display: flex; gap: 6px;
+  }
+  .style-a .dots span {
+    width: 12px; height: 12px; border-radius: 50%;
+  }
+
+  /* ========== 方案 B：简约科技风（推荐） ========== */
+  .style-b {
+    background: #181820;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .style-b h2 { color: #e2e8f0; }
+  .style-b .preview-box {
+    background: #1e1e28;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+  .style-b .code-preview {
+    background: #16161e;
+    border-radius: 8px;
+    padding: 28px 16px 16px;
+    margin-top: 16px;
+    position: relative;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .style-b .code-preview::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 24px;
+    background: #121218;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .style-b .dots {
+    position: absolute;
+    top: 6px; left: 12px;
+    display: flex; gap: 6px;
+  }
+  .style-b .dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .style-b .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    background: rgba(99, 102, 241, 0.1);
+    color: #818cf8;
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    margin: 0 4px;
+  }
+
+  /* ========== 方案 C：极简内容优先 ========== */
+  .style-c {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+  }
+  .style-c h2 { color: #d4d4d4; }
+  .style-c .preview-box {
+    background: #1f1f1f;
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+  }
+  .style-c .code-preview {
+    background: #141414;
+    border-radius: 4px;
+    padding: 16px;
+    margin-top: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: #808080;
+    border: 1px solid #222;
+  }
+  .style-c .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-size: 0.75rem;
+    background: #252525;
+    color: #888;
+    border: 1px solid #333;
+    margin: 0 3px;
+  }
+
+  /* ========== 方案 D：低饱和度柔和风 ========== */
+  .style-d {
+    background: #1e1e2e;
+    border: 1px solid rgba(147, 161, 185, 0.12);
+  }
+  .style-d h2 { color: #cdd6f4; }
+  .style-d .preview-box {
+    background: #252536;
+    border: 1px solid rgba(147, 161, 185, 0.1);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+  }
+  .style-d .code-preview {
+    background: #1a1a2e;
+    border-radius: 12px;
+    padding: 28px 16px 16px;
+    margin-top: 16px;
+    position: relative;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: #9399b2;
+    border: 1px solid rgba(147, 161, 185, 0.08);
+  }
+  .style-d .code-preview::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 26px;
+    background: #161625;
+    border-radius: 12px 12px 0 0;
+    border-bottom: 1px solid rgba(147, 161, 185, 0.08);
+  }
+  .style-d .dots {
+    position: absolute;
+    top: 7px; left: 12px;
+    display: flex; gap: 6px;
+  }
+  .style-d .dots span {
+    width: 11px; height: 11px; border-radius: 50%;
+  }
+  .style-d .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    background: rgba(137, 148, 168, 0.1);
+    color: #8994a8;
+    border: 1px solid rgba(137, 148, 168, 0.15);
+    margin: 0 4px;
+  }
+
+  .recommend {
+    position: absolute;
+    top: -1px; right: 20px;
+    background: linear-gradient(120deg, #6366f1, #8b5cf6);
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 0 0 6px 6px;
+    font-weight: 600;
+  }
+
+  .btn-row {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: none;
+    font-weight: 500;
+  }
+
+  .style-a .btn-primary { background: linear-gradient(135deg, #7aa2f7, #bb9af7); color: #fff; box-shadow: 0 4px 15px rgba(122,162,247,0.3); }
+  .style-a .btn-secondary { background: rgba(122,162,247,0.1); color: #7aa2f7; border: 1px solid rgba(122,162,247,0.2); }
+
+  .style-b .btn-primary { background: #6366f1; color: #fff; }
+  .style-b .btn-secondary { background: transparent; color: #94a3b8; border: 1px solid rgba(255,255,255,0.1); }
+
+  .style-c .btn-primary { background: #333; color: #ccc; border-radius: 2px; }
+  .style-c .btn-secondary { background: transparent; color: #888; border: 1px solid #333; border-radius: 2px; }
+
+  .style-d .btn-primary { background: #6c7a94; color: #e2e8f0; border-radius: 8px; }
+  .style-d .btn-secondary { background: transparent; color: #8994a8; border: 1px solid rgba(147,161,185,0.2); border-radius: 8px; }
+
+  .section-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #565f89;
+    margin: 16px 0 8px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Astral Leap 风格方案对比</h1>
+  <p class="subtitle">四种不同视觉风格的组件预览，供你参考选择</p>
+
+  <div class="grid">
+    <!-- 方案 A：当前华丽风格 -->
+    <div class="card style-a">
+      <h2>方案 A：当前华丽风格</h2>
+      <p class="desc">强毛玻璃、紫蓝渐变、粒子星空、发光边框</p>
+      <div class="preview-box">
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:6px;color:#c0caf5;">技术博客</div>
+        <div style="font-size:0.8rem;color:#565f89;">记录点滴成长，分享技术心得</div>
+      </div>
+      <div class="section-title">代码块</div>
+      <div class="code-preview">
+        <div class="dots"><span style="background:#ff5f56"></span><span style="background:#ffbd2e"></span><span style="background:#27c93f"></span></div>
+        <div style="margin-top:4px;">const astro = new Starfield();</div>
+        <div>astro.init({ count: 250 });</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary">开始阅读</button>
+        <button class="btn btn-secondary">GitHub</button>
+      </div>
+    </div>
+
+    <!-- 方案 B：简约科技风 -->
+    <div class="card style-b">
+      <div class="recommend">推荐</div>
+      <h2>方案 B：简约科技风</h2>
+      <p class="desc">纯色层叠、细线分隔、低饱和强调色、干净排版</p>
+      <div class="preview-box">
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:6px;color:#e2e8f0;">技术博客</div>
+        <div style="font-size:0.8rem;color:#64748b;">记录点滴成长，分享技术心得</div>
+      </div>
+      <div class="section-title">代码块</div>
+      <div class="code-preview">
+        <div class="dots"><span style="background:#ff5f56"></span><span style="background:#ffbd2e"></span><span style="background:#27c93f"></span></div>
+        <div style="margin-top:4px;">const astro = new Starfield();</div>
+        <div>astro.init({ count: 250 });</div>
+      </div>
+      <div class="btn-row">
+        <span class="tag">ESP32</span>
+        <span class="tag">LVGL</span>
+        <span class="tag">嵌入式</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary">开始阅读</button>
+        <button class="btn btn-secondary">GitHub</button>
+      </div>
+    </div>
+
+    <!-- 方案 C：极简内容优先 -->
+    <div class="card style-c">
+      <h2>方案 C：极简内容优先</h2>
+      <p class="desc">无圆角、无阴影、无渐变、纯粹的内容展示</p>
+      <div class="preview-box">
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:6px;color:#d4d4d4;">技术博客</div>
+        <div style="font-size:0.8rem;color:#666;">记录点滴成长，分享技术心得</div>
+      </div>
+      <div class="section-title">代码块</div>
+      <div class="code-preview">
+        <div>const astro = new Starfield();</div>
+        <div>astro.init({ count: 250 });</div>
+      </div>
+      <div class="btn-row">
+        <span class="tag">ESP32</span>
+        <span class="tag">LVGL</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary">开始阅读</button>
+        <button class="btn btn-secondary">GitHub</button>
+      </div>
+    </div>
+
+    <!-- 方案 D：低饱和度柔和风 -->
+    <div class="card style-d">
+      <h2>方案 D：低饱和度柔和风</h2>
+      <p class="desc">柔和蓝灰色调、圆润卡片、温和hover、不刺眼</p>
+      <div class="preview-box">
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:6px;color:#cdd6f4;">技术博客</div>
+        <div style="font-size:0.8rem;color:#6c7086;">记录点滴成长，分享技术心得</div>
+      </div>
+      <div class="section-title">代码块</div>
+      <div class="code-preview">
+        <div class="dots"><span style="background:#ff5f56"></span><span style="background:#ffbd2e"></span><span style="background:#27c93f"></span></div>
+        <div style="margin-top:4px;">const astro = new Starfield();</div>
+        <div>astro.init({ count: 250 });</div>
+      </div>
+      <div class="btn-row">
+        <span class="tag">ESP32</span>
+        <span class="tag">LVGL</span>
+        <span class="tag">嵌入式</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary">开始阅读</button>
+        <button class="btn btn-secondary">GitHub</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
