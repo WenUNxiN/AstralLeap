@@ -1,33 +1,23 @@
----
-# https://vitepress.dev/reference/default-theme-home-page
+﻿---
 layout: home
 
 hero:
   name: "星跃 | Astral Leap"
-  # text: "Stellan W."
   tagline: 以星为向，以技为跃
-  image: 
+  image:
     src: /logo.png
-    alt: logo
+    alt: Astral Leap logo
   actions:
     - theme: brand
-      text: 博客
-      link: /blog/
+      text: 查看项目
+      link: /projects/
     - theme: alt
-      text: GitHub
-      link: https://github.com/WenUNxiN
-
-features:
-  - title:  智能手表 星序AstralOrder
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-    link: /projects/智能手表 星序AstralOrder/智能手表 星序AstralOrder
-  - title: 新项目 - 项目介绍
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-    link: /projects/新项目/项目介绍
-  - title: 新项目2 - 功能说明
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: 新项目3 - 功能说明
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+      text: 阅读博客
+      link: /blog/
 ---
 
+<script setup>
+import ProjectShowcase from './.vitepress/components/ProjectShowcase.vue'
+</script>
 
+<ProjectShowcase />

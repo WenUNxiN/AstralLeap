@@ -1,17 +1,27 @@
-<template>
+﻿<template>
   <div class="blog-stats">
+    <div class="stat-item">
+      <div class="stat-icon articles">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+      </div>
+      <div class="stat-value">{{ totalArticles }}</div>
+      <div class="stat-label">📝 文章总数</div>
+    </div>
+
     <div class="stat-item">
       <div class="stat-icon categories">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 11H5"></path>
-          <path d="M12 19c-4 0-7-3-7-7s3-7 7-7 7 3 7 7-3 7-7 7z"></path>
-          <path d="M12 19l-3-3"></path>
-          <path d="M12 19l3-3"></path>
-          <path d="M12 12l0-5"></path>
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
         </svg>
       </div>
-      <div class="stat-value">3</div>
-      <div class="stat-label">技术分类</div>
+      <div class="stat-value">{{ totalCategories }}</div>
+      <div class="stat-label">📂 技术分类</div>
     </div>
 
     <div class="stat-item">
@@ -21,37 +31,123 @@
           <line x1="7" y1="7" x2="7" y2="7"></line>
         </svg>
       </div>
-      <div class="stat-value">{{ tagsCount }}</div>
-      <div class="stat-label">标签数量</div>
+      <div class="stat-value">{{ totalTags }}</div>
+      <div class="stat-label">🏷️ 标签数量</div>
     </div>
 
     <div class="stat-item">
-      <div class="stat-icon projects">
+      <div class="stat-icon calendar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-          <path d="M2 17l10 5 10-5"></path>
-          <path d="M2 12l10 5 10-5"></path>
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
         </svg>
       </div>
-      <div class="stat-value">5</div>
-      <div class="stat-label">项目经验</div>
+      <div class="stat-value stat-value-small">{{ lastUpdate }}</div>
+      <div class="stat-label">🕐 最后更新</div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
-const articles = [
-  { tags: ['Vue3', 'JavaScript', '前端'] },
-  { tags: [] },
-  { tags: [] },
-  { tags: [] }
-]
+const allPosts = ref([])
 
-const tagsCount = computed(() => {
-  const allTags = articles.flatMap(article => article.tags || [])
-  return [...new Set(allTags)].length
+const getFrontmatter = (content) => {
+  if (typeof content !== 'string') return {}
+  const match = content.match(/^---\s*\n([\s\S]*?)\n---\s*/)
+  if (!match) return {}
+  const fm = match[1]
+  const result = {}
+  let currentKey = ''
+  let currentList = []
+  const lines = fm.split('\n')
+
+  lines.forEach(line => {
+    const trimmed = line.trim()
+    if (trimmed === '') {
+      if (currentKey && currentList.length > 0) {
+        result[currentKey] = currentList
+        currentKey = ''
+        currentList = []
+      }
+      return
+    }
+
+    if (trimmed.startsWith('- ')) {
+      if (currentKey) {
+        currentList.push(trimmed.substring(2).replace(/^['"]|['"]$/g, ''))
+      }
+      return
+    }
+
+    if (currentKey && currentList.length > 0) {
+      result[currentKey] = currentList
+      currentKey = ''
+      currentList = []
+    }
+
+    const colonIndex = line.indexOf(':')
+    if (colonIndex === -1) return
+
+    const key = line.substring(0, colonIndex).trim()
+    const value = line.substring(colonIndex + 1).trim()
+
+    if (value === '') {
+      currentKey = key
+      currentList = []
+    } else if (value.startsWith('[') && value.endsWith(']')) {
+      result[key] = value.slice(1, -1).split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''))
+    } else {
+      result[key] = value.replace(/^['"]|['"]$/g, '')
+    }
+  })
+
+  if (currentKey && currentList.length > 0) {
+    result[currentKey] = currentList
+  }
+
+  return result
+}
+
+onMounted(async () => {
+  const postModules = import.meta.glob('../../blog/posts/*.md', { query: '?raw', import: 'default' })
+  const posts = []
+
+  for (const [, loadContent] of Object.entries(postModules)) {
+    const content = await loadContent()
+    const frontmatter = getFrontmatter(content)
+    posts.push({
+      title: frontmatter.title || '',
+      tags: frontmatter.tags || [],
+      category: frontmatter.category || '',
+      date: frontmatter.date || '',
+    })
+  }
+
+  allPosts.value = posts.sort((a, b) => new Date(b.date) - new Date(a.date))
+})
+
+const totalArticles = computed(() => allPosts.value.length)
+
+const totalCategories = computed(() => {
+  const cats = new Set(allPosts.value.map(p => p.category).filter(Boolean))
+  return cats.size
+})
+
+const totalTags = computed(() => {
+  const tags = new Set(allPosts.value.flatMap(p => p.tags || []))
+  return tags.size
+})
+
+const lastUpdate = computed(() => {
+  if (allPosts.value.length === 0) return '-'
+  const dates = allPosts.value.map(p => new Date(p.date)).filter(d => !isNaN(d))
+  if (dates.length === 0) return '-'
+  const latest = new Date(Math.max(...dates))
+  return latest.toISOString().split('T')[0]
 })
 </script>
 
@@ -140,7 +236,7 @@ const tagsCount = computed(() => {
   box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
 }
 
-.stat-icon.projects {
+.stat-icon.calendar {
   background: linear-gradient(135deg, #10b981, #059669);
   box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
 }
@@ -152,6 +248,10 @@ const tagsCount = computed(() => {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.stat-value-small {
+  font-size: 1.2rem;
 }
 
 .stat-label {

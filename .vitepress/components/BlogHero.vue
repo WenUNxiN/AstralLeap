@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="blog-hero">
     <div class="hero-bg"></div>
     <div class="hero-bg-glow"></div>
@@ -32,6 +32,24 @@
 </template>
 
 <script setup>
+import { onMounted, ref } from 'vue'
+
+const heroRef = ref(null)
+
+onMounted(() => {
+  // 滚动触发动画
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed')
+      }
+    })
+  }, { threshold: 0.1 })
+
+  document.querySelectorAll('.blog-hero').forEach(el => {
+    observer.observe(el)
+  })
+})
 </script>
 
 <style scoped>
@@ -44,6 +62,14 @@
   border-radius: 28px;
   margin-bottom: 2rem;
   border: 1px solid rgba(139, 92, 246, 0.1);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.blog-hero.revealed {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .hero-bg {
@@ -52,7 +78,7 @@
   left: -50%;
   width: 200%;
   height: 300%;
-  background: 
+  background:
     radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 40%),
     radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 40%),
     radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.06) 0%, transparent 60%);
@@ -92,7 +118,7 @@
   align-items: center;
   justify-content: center;
   color: white;
-  box-shadow: 
+  box-shadow:
     0 12px 40px rgba(139, 92, 246, 0.35),
     0 4px 12px rgba(139, 92, 246, 0.2);
   position: relative;
@@ -191,5 +217,36 @@
 .author-title {
   font-size: 0.8rem;
   color: var(--vp-c-text-tertiary);
+}
+
+/* 响应式 */
+@media (max-width: 640px) {
+  .blog-hero {
+    padding: 3rem 1.5rem;
+  }
+  
+  .blog-hero h1 {
+    font-size: 2rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.15rem;
+  }
+  
+  .hero-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+  }
+  
+  .hero-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .icon-ring {
+    width: 76px;
+    height: 76px;
+  }
 }
 </style>

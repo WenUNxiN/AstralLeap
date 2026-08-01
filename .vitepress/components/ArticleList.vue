@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="article-list">
     <div
       v-for="article in filteredArticles"
@@ -9,7 +9,9 @@
         <span class="article-category" :style="{ background: getCategoryColor(article.category) }">
           {{ article.category }}
         </span>
-        <span class="article-date">{{ article.date }}</span>
+        <span class="article-date">📅 {{ article.date }}</span>
+        <span class="article-reading-time">⏱️ {{ article.readingTime }}</span>
+        <span v-if="article.views" class="article-views">👁️ {{ article.views }}</span>
       </div>
       <h3 class="article-title">
         <a :href="article.path">{{ article.title }}</a>
@@ -60,7 +62,7 @@ const getFrontmatter = (content) => {
   let currentKey = ''
   let currentList = []
   const lines = fm.split('\n')
-  
+
   lines.forEach(line => {
     const trimmed = line.trim()
     if (trimmed === '') {
@@ -71,26 +73,26 @@ const getFrontmatter = (content) => {
       }
       return
     }
-    
+
     if (trimmed.startsWith('- ')) {
       if (currentKey) {
         currentList.push(trimmed.substring(2).replace(/^['"]|['"]$/g, ''))
       }
       return
     }
-    
+
     if (currentKey && currentList.length > 0) {
       result[currentKey] = currentList
       currentKey = ''
       currentList = []
     }
-    
+
     const colonIndex = line.indexOf(':')
     if (colonIndex === -1) return
-    
+
     const key = line.substring(0, colonIndex).trim()
     const value = line.substring(colonIndex + 1).trim()
-    
+
     if (value === '') {
       currentKey = key
       currentList = []
@@ -100,11 +102,11 @@ const getFrontmatter = (content) => {
       result[key] = value.replace(/^['"]|['"]$/g, '')
     }
   })
-  
+
   if (currentKey && currentList.length > 0) {
     result[currentKey] = currentList
   }
-  
+
   return result
 }
 
@@ -124,27 +126,40 @@ const getExcerpt = (content) => {
   return excerpt || '暂无摘要'
 }
 
+const estimateReadingTime = (content) => {
+  if (typeof content !== 'string') return '1 分钟'
+  const fmMatch = content.match(/^---\s*\n([\s\S]*?)\n---\s*/)
+  let body = fmMatch ? content.substring(fmMatch[0].length) : content
+  // 中文约 300 字/分钟，英文约 200 词/分钟
+  const chineseChars = (body.match(/[\u4e00-\u9fff]/g) || []).length
+  const englishWords = (body.match(/[a-zA-Z]+/g) || []).length
+  const minutes = Math.max(1, Math.ceil(chineseChars / 300 + englishWords / 200))
+  return minutes + ' 分钟'
+}
+
 onMounted(async () => {
   const postModules = import.meta.glob('../../blog/posts/*.md', { query: '?raw', import: 'default' })
   const posts = []
-  
+
   for (const [path, loadContent] of Object.entries(postModules)) {
     const content = await loadContent()
     const frontmatter = getFrontmatter(content)
-    const nameMatch = path.match(/\.\/blog\/posts\/(.+)\.md$/)
+    const nameMatch = path.match(/blog\/posts\/(.+)\.md$/)
     const slug = nameMatch ? nameMatch[1] : ''
-    
+
     posts.push({
       title: frontmatter.title || '无标题',
       excerpt: frontmatter.excerpt || getExcerpt(content),
       category: frontmatter.category || '',
       date: frontmatter.date || '',
-      author: frontmatter.author || '',
+      author: frontmatter.author || 'Stellan W',
       tags: frontmatter.tags || [],
+      readingTime: estimateReadingTime(content),
+      views: frontmatter.views || 0,
       path: `/AstralLeap/blog/posts/${slug}`
     })
   }
-  
+
   allPosts.value = posts.sort((a, b) => new Date(b.date) - new Date(a.date))
 })
 
@@ -190,6 +205,7 @@ const getCategoryColor = (category) => {
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  align-items: center;
 }
 
 .article-category {
@@ -200,7 +216,9 @@ const getCategoryColor = (category) => {
   font-weight: 500;
 }
 
-.article-date {
+.article-date,
+.article-reading-time,
+.article-views {
   color: var(--vp-c-text-tertiary);
   font-size: 0.8rem;
 }

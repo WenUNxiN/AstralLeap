@@ -1,0 +1,8 @@
+{
+  "icon": "⌚",
+  "name": "智能手表 星序AstralOrder",
+  "gradient": "linear-gradient(135deg, #7aa2f7 0%, #bb9af7 100%)",
+  "tech": ["RV1106", "Buildroot", "LVGL", "MIPI DSI"],
+  "desc": "基于 Luckfox Pico 的全栈嵌入式产品开发：硬件设计、Linux 移植、驱动开发、LVGL 图形界面、移动客户端",
+  "status": "进行中"
+}
