@@ -1,0 +1,61 @@
+﻿{
+    "icon":  "🏠",
+    "name":  "智能家居网关",
+    "gradient":  "linear-gradient(135deg, #e0af68, #f7768e)",
+    "tech":  [
+                 "ESP32",
+                 "Zigbee",
+                 "MQTT",
+                 "HomeAssistant"
+             ],
+    "desc":  "多协议智能家居网关，支持 Zigbee、Wi-Fi、BLE 设备接入，无缝对接 Home Assistant",
+    "status":  "规划中",
+    "statusColor":  "#e0af68",
+    "sidebar":  [
+                    {
+                        "text":  "项目概述",
+                        "link":  "项目概述"
+                    },
+                    {
+                        "text":  "协议支持",
+                        "collapsed":  false,
+                        "items":  [
+                                      {
+                                          "text":  "Zigbee 协议",
+                                          "link":  "Zigbee协议"
+                                      },
+                                      {
+                                          "text":  "MQTT 通信",
+                                          "link":  "MQTT通信"
+                                      },
+                                      {
+                                          "text":  "BLE  Mesh",
+                                          "link":  "BLE_Mesh"
+                                      }
+                                  ]
+                    },
+                    {
+                        "text":  "硬件设计",
+                        "collapsed":  false,
+                        "items":  [
+                                      {
+                                          "text":  "原理图",
+                                          "link":  "原理图"
+                                      },
+                                      {
+                                          "text":  "PCB  Layout",
+                                          "link":  "PCB_Layout"
+                                      }
+                                  ]
+                    },
+                    {
+                        "text":  "软件架构",
+                        "link":  "软件架构"
+                    },
+                    {
+                        "text":  "接入指南",
+                        "link":  "接入指南"
+                    }
+                ],
+    "link":  "/AstralLeap/projects/4. SmartHome-Gateway/项目概述"
+}

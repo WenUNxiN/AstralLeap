@@ -1,8 +1,26 @@
 {
   "icon": "⌚",
   "name": "智能手表 星序AstralOrder",
-  "gradient": "linear-gradient(135deg, #7aa2f7 0%, #bb9af7 100%)",
+  "gradient": "linear-gradient(135deg, #7aa2f7, #bb9af7)",
   "tech": ["RV1106", "Buildroot", "LVGL", "MIPI DSI"],
   "desc": "基于 Luckfox Pico 的全栈嵌入式产品开发：硬件设计、Linux 移植、驱动开发、LVGL 图形界面、移动客户端",
-  "status": "进行中"
+  "status": "进行中",
+  "sidebar": [
+    { "text": "项目介绍", "link": "智能手表 星序AstralOrder" },
+    { "text": "用户操作说明", "collapsed": false, "items": [
+      { "text": "硬件操作", "link": "硬件操作" },
+      { "text": "手机客户端", "link": "手机客户端" },
+      { "text": "常见问题", "link": "常见问题" }
+    ]},
+    { "text": "技术资料", "collapsed": false, "items": [
+      { "text": "硬件规格", "link": "硬件规格" },
+      { "text": "软件架构", "link": "软件架构" },
+      { "text": "开发指南", "link": "开发指南" }
+    ]},
+    { "text": "其他说明", "collapsed": false, "items": [
+      { "text": "版本更新", "link": "版本更新" },
+      { "text": "免责声明", "link": "免责声明" }
+    ]},
+    { "text": "讨论区", "link": "讨论区" }
+  ]
 }

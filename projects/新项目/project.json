@@ -1,9 +1,0 @@
-{
-  "icon": "📦",
-  "name": "新项目",
-  "gradient": "linear-gradient(135deg, #e0af68 0%, #f7768e 100%)",
-  "tech": ["待定"],
-  "desc": "项目功能与进度说明，从 0 到 1 的产品落地记录",
-  "status": "规划中",
-  "statusColor": "#e0af68"
-}

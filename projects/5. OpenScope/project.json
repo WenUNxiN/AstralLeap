@@ -1,0 +1,69 @@
+﻿{
+    "icon":  "📊",
+    "name":  "开源数字示波器",
+    "gradient":  "linear-gradient(135deg, #bb9af7, #f7768e)",
+    "tech":  [
+                 "FPGA",
+                 "ADC",
+                 "LCD",
+                 "DSP"
+             ],
+    "desc":  "基于 FPGA 的高精度数字示波器项目，支持多通道采集、实时信号处理与波形显示",
+    "status":  "构思中",
+    "statusColor":  "#bb9af7",
+    "sidebar":  [
+                    {
+                        "text":  "项目介绍",
+                        "link":  "项目介绍"
+                    },
+                    {
+                        "text":  "硬件架构",
+                        "collapsed":  false,
+                        "items":  [
+                                      {
+                                          "text":  "ADC 前端",
+                                          "link":  "ADC前端"
+                                      },
+                                      {
+                                          "text":  "FPGA 逻辑",
+                                          "link":  "FPGA逻辑"
+                                      },
+                                      {
+                                          "text":  "显示模块",
+                                          "link":  "显示模块"
+                                      }
+                                  ]
+                    },
+                    {
+                        "text":  "信号处理",
+                        "collapsed":  false,
+                        "items":  [
+                                      {
+                                          "text":  "FFT 变换",
+                                          "link":  "FFT变换"
+                                      },
+                                      {
+                                          "text":  "滤波器设计",
+                                          "link":  "滤波器设计"
+                                      },
+                                      {
+                                          "text":  "触发系统",
+                                          "link":  "触发系统"
+                                      }
+                                  ]
+                    },
+                    {
+                        "text":  "固件开发",
+                        "link":  "固件开发"
+                    },
+                    {
+                        "text":  "上位机软件",
+                        "link":  "上位机软件"
+                    },
+                    {
+                        "text":  "版本记录",
+                        "link":  "版本记录"
+                    }
+                ],
+    "link":  "/AstralLeap/projects/5. OpenScope/项目介绍"
+}
