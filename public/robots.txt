@@ -1,8 +1,8 @@
-﻿User-agent: *
+User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://your-domain.com/sitemap.xml
+Sitemap: https://astral-leap.dev/sitemap.xml
 
 # Crawl-delay
 Crawl-delay: 1

@@ -1,5 +1,5 @@
-﻿<template>
-  <div class="blog-hero">
+<template>
+  <div class="blog-hero" ref="heroRef">
     <div class="hero-bg"></div>
     <div class="hero-bg-glow"></div>
     <div class="hero-content">
@@ -32,22 +32,15 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 const heroRef = ref(null)
 
 onMounted(() => {
-  // 滚动触发动画
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('revealed')
-      }
-    })
-  }, { threshold: 0.1 })
-
-  document.querySelectorAll('.blog-hero').forEach(el => {
-    observer.observe(el)
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      heroRef.value?.classList.add('revealed')
+    }, 100)
   })
 })
 </script>
@@ -224,29 +217,23 @@ onMounted(() => {
   .blog-hero {
     padding: 3rem 1.5rem;
   }
-  
   .blog-hero h1 {
     font-size: 2rem;
   }
-  
   .hero-subtitle {
     font-size: 1.15rem;
   }
-  
   .hero-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 18px;
+    width: 64px;
+    height: 64px;
   }
-  
   .hero-icon svg {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
   }
-  
   .icon-ring {
-    width: 76px;
-    height: 76px;
+    width: 80px;
+    height: 80px;
   }
 }
 </style>

@@ -27,6 +27,8 @@
 </template>
 
 <script setup>
+import { getFrontmatter } from '../utils/frontmatter'
+
 import { ref, computed, h, onMounted } from 'vue'
 
 const softwareIcon = h('path', { d: 'M20 18v-4a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v4' })
@@ -36,62 +38,6 @@ const lifeIcon = h('path', { d: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z' })
 
 const allPosts = ref([])
 
-const getFrontmatter = (content) => {
-  if (typeof content !== 'string') return {}
-  const match = content.match(/^---\s*\n([\s\S]*?)\n---\s*/)
-  if (!match) return {}
-  const fm = match[1]
-  const result = {}
-  let currentKey = ''
-  let currentList = []
-  const lines = fm.split('\n')
-  
-  lines.forEach(line => {
-    const trimmed = line.trim()
-    if (trimmed === '') {
-      if (currentKey && currentList.length > 0) {
-        result[currentKey] = currentList
-        currentKey = ''
-        currentList = []
-      }
-      return
-    }
-    
-    if (trimmed.startsWith('- ')) {
-      if (currentKey) {
-        currentList.push(trimmed.substring(2).replace(/^['"]|['"]$/g, ''))
-      }
-      return
-    }
-    
-    if (currentKey && currentList.length > 0) {
-      result[currentKey] = currentList
-      currentKey = ''
-      currentList = []
-    }
-    
-    const colonIndex = line.indexOf(':')
-    if (colonIndex === -1) return
-    
-    const key = line.substring(0, colonIndex).trim()
-    const value = line.substring(colonIndex + 1).trim()
-    
-    if (value === '') {
-      currentKey = key
-      currentList = []
-    } else if (value.startsWith('[') && value.endsWith(']')) {
-      result[key] = value.slice(1, -1).split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''))
-    } else {
-      result[key] = value.replace(/^['"]|['"]$/g, '')
-    }
-  })
-  
-  if (currentKey && currentList.length > 0) {
-    result[currentKey] = currentList
-  }
-  
-  return result
-}
 
 onMounted(async () => {
   const postModules = import.meta.glob('../../blog/posts/*.md', { query: '?raw', import: 'default' })
@@ -164,6 +110,7 @@ const categories = computed(() => [
 const totalArticles = computed(() => {
   return Object.values(categoryStats.value).reduce((sum, count) => sum + count, 0)
 })
+
 </script>
 
 <style scoped>
@@ -175,12 +122,12 @@ const totalArticles = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .section-title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   padding-left: 0.75rem;
 }
 

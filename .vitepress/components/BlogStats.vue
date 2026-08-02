@@ -1,13 +1,13 @@
-﻿<template>
+<template>
   <div class="blog-stats">
     <div class="stat-item">
       <div class="stat-icon articles">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="16" y1="13" x2="8" y2="13"></line>
-          <line x1="16" y1="17" x2="8" y2="17"></line>
-          <polyline points="10 9 9 9 8 9"></polyline>
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
         </svg>
       </div>
       <div class="stat-value">{{ totalArticles }}</div>
@@ -17,7 +17,7 @@
     <div class="stat-item">
       <div class="stat-icon categories">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
         </svg>
       </div>
       <div class="stat-value">{{ totalCategories }}</div>
@@ -27,8 +27,8 @@
     <div class="stat-item">
       <div class="stat-icon tags">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-          <line x1="7" y1="7" x2="7" y2="7"></line>
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+          <line x1="7" y1="7" x2="7" y2="7"/>
         </svg>
       </div>
       <div class="stat-value">{{ totalTags }}</div>
@@ -38,10 +38,10 @@
     <div class="stat-item">
       <div class="stat-icon calendar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-          <line x1="16" y1="2" x2="16" y2="6"></line>
-          <line x1="8" y1="2" x2="8" y2="6"></line>
-          <line x1="3" y1="10" x2="21" y2="10"></line>
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
         </svg>
       </div>
       <div class="stat-value stat-value-small">{{ lastUpdate }}</div>
@@ -52,65 +52,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { getFrontmatter } from '../utils/frontmatter'
 
 const allPosts = ref([])
-
-const getFrontmatter = (content) => {
-  if (typeof content !== 'string') return {}
-  const match = content.match(/^---\s*\n([\s\S]*?)\n---\s*/)
-  if (!match) return {}
-  const fm = match[1]
-  const result = {}
-  let currentKey = ''
-  let currentList = []
-  const lines = fm.split('\n')
-
-  lines.forEach(line => {
-    const trimmed = line.trim()
-    if (trimmed === '') {
-      if (currentKey && currentList.length > 0) {
-        result[currentKey] = currentList
-        currentKey = ''
-        currentList = []
-      }
-      return
-    }
-
-    if (trimmed.startsWith('- ')) {
-      if (currentKey) {
-        currentList.push(trimmed.substring(2).replace(/^['"]|['"]$/g, ''))
-      }
-      return
-    }
-
-    if (currentKey && currentList.length > 0) {
-      result[currentKey] = currentList
-      currentKey = ''
-      currentList = []
-    }
-
-    const colonIndex = line.indexOf(':')
-    if (colonIndex === -1) return
-
-    const key = line.substring(0, colonIndex).trim()
-    const value = line.substring(colonIndex + 1).trim()
-
-    if (value === '') {
-      currentKey = key
-      currentList = []
-    } else if (value.startsWith('[') && value.endsWith(']')) {
-      result[key] = value.slice(1, -1).split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''))
-    } else {
-      result[key] = value.replace(/^['"]|['"]$/g, '')
-    }
-  })
-
-  if (currentKey && currentList.length > 0) {
-    result[currentKey] = currentList
-  }
-
-  return result
-}
 
 onMounted(async () => {
   const postModules = import.meta.glob('../../blog/posts/*.md', { query: '?raw', import: 'default' })
@@ -131,12 +75,10 @@ onMounted(async () => {
 })
 
 const totalArticles = computed(() => allPosts.value.length)
-
 const totalCategories = computed(() => {
   const cats = new Set(allPosts.value.map(p => p.category).filter(Boolean))
   return cats.size
 })
-
 const totalTags = computed(() => {
   const tags = new Set(allPosts.value.flatMap(p => p.tags || []))
   return tags.size
