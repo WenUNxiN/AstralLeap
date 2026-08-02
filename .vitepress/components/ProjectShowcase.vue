@@ -1,6 +1,6 @@
 <template>
   <div class="projects-grid">
-    <div v-for="(project, i) in projects" :key="project.name" class="project-card" :style="{ animationDelay: i * 0.1 + 's' }">
+    <div v-for="(project, i) in sortedProjects" :key="project.name" class="project-card" :style="{ animationDelay: i * 0.1 + 's' }">
       <div class="card-accent" :style="{ background: project.gradient }"></div>
       <div class="card-body">
         <div class="card-top">
@@ -26,9 +26,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const projects = ref([])
+
+const sortedProjects = computed(() => {
+  return [...projects.value].sort((a, b) => {
+    const numA = parseFloat((a.folder.match(/^(\d+)/) || ['0'])[0])
+    const numB = parseFloat((b.folder.match(/^(\d+)/) || ['0'])[0])
+    return numB - numA
+  })
+})
 
 onMounted(async () => {
   try {
@@ -42,11 +50,11 @@ onMounted(async () => {
         const linkMatch = path.match(/projects\/(.+?)\/project\.json$/)
         const slug = linkMatch ? linkMatch[1] : ''
         
-        // 使用 project.json 中的 link，如果没有则使用默认路径
         const link = data.link || ('/AstralLeap/projects/' + slug + '/' + slug)
         
         list.push({
           ...data,
+          folder: slug,
           link: link,
           statusColor: data.statusColor || 'var(--vp-c-brand)'
         })

@@ -1,61 +1,21 @@
-﻿{
-    "icon":  "🤖",
-    "name":  "边缘 AI 计算平台",
-    "gradient":  "linear-gradient(135deg, #9ece6a, #7dcfff)",
-    "tech":  [
-                 "RV1106",
-                 "NPU",
-                 "TensorRT",
-                 "ONNX"
-             ],
-    "desc":  "基于 Luckfox Pico 的边缘 AI 推理平台，支持模型部署、量化优化与多场景应用",
-    "status":  "开发中",
-    "statusColor":  "#9ece6a",
-    "sidebar":  [
-                    {
-                        "text":  "项目概述",
-                        "link":  "项目概述"
-                    },
-                    {
-                        "text":  "模型部署",
-                        "collapsed":  false,
-                        "items":  [
-                                      {
-                                          "text":  "ONNX 转换",
-                                          "link":  "ONNX转换"
-                                      },
-                                      {
-                                          "text":  "量化优化",
-                                          "link":  "量化优化"
-                                      },
-                                      {
-                                          "text":  "推理测试",
-                                          "link":  "推理测试"
-                                      }
-                                  ]
-                    },
-                    {
-                        "text":  "硬件适配",
-                        "collapsed":  false,
-                        "items":  [
-                                      {
-                                          "text":  "NPU 驱动",
-                                          "link":  "NPU驱动"
-                                      },
-                                      {
-                                          "text":  "内存优化",
-                                          "link":  "内存优化"
-                                      }
-                                  ]
-                    },
-                    {
-                        "text":  "应用案例",
-                        "link":  "应用案例"
-                    },
-                    {
-                        "text":  "开发日志",
-                        "link":  "开发日志"
-                    }
-                ],
-    "link":  "/AstralLeap/projects/3. EdgeAI-Platform/项目概述"
+{
+  "icon": "🤖",
+  "name": "边缘 AI 计算平台",
+  "gradient": "linear-gradient(135deg, #9ece6a, #7dcfff)",
+  "tech": ["RV1106", "NPU", "TensorRT", "ONNX"],
+  "desc": "基于 Luckfox Pico 的边缘 AI 推理平台",
+  "status": "开发中",
+  "statusColor": "#9ece6a",
+  "link": "/AstralLeap/projects/3. EdgeAI-Platform/项目概述",
+  "sidebar": [
+    { "text": "项目概述", "link": "项目概述" },
+    { "text": "模型部署", "collapsed": false, "items": [
+      { "text": "ONNX 转换", "link": "ONNX转换" },
+      { "text": "量化优化", "link": "量化优化" }
+    ]},
+    { "text": "硬件适配", "collapsed": false, "items": [
+      { "text": "NPU 驱动", "link": "NPU驱动" }
+    ]},
+    { "text": "开发日志", "link": "开发日志" }
+  ]
 }

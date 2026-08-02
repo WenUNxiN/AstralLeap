@@ -14,12 +14,22 @@ function getProjectSidebar(dir) {
         if (item.items) result.items = addBase(item.items)
         return result
       })
-      return [{ text: dir, collapsed: false, items: addBase(json.sidebar) }]
+      return [{ text: dir.replace(/^[\d.]+\s*/, ''), collapsed: false, items: addBase(json.sidebar) }]
     }
-  } catch (e) {
-    console.warn('Failed to load sidebar:', dir, e)
+  } catch (e) { console.warn('Failed:', dir) }
+  return [{ text: dir.replace(/^[\d.]+\s*/, ''), collapsed: false, items: [] }]
+}
+
+function getSortedProjectDirs() {
+  const projectsDir = join(process.cwd(), 'projects')
+  const dirs = readdirSync(projectsDir).filter(d => statSync(join(projectsDir, d)).isDirectory())
+  
+  const getNum = (name) => {
+    const m = name.match(/^(\d+)/)
+    return m ? parseInt(m[1]) : 0
   }
-  return [{ text: dir, collapsed: false, items: [] }]
+  
+  return dirs.sort((a, b) => getNum(b) - getNum(a))
 }
 
 export default defineConfig({
@@ -27,46 +37,34 @@ export default defineConfig({
   lang: 'zh-CN',
   title: "星跃 | Astral Leap",
   description: "嵌入式工程师 Stellan W 的个人博客",
-
-  head: [
-    ['link', { rel: 'icon', href: '/AstralLeap/favicon.ico' }],
-    ['meta', { name: 'keywords', content: '嵌入式,MCU,RTOS,LVGL,硬件设计,RV1106' }],
-    ['meta', { name: 'author', content: 'Stellan W' }],
-  ],
-
+  head: [['link', { rel: 'icon', href: '/AstralLeap/favicon.ico' }]],
   themeConfig: {
     logo: '/logo.png',
     outline: { label: '页面大纲', level: [2, 3] },
     docFooter: { prev: '上一篇', next: '下一篇' },
-    footer: { message: '以星为向，以技为跃', copyright: '© ' + new Date().getFullYear() },
+    footer: { message: '以星为向，以技为跃' },
     search: { provider: 'local' },
-
     nav: [
       { text: '主页', link: '/' },
       { text: '项目', link: '/projects/' },
       { text: '博客', link: '/blog/' },
       { text: '关于我', link: '/about/' },
     ],
-
     sidebar: (() => {
       const sidebar = {}
-      const dirs = readdirSync('projects').filter(d => statSync(join('projects', d)).isDirectory())
+      const dirs = getSortedProjectDirs()
+      console.log('Sorted project dirs:', dirs)
       for (const dir of dirs) {
         sidebar['/projects/' + dir + '/'] = getProjectSidebar(dir)
       }
-      sidebar['/blog/'] = [{
-        text: '技术博客',
-        items: [
-          { text: '博客首页', link: '/blog/' },
-          { text: '嵌入式软件', link: '/blog/categories/embedded-sw' },
-          { text: '硬件设计', link: '/blog/categories/hardware-design' },
-          { text: '项目复盘', link: '/blog/categories/projects' },
-          { text: '随笔/工具', link: '/blog/categories/essays-tools' },
-        ]
-      }]
+      sidebar['/blog/'] = [{ text: '技术博客', items: [
+        { text: '博客首页', link: '/blog/' },
+        { text: '嵌入式软件', link: '/blog/categories/embedded-sw' },
+        { text: '硬件设计', link: '/blog/categories/hardware-design' },
+        { text: '项目复盘', link: '/blog/categories/projects' },
+        { text: '随笔/工具', link: '/blog/categories/essays-tools' },
+      ]}]
       return sidebar
     })(),
   },
-
-  sitemap: { hostname: 'https://your-domain.com' }
 })
