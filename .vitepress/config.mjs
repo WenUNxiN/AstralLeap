@@ -48,7 +48,6 @@ export default defineConfig({
       { text: '主页', link: '/' },
       { text: '项目', link: '/projects/' },
       { text: '博客', link: '/blog/' },
-      { text: '关于我', link: '/about/' },
     ],
     sidebar: (() => {
       const sidebar = {}

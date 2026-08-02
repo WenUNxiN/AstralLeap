@@ -1,4 +1,4 @@
-﻿---
+---
 layout: home
 
 hero:
@@ -20,4 +20,4 @@ hero:
 import ProjectShowcase from './.vitepress/components/ProjectShowcase.vue'
 </script>
 
-<ProjectShowcase />
+<ProjectShowcase :limit="4" />
