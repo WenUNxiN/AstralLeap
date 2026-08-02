@@ -16,6 +16,90 @@
   filter: brightness(0) invert(1) opacity(1);
 }
 
+
+/* ===== Site Footer ===== */
+.site-footer {
+  padding: 2rem 1.5rem 1.5rem;
+  margin-top: 3rem;
+}
+
+.footer-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--vp-c-divider) 20%, var(--vp-c-divider) 80%, transparent);
+  margin-bottom: 1.5rem;
+}
+
+.footer-content {
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.footer-copyright {
+  font-size: 0.85rem;
+  color: var(--vp-c-text-2);
+  font-weight: 500;
+}
+
+.footer-separator {
+  color: var(--vp-c-text-3);
+  font-size: 0.75rem;
+}
+
+.footer-powered {
+  font-size: 0.8rem;
+  color: var(--vp-c-text-3);
+}
+
+.footer-powered a {
+  color: var(--vp-c-brand);
+  text-decoration: none;
+}
+
+.footer-powered a:hover {
+  text-decoration: underline;
+}
+
+.footer-stats {
+  gap: 0.75rem;
+}
+
+.stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.75rem;
+  background: var(--vp-c-bg-alt);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: var(--vp-c-text-2);
+}
+
+.stat-icon {
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.footer-tagline {
+  font-size: 0.75rem;
+  color: var(--vp-c-text-3);
+  letter-spacing: 0.05em;
+  margin-top: 0.25rem;
+}
+
+
 /**
  * Customize default theme styling by overriding CSS variables:
  * https://github.com/vuejs/vitepress/blob/main/src/client/theme-default/styles/vars.css

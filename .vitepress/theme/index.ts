@@ -32,7 +32,7 @@ const SocialIcons = {
 }
 
 // 不蒜子访问量统计（单一加载源）
-const SiteStats = {
+const SiteFooter = {
   mounted() {
     if (typeof window === 'undefined') return
     if (window.__busuanzi_loaded) return
@@ -44,14 +44,32 @@ const SiteStats = {
     document.body.appendChild(script)
   },
   render() {
-    return h("div", {
-      style: { textAlign: "center", padding: "16px", fontSize: "13px", color: "var(--vp-c-text-3)", borderTop: "1px solid var(--vp-c-divider)" }
-    }, [
-      h("span", { id: "busuanzi_container_site_pv", style: { marginRight: "16px" } }, [
-        "👁️ 总访问量：", h("span", { id: "busuanzi_value_site_pv" }, "--")
-      ]),
-      h("span", { id: "busuanzi_container_site_uv" }, [
-        "👤 总访客：", h("span", { id: "busuanzi_value_site_uv" }, "--")
+    return h("footer", { class: "site-footer" }, [
+      h("div", { class: "footer-divider" }),
+      h("div", { class: "footer-content" }, [
+        h("div", { class: "footer-row" }, [
+          h("span", { class: "footer-copyright" }, "© 2026 Stellan W"),
+          
+        ]),
+        h("div", { class: "footer-row footer-stats" }, [
+          h("span", { class: "stat-pill" }, [
+            h("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", class: "stat-icon" }, [
+              h("path", { d: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" }),
+              h("circle", { cx: "12", cy: "12", r: "3" })
+            ]),
+            h("span", { id: "busuanzi_value_site_pv" }, "--"), " 次访问"
+          ]),
+          h("span", { class: "stat-pill" }, [
+            h("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", class: "stat-icon" }, [
+              h("path", { d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" }),
+              h("circle", { cx: "9", cy: "7", r: "4" }),
+              h("path", { d: "M23 21v-2a4 4 0 0 0-3-3.87" }),
+              h("path", { d: "M16 3.13a4 4 0 0 1 0 7.75" })
+            ]),
+            h("span", { id: "busuanzi_value_site_uv" }, "--"), " 位访客"
+          ])
+        ]),
+        h("div", { class: "footer-row footer-tagline" }, "以星为向，以技为跃 ✦ Astral Leap")
       ])
     ])
   }
@@ -63,7 +81,7 @@ export default {
     return h(DefaultTheme.Layout, null, {
       "layout-top": () => h(StarfieldBackground),
       "nav-bar-content-after": () => h(SocialIcons),
-      "layout-bottom": () => h(SiteStats),
+      "layout-bottom": () => h(SiteFooter),
       "doc-after": () => h(BackToTop)
     })
   },

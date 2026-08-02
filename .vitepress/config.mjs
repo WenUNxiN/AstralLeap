@@ -42,7 +42,6 @@ export default defineConfig({
     logo: '/logo.png',
     outline: { label: '页面大纲', level: [2, 3] },
     docFooter: { prev: '上一篇', next: '下一篇' },
-    footer: { message: '以星为向，以技为跃' },
     search: { provider: 'local' },
     nav: [
       { text: '主页', link: '/' },
