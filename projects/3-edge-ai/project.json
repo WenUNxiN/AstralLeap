@@ -6,7 +6,7 @@
   "desc": "基于 Luckfox Pico 的边缘 AI 推理平台",
   "status": "开发中",
   "statusColor": "#9ece6a",
-  "link": "/AstralLeap/projects/3. EdgeAI-Platform/项目概述",
+  "link": "/AstralLeap/projects/3-edge-ai/项目概述",
   "sidebar": [
     { "text": "项目概述", "link": "项目概述" },
     { "text": "模型部署", "collapsed": false, "items": [

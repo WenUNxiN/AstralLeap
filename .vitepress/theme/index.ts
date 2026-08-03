@@ -3,7 +3,6 @@ import type { Theme } from "vitepress"
 import DefaultTheme from "vitepress/theme"
 import "./style.css"
 import StarfieldBackground from "../components/StarfieldBackground.vue"
-import BackToTop from "../components/BackToTop.vue"
 
 const SocialIcons = {
   render() {
@@ -31,13 +30,11 @@ const SocialIcons = {
   }
 }
 
-// 不蒜子访问量统计（单一加载源）
 const SiteFooter = {
   mounted() {
     if (typeof window === 'undefined') return
     if (window.__busuanzi_loaded) return
     window.__busuanzi_loaded = true
-
     const script = document.createElement('script')
     script.src = '//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js'
     script.async = true
@@ -48,8 +45,7 @@ const SiteFooter = {
       h("div", { class: "footer-divider" }),
       h("div", { class: "footer-content" }, [
         h("div", { class: "footer-row" }, [
-          h("span", { class: "footer-copyright" }, "© 2026 Stellan W"),
-          
+          h("span", { class: "footer-copyright" }, "© 2026 Stellan W")
         ]),
         h("div", { class: "footer-row footer-stats" }, [
           h("span", { class: "stat-pill" }, [
@@ -81,8 +77,7 @@ export default {
     return h(DefaultTheme.Layout, null, {
       "layout-top": () => h(StarfieldBackground),
       "nav-bar-content-after": () => h(SocialIcons),
-      "layout-bottom": () => h(SiteFooter),
-      "doc-after": () => h(BackToTop)
+      "layout-bottom": () => h(SiteFooter)
     })
   },
   enhanceApp({ app, router }) {

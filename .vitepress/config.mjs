@@ -14,21 +14,19 @@ function getProjectSidebar(dir) {
         if (item.items) result.items = addBase(item.items)
         return result
       })
-      return [{ text: dir.replace(/^[\d.]+\s*/, ''), collapsed: false, items: addBase(json.sidebar) }]
+      return [{ text: json.name || dir, collapsed: false, items: addBase(json.sidebar) }]
     }
   } catch (e) { console.warn('Failed:', dir) }
-  return [{ text: dir.replace(/^[\d.]+\s*/, ''), collapsed: false, items: [] }]
+  return [{ text: dir, collapsed: false, items: [] }]
 }
 
 function getSortedProjectDirs() {
   const projectsDir = join(process.cwd(), 'projects')
   const dirs = readdirSync(projectsDir).filter(d => statSync(join(projectsDir, d)).isDirectory())
-  
   const getNum = (name) => {
     const m = name.match(/^(\d+)/)
     return m ? parseInt(m[1]) : 0
   }
-  
   return dirs.sort((a, b) => getNum(b) - getNum(a))
 }
 
@@ -64,7 +62,6 @@ export default defineConfig({
     sidebar: (() => {
       const sidebar = {}
       const dirs = getSortedProjectDirs()
-      console.log('Sorted project dirs:', dirs)
       for (const dir of dirs) {
         sidebar['/projects/' + dir + '/'] = getProjectSidebar(dir)
       }

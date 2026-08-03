@@ -6,7 +6,7 @@
   "desc": "多协议智能家居网关",
   "status": "规划中",
   "statusColor": "#e0af68",
-  "link": "/AstralLeap/projects/4. SmartHome-Gateway/项目概述",
+  "link": "/AstralLeap/projects/4-smart-home/项目概述",
   "sidebar": [
     { "text": "项目概述", "link": "项目概述" },
     { "text": "协议支持", "collapsed": false, "items": [

@@ -6,13 +6,14 @@
   "desc": "基于 FPGA 的高精度数字示波器",
   "status": "构思中",
   "statusColor": "#bb9af7",
-  "link": "/AstralLeap/projects/5. OpenScope/项目介绍",
+  "link": "/AstralLeap/projects/5-open-scope/项目介绍",
   "sidebar": [
     { "text": "项目介绍", "link": "项目介绍" },
     { "text": "硬件架构", "collapsed": false, "items": [
       { "text": "ADC 前端", "link": "ADC前端" },
       { "text": "FPGA 逻辑", "link": "FPGA逻辑" }
     ]},
+    { "text": "信号处理", "link": "信号处理" },
     { "text": "固件开发", "link": "固件开发" }
   ]
 }

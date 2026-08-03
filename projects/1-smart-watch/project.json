@@ -5,7 +5,7 @@
   "tech": ["RV1106", "Buildroot", "LVGL", "MIPI DSI"],
   "desc": "基于 Luckfox Pico 的全栈嵌入式产品开发",
   "status": "进行中",
-  "link": "/AstralLeap/projects/1. 智能手表 星序AstralOrder/智能手表 星序AstralOrder",
+  "link": "/AstralLeap/projects/1-smart-watch/智能手表 星序AstralOrder",
   "sidebar": [
     { "text": "项目介绍", "link": "智能手表 星序AstralOrder" },
     { "text": "用户操作说明", "collapsed": false, "items": [
