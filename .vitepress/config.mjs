@@ -42,7 +42,20 @@ export default defineConfig({
     logo: '/logo.png',
     outline: { label: '页面大纲', level: [2, 3] },
     docFooter: { prev: '上一篇', next: '下一篇' },
-    search: { provider: 'local' },
+    search: {
+      provider: 'local',
+      options: {
+        translations: {
+          button: { buttonText: '搜索', buttonAriaLabel: '搜索' },
+          modal: {
+            displayDetails: '显示详情',
+            noResultsText: '无法找到相关结果',
+            resetButtonTitle: '清除查询条件',
+            footer: { navigateText: '切换', selectText: '选择', closeText: '关闭', searchByText: '搜索提供者' }
+          }
+        }
+      }
+    },
     nav: [
       { text: '主页', link: '/' },
       { text: '项目', link: '/projects/' },

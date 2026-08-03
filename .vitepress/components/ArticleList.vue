@@ -7,7 +7,6 @@
             {{ article.category || '未分类' }}
           </span>
           <span class="article-date">{{ formatDate(article.date) }}</span>
-          <span class="article-reading-time">{{ article.readingTime }}</span>
         </div>
         <h3 class="article-title">
           <a :href="article.path">{{ article.title }}</a>
@@ -40,7 +39,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getFrontmatter, estimateReadingTime, getExcerpt } from '../utils/frontmatter'
+import { getFrontmatter, getExcerpt } from '../utils/frontmatter'
 
 const props = defineProps({
   category: { type: String, default: '' }
@@ -72,7 +71,6 @@ onMounted(async () => {
       date: frontmatter.date || '',
       author: frontmatter.author || 'Stellan W',
       tags: frontmatter.tags || [],
-      readingTime: estimateReadingTime(content),
       path: `/AstralLeap/blog/posts/${slug}`
     })
   }
@@ -136,10 +134,7 @@ const getCategoryColor = (category) => {
   font-weight: 500;
 }
 .article-date,
-.article-reading-time {
-  color: var(--vp-c-text-tertiary);
-  font-size: 0.8rem;
-}
+
 
 .article-title {
   margin: 0 0 0.75rem 0;
