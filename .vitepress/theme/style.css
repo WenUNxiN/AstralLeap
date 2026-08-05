@@ -527,10 +527,22 @@ html {
   }
 }
 
-/* 宽屏 */
+/* 宽屏优化 - 内容区域加宽 */
+@media (min-width: 1200px) {
+  .VPDoc .container {
+    max-width: 1100px !important;
+  }
+}
+
 @media (min-width: 1500px) {
   .VPDoc .container {
-    max-width: 880px !important;
+    max-width: 1300px !important;
+  }
+}
+
+@media (min-width: 1800px) {
+  .VPDoc .container {
+    max-width: 1500px !important;
   }
 }
 
