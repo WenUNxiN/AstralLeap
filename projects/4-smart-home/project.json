@@ -2,42 +2,22 @@
   "icon": "🏠",
   "name": "智能家居网关",
   "gradient": "linear-gradient(135deg, #e0af68, #f7768e)",
-  "tech": [
-    "ESP32",
-    "Zigbee",
-    "MQTT",
-    "HomeAssistant"
-  ],
+  "tech": ["ESP32", "Zigbee", "MQTT", "HomeAssistant"],
   "desc": "多协议智能家居网关",
   "status": "规划中",
   "statusColor": "#e0af68",
   "link": "/AstralLeap/projects/4-smart-home/项目概述",
   "sidebar": [
-    {
-      "text": "📋 项目概述",
-      "link": "项目概述"
-    },
+    {"text": "📋 项目概述", "link": "项目概述"},
     {
       "text": "📡 协议支持",
       "collapsed": false,
       "items": [
-        {
-          "text": "🔗 Zigbee",
-          "link": "Zigbee协议"
-        },
-        {
-          "text": "📨 MQTT",
-          "link": "MQTT通信"
-        }
+        {"text": "🔗 Zigbee", "link": "Zigbee协议"},
+        {"text": "📨 MQTT", "link": "MQTT通信"}
       ]
     },
-    {
-      "text": "🖥️ 硬件设计",
-      "link": "硬件设计"
-    },
-    {
-      "text": "🔑 接入指南",
-      "link": "接入指南"
-    }
+    {"text": "🖥️ 硬件设计", "link": "硬件设计"},
+    {"text": "🔑 接入指南", "link": "接入指南"}
   ]
 }

@@ -8,6 +8,5 @@ title: 嵌入式软件
 
 <ArticleList category="嵌入式软件" />
 
-<script setup>
-import ArticleList from '../../.vitepress/components/ArticleList.vue'
+<script setup>import ArticleList from '../../.vitepress/components/ArticleList.vue'
 </script>

@@ -8,6 +8,5 @@ title: 随笔/工具
 
 <ArticleList category="随笔/工具" />
 
-<script setup>
-import ArticleList from '../../.vitepress/components/ArticleList.vue'
+<script setup>import ArticleList from '../../.vitepress/components/ArticleList.vue'
 </script>
