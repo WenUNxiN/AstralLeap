@@ -65,12 +65,12 @@ export default defineConfig({
       for (const dir of dirs) {
         sidebar['/projects/' + dir + '/'] = getProjectSidebar(dir)
       }
-      sidebar['/blog/'] = [{ text: '技术博客', items: [
-        { text: '博客首页', link: '/blog/' },
-        { text: '嵌入式软件', link: '/blog/categories/embedded-sw' },
-        { text: '硬件设计', link: '/blog/categories/hardware-design' },
-        { text: '项目复盘', link: '/blog/categories/projects' },
-        { text: '随笔/工具', link: '/blog/categories/essays-tools' },
+      sidebar['/blog/'] = [{ text: '📝 技术博客', items: [
+        { text: '🏠 博客首页', link: '/blog/' },
+        { text: '💻 嵌入式软件', link: '/blog/categories/embedded-sw' },
+        { text: '🔌 硬件设计', link: '/blog/categories/hardware-design' },
+        { text: '📦 项目复盘', link: '/blog/categories/projects' },
+        { text: '✍️ 随笔/工具', link: '/blog/categories/essays-tools' },
       ]}]
       return sidebar
     })(),

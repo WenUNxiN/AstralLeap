@@ -112,6 +112,8 @@ const getCategoryColor = (category) => {
   padding: 1.75rem;
   transition: all 0.3s ease;
   border: 1px solid var(--vp-c-divider);
+  position: relative;
+  cursor: pointer;
 }
 .article-card:hover {
   transform: translateY(-4px);
@@ -144,6 +146,15 @@ const getCategoryColor = (category) => {
   color: var(--vp-c-text-primary);
   text-decoration: none;
   transition: color 0.2s ease;
+}
+.article-title a::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
 }
 .article-title a:hover {
   color: var(--vp-c-brand);

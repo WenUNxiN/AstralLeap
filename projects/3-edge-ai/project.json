@@ -2,20 +2,48 @@
   "icon": "🤖",
   "name": "边缘 AI 计算平台",
   "gradient": "linear-gradient(135deg, #9ece6a, #7dcfff)",
-  "tech": ["RV1106", "NPU", "TensorRT", "ONNX"],
+  "tech": [
+    "RV1106",
+    "NPU",
+    "TensorRT",
+    "ONNX"
+  ],
   "desc": "基于 Luckfox Pico 的边缘 AI 推理平台",
   "status": "开发中",
   "statusColor": "#9ece6a",
   "link": "/AstralLeap/projects/3-edge-ai/项目概述",
   "sidebar": [
-    { "text": "项目概述", "link": "项目概述" },
-    { "text": "模型部署", "collapsed": false, "items": [
-      { "text": "ONNX 转换", "link": "ONNX转换" },
-      { "text": "量化优化", "link": "量化优化" }
-    ]},
-    { "text": "硬件适配", "collapsed": false, "items": [
-      { "text": "NPU 驱动", "link": "NPU驱动" }
-    ]},
-    { "text": "开发日志", "link": "开发日志" }
+    {
+      "text": "📋 项目概述",
+      "link": "项目概述"
+    },
+    {
+      "text": "🚀 模型部署",
+      "collapsed": false,
+      "items": [
+        {
+          "text": "🔄 ONNX 转换",
+          "link": "ONNX转换"
+        },
+        {
+          "text": "📉 量化优化",
+          "link": "量化优化"
+        }
+      ]
+    },
+    {
+      "text": "🔌 硬件适配",
+      "collapsed": false,
+      "items": [
+        {
+          "text": "⚙️ NPU 驱动",
+          "link": "NPU驱动"
+        }
+      ]
+    },
+    {
+      "text": "📅 开发日志",
+      "link": "开发日志"
+    }
   ]
 }
