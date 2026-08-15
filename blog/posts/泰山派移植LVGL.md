@@ -22,7 +22,7 @@ LVGL（Light and Versatile Graphics Library）是一个免费的开放源代码�
 
 ### 2.1 准备源码
 
-```bash
+```bash title="clone.sh"
 git clone https://github.com/lvgl/lvgl.git
 git clone https://github.com/lvgl/lv_port_linux_frame_buffer.git
 ```
@@ -31,7 +31,7 @@ git clone https://github.com/lvgl/lv_port_linux_frame_buffer.git
 
 修改 `lv_conf.h` 中的分辨率和颜色深度：
 
-```c
+```c title="lv_conf.h"
 #define HOR_RES_MAX 480
 #define VER_RES_MAX 800
 #define LV_COLOR_DEPTH 32

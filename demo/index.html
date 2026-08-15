@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AstralLeap 美化 Demo 总览</title>
+<style>
+  :root {
+    --bg: #1a1b26; --bg-alt: #24283b; --bg-elv: #2f334d; --bg-soft: #1e2030;
+    --text-1: #c0caf5; --text-2: #a9b1d6; --text-3: #565f89;
+    --brand: #7aa2f7; --brand2: #bb9af7; --cyan: #7dcfff; --orange: #e0af68; --green: #9ece6a; --red: #f7768e;
+    --border: rgba(192, 202, 245, 0.12); --divider: rgba(192, 202, 245, 0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(122,162,247,.15), transparent),
+      radial-gradient(ellipse 60% 40% at 85% 110%, rgba(187,154,247,.1), transparent),
+      var(--bg);
+    color: var(--text-1); min-height: 100vh; padding: 60px 24px;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; }
+  h1 {
+    font-size: 2.2rem; margin-bottom: 8px;
+    background: linear-gradient(120deg, #bb9af7, #7dcfff);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub { color: var(--text-2); margin-bottom: 48px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+  a.card {
+    display: block; text-decoration: none; position: relative;
+    background: rgba(36,40,59,.7); backdrop-filter: blur(12px);
+    border: 1px solid var(--border); border-radius: 14px;
+    padding: 26px; overflow: hidden;
+    transition: transform .35s cubic-bezier(.4,0,.2,1), border-color .35s, box-shadow .35s;
+  }
+  a.card::before {
+    content: ''; position: absolute; inset: 0 0 auto 0; height: 2px;
+    background: linear-gradient(90deg, var(--c1, #7aa2f7), var(--c2, #7dcfff), transparent);
+    opacity: 0; transition: opacity .35s;
+  }
+  a.card:hover { transform: translateY(-6px); border-color: rgba(122,162,247,.3); box-shadow: 0 12px 40px rgba(0,0,0,.35); }
+  a.card:hover::before { opacity: 1; }
+  .num { font-family: 'JetBrains Mono', Consolas, monospace; font-size: .75rem; color: var(--text-3); letter-spacing: .1em; }
+  .card h2 { font-size: 1.15rem; margin: 8px 0 10px; color: var(--text-1); }
+  .card p { font-size: .88rem; color: var(--text-2); line-height: 1.7; }
+  .tag { display: inline-block; margin-top: 14px; font-size: .75rem; padding: 3px 10px; border-radius: 99px;
+    background: rgba(122,162,247,.12); color: var(--brand); }
+  .note {
+    margin-top: 48px; padding: 20px 24px; border-radius: 12px;
+    background: rgba(224,175,104,.1); border: 1px solid rgba(224,175,104,.25);
+    color: var(--text-2); font-size: .9rem; line-height: 1.8;
+  }
+  .note strong { color: var(--orange); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>星跃 AstralLeap · 美化 Demo 总览</h1>
+  <p class="sub">基于 Tokyo Night 深色主题的 5 组可视化建议，每个 demo 均为独立 HTML，可直接浏览器打开预览。</p>
+
+  <div class="grid">
+    <a class="card" href="01-home-hero.html" style="--c1:#7aa2f7;--c2:#7dcfff">
+      <span class="num">DEMO 01</span>
+      <h2>首页 Hero 与项目卡片</h2>
+      <p>星空背景 + 渐变标题 + 鼠标追光（spotlight）卡片 + 滚动渐入动画，解决首屏空洞问题。</p>
+      <span class="tag">Hero / 卡片 / 动效</span>
+    </a>
+    <a class="card" href="02-code-block.html" style="--c1:#bb9af7;--c2:#f7768e">
+      <span class="num">DEMO 02</span>
+      <h2>编辑器风格代码块</h2>
+      <p>macOS 窗口灯 + 文件名标签 + 行号 + 可交互复制/折叠按钮，比纯语言标签更实用。</p>
+      <span class="tag">代码块 / 交互</span>
+    </a>
+    <a class="card" href="03-blog-list.html" style="--c1:#9ece6a;--c2:#7dcfff">
+      <span class="num">DEMO 03</span>
+      <h2>博客列表页</h2>
+      <p>文章卡片（日期/标签/阅读时间/摘要）+ 渐变分类卡，修复描述截断、信息层级不足问题。</p>
+      <span class="tag">博客 / 列表</span>
+    </a>
+    <a class="card" href="04-article-reading.html" style="--c1:#e0af68;--c2:#f7768e">
+      <span class="num">DEMO 04</span>
+      <h2>文章阅读页增强</h2>
+      <p>滚动高亮目录 + 锚点标题 + 元信息栏（日期/阅读时间）+ 上下篇导航卡片。</p>
+      <span class="tag">阅读体验 / TOC</span>
+    </a>
+    <a class="card" href="05-micro-interactions.html" style="--c1:#7dcfff;--c2:#bb9af7">
+      <span class="num">DEMO 05</span>
+      <h2>微交互合集</h2>
+      <p>顶部滚动进度条、返回顶部按钮、明暗切换过渡、按钮涟漪等小而美的细节。</p>
+      <span class="tag">进度条 / 返回顶部</span>
+    </a>
+  </div>
+
+  <div class="note">
+    <strong>⚠ 当前站点最关键的问题：</strong>
+    <code>public/custom-theme.css</code>（深色 Tokyo Night 主题，581 行）没有被任何文件引用 —— 主题入口只加载了
+    <code>.vitepress/theme/style.css</code>，所以线上实际是默认浅色主题，代码块的 macOS 窗口样式也从未生效。
+    建议在 <code>theme/index.ts</code> 中 <code>import "../../public/custom-theme.css"</code> 或将其并入 style.css 后统一变量。
+  </div>
+</div>
+</body>
+</html>

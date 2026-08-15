@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo 02 · 编辑器风格代码块</title>
+<style>
+  :root {
+    --bg: #1a1b26; --bg-alt: #24283b; --bg-elv: #2f334d;
+    --text-1: #c0caf5; --text-2: #a9b1d6; --text-3: #565f89;
+    --brand: #7aa2f7; --cyan: #7dcfff; --green: #9ece6a; --orange: #e0af68; --red: #f7768e; --purple: #bb9af7;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text-1); padding: 60px 24px; }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 1.8rem; margin-bottom: 8px; background: linear-gradient(120deg, #bb9af7, #7dcfff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--text-2); font-size: .95rem; margin-bottom: 40px; }
+  .sub code { font-family: Consolas, monospace; color: var(--cyan); font-size: .88em; }
+
+  /* ---------- 代码块：macOS 编辑器窗口 ---------- */
+  .code-window {
+    border-radius: 12px; overflow: hidden; margin: 28px 0;
+    background: #16161e;
+    box-shadow: 0 4px 24px rgba(0,0,0,.4), 0 0 0 1px rgba(122,162,247,.08);
+    transition: box-shadow .3s ease;
+  }
+  .code-window:hover { box-shadow: 0 6px 32px rgba(0,0,0,.5), 0 0 0 1px rgba(122,162,247,.16); }
+  .titlebar {
+    display: flex; align-items: center; gap: 14px;
+    height: 38px; padding: 0 14px; background: #1a1d2e;
+    border-bottom: 1px solid rgba(122,162,247,.12);
+  }
+  .dots { display: flex; gap: 8px; }
+  .dots i { width: 12px; height: 12px; border-radius: 50%; }
+  .dots i:nth-child(1) { background: #ff5f56; } .dots i:nth-child(2) { background: #ffbd2e; } .dots i:nth-child(3) { background: #27c93f; }
+  .filename { font-family: Consolas, monospace; font-size: .78rem; color: var(--text-2); flex: 1; display: flex; align-items: center; gap: 6px; }
+  .filename .ext { color: var(--text-3); }
+  .actions { display: flex; gap: 6px; }
+  .actions button {
+    border: 1px solid var(--border, rgba(192,202,245,.12)); background: transparent; color: var(--text-2);
+    font-size: .7rem; font-family: Consolas, monospace; padding: 3px 10px; border-radius: 6px;
+    cursor: pointer; transition: all .2s; letter-spacing: .05em;
+  }
+  .actions button:hover { border-color: rgba(122,162,247,.4); color: var(--brand); background: rgba(122,162,247,.08); }
+  .actions button.ok { border-color: rgba(158,206,106,.5); color: var(--green); }
+  .code-window.collapsed pre { display: none; }
+  .code-window.collapsed { border-radius: 10px; }
+  pre {
+    margin: 0; padding: 16px 0; overflow-x: auto;
+    font-family: 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+    font-size: .84rem; line-height: 1.75; counter-reset: line;
+  }
+  pre .ln {
+    display: inline-block; width: 44px; text-align: right; padding-right: 18px;
+    color: #3b4261; user-select: none; position: sticky; left: 0; background: #16161e;
+  }
+  pre .ln.hl { color: var(--brand); }
+  /* Tokyo Night 语法配色 */
+  .kw { color: #bb9af7; } .fn { color: #7aa2f7; } .str { color: #9ece6a; }
+  .cm { color: #565f89; font-style: italic; } .num { color: #ff9e64; }
+  .var { color: #7dcfff; } .op { color: #89ddff; }
+
+  /* 行内代码 */
+  p code, li code, td code {
+    font-family: Consolas, monospace; font-size: .86em;
+    background: rgba(122,162,247,.1); color: var(--brand);
+    border: 1px solid rgba(122,162,247,.14); border-radius: 5px; padding: 2px 7px;
+  }
+  .hint { margin-top: 40px; padding: 18px 22px; border-radius: 10px; background: rgba(122,162,247,.08); border-left: 4px solid var(--brand); color: var(--text-2); font-size: .9rem; line-height: 1.8; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>编辑器风格代码块</h1>
+  <p class="sub">在 <code>custom-theme.css</code> 已有的 macOS 窗口样式基础上，增加：文件名标题、行号、可用的复制/折叠按钮。VitePress 侧可用 <code>```bash title="build.sh" {1,3-5}</code> 语法 + 少量 JS 实现。</p>
+
+  <!-- 示例 1：bash -->
+  <div class="code-window" data-code-id="c1">
+    <div class="titlebar">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <span class="filename">📄 build.sh <span class="ext">— bash</span></span>
+      <div class="actions">
+        <button class="btn-fold" onclick="toggleFold(this)">▾ 折叠</button>
+        <button class="btn-copy" onclick="copyCode(this, 'c1')">复制</button>
+      </div>
+    </div>
+    <pre id="c1"><span class="ln">1</span><span class="cm"># 设置交叉编译工具链</span>
+<span class="ln">2</span><span class="kw">export</span> <span class="var">PATH</span>=<span class="var">$HOME</span>/arm-rockchip830-linux-uclibcgnueabi/bin:<span class="var">$PATH</span>
+<span class="ln">3</span>
+<span class="ln">4</span><span class="cm"># 解压 SDK 并编译</span>
+<span class="ln">5</span>tar <span class="op">zxvf</span> luckfox_pico_sdk.tar.gz
+<span class="ln">6</span><span class="fn">cd</span> luckfox_pico_sdk &amp;&amp; ./build.sh <span class="str">lunch</span></pre>
+  </div>
+
+  <!-- 示例 2：C -->
+  <div class="code-window" data-code-id="c2">
+    <div class="titlebar">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <span class="filename">📄 main.c <span class="ext">— c</span></span>
+      <div class="actions">
+        <button class="btn-fold" onclick="toggleFold(this)">▾ 折叠</button>
+        <button class="btn-copy" onclick="copyCode(this, 'c2')">复制</button>
+      </div>
+    </div>
+    <pre id="c2"><span class="ln">1</span><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+<span class="ln">2</span>
+<span class="ln">3</span><span class="kw">int</span> <span class="fn">main</span>(<span class="kw">void</span>)
+<span class="ln">4</span>{
+<span class="ln">5</span>    <span class="fn">printf</span>(<span class="str">"Hello, AstralLeap!\n"</span>);
+<span class="ln">6</span>    <span class="kw">return</span> <span class="num">0</span>;
+<span class="ln">7</span>}</pre>
+  </div>
+
+  <p style="font-size:.92rem;line-height:1.9;color:var(--text-2)">
+    行内代码样式保持一致：使用 <code>--vp-c-brand</code> 品牌色文字 + 半透明底色，
+    例如 <code>arm-none-linux-gnueabihf-gcc</code> 这样长的工具链名称也能清晰可读。
+  </p>
+
+  <div class="hint">
+    💡 落地提示：VitePress 原生支持 <code>```c title="main.c"</code> 显示文件名；
+    行高亮用 <code>{4-7}</code>；复制按钮默认自带，只需 CSS 调整位置（custom-theme.css 中已写好）。
+    当前问题是该文件未被加载 —— 修复引用后这些效果即可直接生效。
+  </div>
+</div>
+
+<script>
+  function toggleFold(btn) {
+    const win = btn.closest('.code-window');
+    win.classList.toggle('collapsed');
+    btn.textContent = win.classList.contains('collapsed') ? '▸ 展开' : '▾ 折叠';
+  }
+  function copyCode(btn, id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text.replace(/^\d+/gm, '')).then(() => {
+      btn.textContent = '✓ 已复制'; btn.classList.add('ok');
+      setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('ok'); }, 1600);
+    });
+  }
+</script>
+</body>
+</html>

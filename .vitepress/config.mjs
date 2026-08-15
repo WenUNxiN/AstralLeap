@@ -36,6 +36,25 @@ export default defineConfig({
   title: "星跃 | Astral Leap",
   description: "嵌入式工程师 Stellan W 的个人博客",
   head: [['link', { rel: 'icon', href: '/AstralLeap/favicon.ico' }]],
+  markdown: {
+    config(md) {
+      /* 代码块文件名标题：```bash title="build.sh" 语法 → 在包装 div 内注入 <span class="title"> */
+      const originalFence = md.renderer.rules.fence
+      md.renderer.rules.fence = (tokens, idx, options, env, self) => {
+        const rendered = originalFence(tokens, idx, options, env, self)
+        const info = tokens[idx].info || ''
+        const m = info.match(/title\s*=\s*"([^"]*)"/)
+        if (!m) return rendered
+        let title = m[1]
+        try { title = decodeURIComponent(title) } catch { /* 保留原文 */ }
+        const escaped = md.utils.escapeHtml(title)
+        return rendered.replace(
+          /(<div class="language-[^"]*"[^>]*>)/,
+          `$1<span class="title">${escaped}</span>`
+        )
+      }
+    }
+  },
   themeConfig: {
     logo: '/logo.png',
     outline: { label: '页面大纲', level: [2, 3] },

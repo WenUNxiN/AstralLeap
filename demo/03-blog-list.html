@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo 03 · 博客列表页</title>
+<style>
+  :root {
+    --bg: #1a1b26; --bg-alt: #24283b; --bg-elv: #2f334d;
+    --text-1: #c0caf5; --text-2: #a9b1d6; --text-3: #565f89;
+    --brand: #7aa2f7; --cyan: #7dcfff; --green: #9ece6a; --orange: #e0af68; --red: #f7768e; --purple: #bb9af7;
+    --border: rgba(192,202,245,.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: radial-gradient(ellipse 70% 40% at 50% -10%, rgba(122,162,247,.12), transparent), var(--bg);
+    color: var(--text-1); padding: 60px 24px; }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 1.8rem; margin-bottom: 8px; background: linear-gradient(120deg, #9ece6a, #7dcfff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--text-2); font-size: .95rem; margin-bottom: 44px; }
+
+  .sec-title { display: flex; align-items: baseline; gap: 14px; margin: 44px 0 22px; }
+  .sec-title h2 { font-size: 1.25rem; }
+  .sec-title .line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+  .sec-title .pill { font-size: .75rem; padding: 3px 12px; border-radius: 99px; background: rgba(122,162,247,.12); color: var(--brand); }
+
+  /* ---------- 分类卡：渐变图标 + 完整描述（不截断） ---------- */
+  .cats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+  .cat {
+    position: relative; border-radius: 14px; padding: 20px; overflow: hidden; cursor: pointer;
+    background: rgba(36,40,59,.65); border: 1px solid var(--border); text-decoration: none; color: inherit;
+    transition: transform .35s cubic-bezier(.4,0,.2,1), border-color .35s, box-shadow .35s;
+  }
+  .cat:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--c1) 45%, transparent);
+    box-shadow: 0 10px 32px rgba(0,0,0,.3); }
+  .cat .icon { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; font-size: 1.15rem; margin-bottom: 12px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--c1) 22%, transparent), color-mix(in srgb, var(--c2) 22%, transparent));
+    border: 1px solid color-mix(in srgb, var(--c1) 30%, transparent); }
+  .cat h3 { font-size: .98rem; margin-bottom: 4px; }
+  .cat .count { font-size: .75rem; color: var(--c2); font-family: Consolas, monospace; }
+  .cat p { font-size: .8rem; color: var(--text-2); line-height: 1.65; margin-top: 8px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* ---------- 文章卡：日期 + 标签 + 阅读时间 + 摘要 ---------- */
+  .posts { display: flex; flex-direction: column; gap: 16px; }
+  .post {
+    display: grid; grid-template-columns: 84px 1fr auto; gap: 20px; align-items: center;
+    border-radius: 14px; padding: 22px 24px; position: relative; overflow: hidden;
+    background: rgba(36,40,59,.65); border: 1px solid var(--border); text-decoration: none; color: inherit;
+    transition: transform .35s cubic-bezier(.4,0,.2,1), border-color .35s, box-shadow .35s;
+  }
+  .post::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: linear-gradient(180deg, var(--c1, #7aa2f7), var(--c2, #7dcfff));
+    transform: scaleY(0); transform-origin: top; transition: transform .35s ease; }
+  .post:hover { transform: translateX(6px); border-color: rgba(122,162,247,.28); box-shadow: 0 8px 28px rgba(0,0,0,.3); }
+  .post:hover::before { transform: scaleY(1); }
+  .date { text-align: center; }
+  .date .d { font-size: 1.7rem; font-weight: 800; color: var(--c1, #7aa2f7); font-family: Consolas, monospace; display: block; line-height: 1.1; }
+  .date .m { font-size: .72rem; color: var(--text-3); letter-spacing: .1em; }
+  .post h3 { font-size: 1.08rem; margin-bottom: 8px; }
+  .post h3 .pin { font-size: .72rem; vertical-align: middle; margin-left: 8px; padding: 2px 8px; border-radius: 99px;
+    background: rgba(224,175,104,.12); color: var(--orange); border: 1px solid rgba(224,175,104,.3); }
+  .post .excerpt { font-size: .86rem; color: var(--text-2); line-height: 1.7; margin-bottom: 10px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: .74rem; color: var(--text-3); }
+  .meta .tag { font-family: Consolas, monospace; padding: 2px 9px; border-radius: 6px;
+    background: rgba(122,162,247,.1); color: var(--brand); border: 1px solid rgba(122,162,247,.15); }
+  .meta .dot { opacity: .5; }
+  .arrow { font-size: 1.3rem; color: var(--text-3); transition: all .3s; }
+  .post:hover .arrow { color: var(--brand); transform: translateX(4px); }
+
+  .empty {
+    text-align: center; padding: 48px 20px; border: 1px dashed var(--border); border-radius: 14px;
+    color: var(--text-3); font-size: .9rem;
+  }
+
+  @media (max-width: 680px) {
+    .post { grid-template-columns: 1fr; }
+    .date { display: flex; gap: 8px; align-items: baseline; text-align: left; }
+    .date .d { font-size: 1.1rem; }
+    .arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>博客列表页</h1>
+  <p class="sub">分类卡完整描述 + 文章卡带元信息（日期 / 标签 / 阅读时间 / 摘要），替代目前"只有分类、没有文章列表"的布局。</p>
+
+  <div class="sec-title"><h2>📝 文章分类</h2><span class="line"></span><span class="pill">共 2 篇文章</span></div>
+  <div class="cats">
+    <a class="cat" style="--c1:#7aa2f7;--c2:#7dcfff">
+      <div class="icon">💻</div><h3>嵌入式软件</h3><span class="count">1 篇</span>
+      <p>专注于 MCU / Linux 嵌入式编程、驱动开发与 Buildroot 系统定制。</p>
+    </a>
+    <a class="cat" style="--c1:#7dcfff;--c2:#9ece6a">
+      <div class="icon">🔌</div><h3>硬件设计</h3><span class="count">0 篇</span>
+      <p>模电 / 数电基础、PCB 设计规范与立创 EDA 实战记录。</p>
+    </a>
+    <a class="cat" style="--c1:#9ece6a;--c2:#e0af68">
+      <div class="icon">📦</div><h3>项目复盘</h3><span class="count">0 篇</span>
+      <p>软硬结合的项目复盘、从 0 到 1 的完整开发过程记录。</p>
+    </a>
+    <a class="cat" style="--c1:#e0af68;--c2:#f7768e">
+      <div class="icon">✍️</div><h3>随笔 / 工具</h3><span class="count">1 篇</span>
+      <p>开发工具技巧、学习心得与效率提升的碎碎念。</p>
+    </a>
+  </div>
+
+  <div class="sec-title"><h2>🕒 最新文章</h2><span class="line"></span><span class="pill">Latest</span></div>
+  <div class="posts">
+    <a class="post" style="--c1:#7aa2f7;--c2:#7dcfff">
+      <div class="date"><span class="d">14</span><span class="m">2026-08</span></div>
+      <div>
+        <h3>泰山派移植 LVGL<span class="pin">置顶</span></h3>
+        <p class="excerpt">记录在泰山派 (RV1106) 上从零移植 LVGL 9 的完整过程：FrameBuffer 配置、交叉编译、触摸驱动接入与性能调优……</p>
+        <div class="meta">
+          <span class="tag">LVGL</span><span class="tag">RV1106</span>
+          <span class="dot">·</span><span>⏱ 约 8 分钟</span><span class="dot">·</span><span>💻 嵌入式软件</span>
+        </div>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+    <a class="post" style="--c1:#bb9af7;--c2:#7dcfff">
+      <div class="date"><span class="d">02</span><span class="m">2026-08</span></div>
+      <div>
+        <h3>RV1106 交叉编译</h3>
+        <p class="excerpt">整理自 Luckfox 官方文档，适用于 RV1106，记录交叉编译环境配置及应用程序编译流程，覆盖 Buildroot (uclibc) 与 Ubuntu (glibc) 两套工具链……</p>
+        <div class="meta">
+          <span class="tag">交叉编译</span><span class="tag">Buildroot</span>
+          <span class="dot">·</span><span>⏱ 约 5 分钟</span><span class="dot">·</span><span>✍️ 随笔 / 工具</span>
+        </div>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+    <a class="post" style="--c1:#9ece6a;--c2:#7dcfff">
+      <div class="date"><span class="d">28</span><span class="m">2026-07</span></div>
+      <div>
+        <h3>边缘 AI 平台 NPU 驱动开发日志</h3>
+        <p class="excerpt">基于 Luckfox Pico 的边缘 AI 推理平台开发日志：NPU 驱动适配、rknn-toolkit-lite 部署与量化模型的推理性能对比……</p>
+        <div class="meta">
+          <span class="tag">NPU</span><span class="tag">ONNX</span>
+          <span class="dot">·</span><span>⏱ 约 12 分钟</span><span class="dot">·</span><span>💻 嵌入式软件</span>
+        </div>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+    <div class="empty">该分类下暂无文章，去写一篇吧 ✨</div>
+  </div>
+</div>
+</body>
+</html>

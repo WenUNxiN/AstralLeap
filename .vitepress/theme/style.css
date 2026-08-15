@@ -738,3 +738,227 @@ html {
 .VPHomeFeatures .VPFeature a {
   color: var(--vp-c-brand) !important;
 }
+
+/* =============================================
+ * 编辑器风格代码块（macOS 窗口）
+ * ============================================= */
+.vp-doc div[class*="language-"] {
+  position: relative;
+  margin: 1.25rem 0 !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  padding-top: 38px !important;
+  border: 1px solid var(--vp-c-divider) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease;
+}
+
+.vp-doc div[class*="language-"]:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* 标题栏 */
+.vp-doc div[class*="language-"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 38px;
+  background: var(--vp-c-bg-soft);
+  border-bottom: 1px solid var(--vp-c-divider);
+  z-index: 2;
+}
+
+.dark .vp-doc div[class*="language-"]::before {
+  background: #1a1d2e;
+}
+
+/* 红黄绿窗口按钮 */
+.vp-doc div[class*="language-"]::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff5f56;
+  box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #27c93f;
+  z-index: 3;
+}
+
+/* 语言标签 → 文件名位置（左侧），无文件名时作占位显示 */
+.vp-doc div[class*="language-"] .lang {
+  position: absolute;
+  top: 10px;
+  left: 74px;
+  right: auto;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--vp-c-text-3);
+  font-family: 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+  letter-spacing: 0.05em;
+  background: transparent;
+  padding: 0;
+  border: none;
+  opacity: 0.75;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* 复制按钮：与折叠按钮同规格的幽灵按钮，形成统一的按钮组 */
+.vp-doc div[class*="language-"] button.copy {
+  top: 6px !important;
+  right: 8px !important;
+  width: 26px !important;
+  height: 26px !important;
+  border: none !important;
+  border-radius: 6px !important;
+  background-color: transparent !important;
+  background-size: 15px !important;
+  opacity: 0;
+  transition: opacity 0.25s ease, background 0.2s ease !important;
+  z-index: 4 !important;
+}
+
+/* hover 代码块或复制成功时显示按钮 */
+.vp-doc div[class*="language-"]:hover button.copy,
+.vp-doc div[class*="language-"] button.copy.copied,
+.vp-doc div[class*="language-"] button.copy:focus-visible {
+  opacity: 1;
+}
+
+.vp-doc div[class*="language-"] button.copy.copied {
+  border-radius: 6px !important;
+  background-color: var(--vp-c-brand-soft) !important;
+}
+
+.vp-doc div[class*="language-"] button.copy:hover {
+  background-color: var(--vp-c-bg-soft-up) !important;
+}
+
+.vp-doc div[class*="language-"] pre {
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* =============================================
+ * 微交互：按钮涟漪 + 滚动渐入
+ * ============================================= */
+.VPButton {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(0);
+  animation: btn-ripple 0.6s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes btn-ripple {
+  to { transform: scale(3); opacity: 0; }
+}
+
+/* 滚动渐入（配合 IntersectionObserver 添加 .revealed） */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* =============================================
+ * 代码块增强：行号 / 文件名标题 / 折叠按钮
+ * ============================================= */
+
+/* 行号：CSS 计数器实现，伪元素内容不会污染复制的代码 */
+.vp-doc div[class*="language-"] pre {
+  counter-reset: line-no;
+}
+
+.vp-doc div[class*="language-"] code .line {
+  counter-increment: line-no;
+}
+
+.vp-doc div[class*="language-"] code .line::before {
+  content: counter(line-no);
+  display: inline-block;
+  width: 1.4em;
+  margin-right: 1.5em;
+  text-align: right;
+  color: var(--vp-c-text-3);
+  opacity: 0.55;
+}
+
+/* 文件名标题：```bash title="build.sh" 语法触发，显示在窗口灯右侧 */
+.vp-doc div[class*="language-"] .title {
+  position: absolute;
+  top: 9px;
+  left: 74px;
+  z-index: 3;
+  font-size: 0.78rem;
+  font-family: 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+  color: var(--vp-c-text-2);
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 有文件名时隐藏语言标签：文件名本身已表明语言，避免冗余 */
+.vp-doc div[class*="language-"]:has(.title) .lang {
+  display: none;
+}
+
+/* 折叠按钮（由 MicroInteractions 组件动态注入）：与复制按钮同规格，
+   仅在 hover 代码块时显示，避免与复制按钮视觉冲突 */
+.vp-doc div[class*="language-"] .code-fold {
+  position: absolute;
+  top: 6px;
+  right: 38px;
+  z-index: 4;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--vp-c-text-3);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.25s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.vp-doc div[class*="language-"]:hover .code-fold,
+.vp-doc div[class*="language-"].collapsed .code-fold,
+.vp-doc div[class*="language-"] .code-fold:focus-visible {
+  opacity: 1;
+}
+
+.vp-doc div[class*="language-"] .code-fold:hover {
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-bg-soft-up);
+}
+
+.vp-doc div[class*="language-"].collapsed pre {
+  display: none;
+}

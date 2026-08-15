@@ -3,6 +3,7 @@ import type { Theme } from "vitepress"
 import DefaultTheme from "vitepress/theme"
 import "./style.css"
 import StarfieldBackground from "../components/StarfieldBackground.vue"
+import MicroInteractions from "../components/MicroInteractions.vue"
 
 const SocialIcons = {
   render() {
@@ -30,11 +31,12 @@ const SocialIcons = {
   }
 }
 
+let busuanziLoaded = false
+
 const SiteFooter = {
   mounted() {
-    if (typeof window === 'undefined') return
-    if (window.__busuanzi_loaded) return
-    window.__busuanzi_loaded = true
+    if (typeof window === 'undefined' || busuanziLoaded) return
+    busuanziLoaded = true
     const script = document.createElement('script')
     script.src = '//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js'
     script.async = true
@@ -75,12 +77,15 @@ export default {
   extends: DefaultTheme,
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
-      "layout-top": () => h(StarfieldBackground),
+      "layout-top": () => [h(StarfieldBackground), h(MicroInteractions)],
       "nav-bar-content-after": () => h(SocialIcons),
       "layout-bottom": () => h(SiteFooter)
     })
   },
   enhanceApp({ app, router }) {
-    router.onAfterRouteChanged = () => { window.scrollTo({ top: 0, behavior: "smooth" }) }
+    router.onAfterRouteChange = () => {
+      if (typeof window === "undefined") return
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
   }
 } satisfies Theme
