@@ -15,15 +15,25 @@ import { onMounted, onBeforeUnmount, ref } from 'vue'
 const progressBar = ref(null)
 const backTop = ref(null)
 
-const onScroll = () => {
+/* 滚动处理：rAF 节流；进度条用 transform 缩放，避免每帧触发布局重排 */
+let ticking = false
+const updateScrollUI = () => {
+  ticking = false
   const h = document.documentElement
   const max = h.scrollHeight - h.clientHeight
+  const ratio = max > 0 ? h.scrollTop / max : 0
   if (progressBar.value) {
-    progressBar.value.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%'
+    progressBar.value.style.transform = `scaleX(${ratio})`
   }
   if (backTop.value) {
     backTop.value.classList.toggle('visible', h.scrollTop > 300)
   }
+}
+
+const onScroll = () => {
+  if (ticking) return
+  ticking = true
+  requestAnimationFrame(updateScrollUI)
 }
 
 const scrollToTop = () => {
@@ -62,12 +72,23 @@ const enhanceCodeBlock = (block) => {
   block.appendChild(btn)
 }
 
+let codeObserver = null
+let scanPending = false
+
+const scanCodeBlocks = () => {
+  scanPending = false
+  document.querySelectorAll('div[class*="language-"]:not([data-enhanced])').forEach(enhanceCodeBlock)
+}
+
 const watchCodeBlocks = () => {
-  document.querySelectorAll('div[class*="language-"]').forEach(enhanceCodeBlock)
-  const observer = new MutationObserver(() => {
-    document.querySelectorAll('div[class*="language-"]:not([data-enhanced])').forEach(enhanceCodeBlock)
+  scanCodeBlocks()
+  codeObserver = new MutationObserver(() => {
+    /* 微任务合并：同批 DOM 变更只扫描一次，避免自身插入按钮再触发扫描 */
+    if (scanPending) return
+    scanPending = true
+    queueMicrotask(scanCodeBlocks)
   })
-  observer.observe(document.body, { childList: true, subtree: true })
+  codeObserver.observe(document.body, { childList: true, subtree: true })
 }
 
 onMounted(() => {
@@ -80,6 +101,10 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll)
   document.removeEventListener('click', onClick)
+  if (codeObserver) {
+    codeObserver.disconnect()
+    codeObserver = null
+  }
 })
 </script>
 

@@ -43,7 +43,7 @@ export default defineConfig({
       md.renderer.rules.fence = (tokens, idx, options, env, self) => {
         const rendered = originalFence(tokens, idx, options, env, self)
         const info = tokens[idx].info || ''
-        const m = info.match(/title\s*=\s*"([^"]*)"/)
+        const m = info.match(/title\s*=\s*["']([^"']*)["']/)
         if (!m) return rendered
         let title = m[1]
         try { title = decodeURIComponent(title) } catch { /* 保留原文 */ }

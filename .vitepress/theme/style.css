@@ -202,12 +202,6 @@
       #bd34fe 50%,
       #47caff 50%);
   --vp-home-hero-image-filter: blur(44px);
-
-  --vp-card-bg: var(--vp-c-white);
-  --vp-card-border: var(--vp-c-gray-2);
-  --vp-card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  --vp-card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.1);
-  --vp-card-border-radius: 8px;
 }
 
 .VPHomeHero .image-src {
@@ -256,29 +250,7 @@
   }
 }
 
-/* Card styles */
-.VPHomeFeatures .VPHomeFeatures_item {
-  background-color: var(--vp-card-bg);
-  border: 1px solid var(--vp-card-border);
-  border-radius: var(--vp-card-border-radius);
-  box-shadow: var(--vp-card-shadow);
-  transition: all 0.3s ease;
-  padding: 24px;
-  margin-bottom: 20px;
-}
-
-.VPHomeFeatures .VPHomeFeatures_item:hover {
-  box-shadow: var(--vp-card-shadow-hover);
-  transform: translateY(-4px);
-}
-
 /* Sidebar styles */
-.VPSidebar {
-  background-color: var(--vp-c-background);
-  border-right: 1px solid var(--vp-c-divider);
-  flex-shrink: 0;
-}
-
 .VPSidebarItem {
   transition: all 0.2s ease;
 }
@@ -301,13 +273,6 @@
 .VPButton:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Custom block styles */
-.VPCustomBlock {
-  border-radius: 8px;
-  padding: 20px;
-  margin: 20px 0;
 }
 
 /* Code block styles */
@@ -336,20 +301,8 @@
   font-weight: 500;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .VPHomeFeatures .VPHomeFeatures_item {
-    padding: 16px;
-  }
-}
-
 :root {
   --vp-layout-max-width: 100%;
-}
-
-.VPLayout {
-  max-width: none !important;
-  width: 100%;
 }
 
 .VPContent {
@@ -432,7 +385,10 @@ img[loading="lazy"] {
   height: 3px;
   background: linear-gradient(90deg, var(--vp-c-brand-1), #bb9af7);
   z-index: 9999;
-  transition: width 0.1s linear;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  will-change: transform;
 }
 
 /* 链接 hover 过渡统一 */
@@ -444,24 +400,6 @@ a {
 input:focus {
   box-shadow: 0 0 0 3px rgba(122, 162, 247, 0.2);
   transition: box-shadow 0.3s ease;
-}
-
-/* 骨架屏加载 */
-.skeleton {
-  background: linear-gradient(90deg, var(--vp-c-bg-alt) 25%, var(--vp-c-bg-elv) 50%, var(--vp-c-bg-alt) 75%);
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s ease-in-out infinite;
-  border-radius: 6px;
-}
-
-@keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* 暗色模式切换过渡 */
-html {
-  transition: background-color 0.3s ease;
 }
 
 /* =============================================
@@ -477,10 +415,6 @@ html {
   .VPDoc .container {
     max-width: 100% !important;
     padding: 0 16px;
-  }
-  
-  .VPHomeFeatures .VPHomeFeatures_item {
-    padding: 20px;
   }
 }
 
@@ -565,7 +499,7 @@ html {
   .VPSidebar,
   .visitor-counter,
   .scroll-progress,
-  .back-to-star {
+  .back-to-top {
     display: none !important;
   }
   
@@ -581,162 +515,6 @@ html {
   a {
     color: #1a73e8;
   }
-}
-
-/* =============================================
- * 项目卡片增强 - Features 首页
- * ============================================= */
-
-.VPHomeFeatures {
-  padding: 0;
-}
-
-.VPHomeFeatures .VPFeatures {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
-}
-
-@media (max-width: 768px) {
-  .VPHomeFeatures .VPFeatures {
-    grid-template-columns: 1fr;
-  }
-}
-
-.VPHomeFeatures .VPFeature {
-  position: relative;
-  background: rgba(30, 32, 48, 0.6) !important;
-  border: 1px solid rgba(122, 162, 247, 0.08) !important;
-  border-radius: 16px !important;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 0 !important;
-}
-
-.VPHomeFeatures .VPFeature:hover {
-  border-color: rgba(122, 162, 247, 0.25) !important;
-  transform: translateY(-6px) !important;
-  box-shadow: 
-    0 12px 40px rgba(0, 0, 0, 0.2),
-    0 0 0 1px rgba(122, 162, 247, 0.1);
-}
-
-/* Top accent line */
-.VPHomeFeatures .VPFeature::before {
-  content: '''';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #7aa2f7, #bb9af7);
-  opacity: 0.8;
-  transition: opacity 0.3s;
-}
-
-.VPHomeFeatures .VPFeature:nth-child(2)::before {
-  background: linear-gradient(90deg, #e0af68, #f7768e);
-}
-
-.VPHomeFeatures .VPFeature:nth-child(3)::before {
-  background: linear-gradient(90deg, #9ece6a, #7dcfff);
-}
-
-.VPHomeFeatures .VPFeature:nth-child(4)::before {
-  background: linear-gradient(90deg, #bb9af7, #f7768e);
-}
-
-.VPHomeFeatures .VPFeature:hover::before {
-  opacity: 1;
-}
-
-.VPHomeFeatures .VPFeature .box {
-  padding: 1.5rem;
-}
-
-.VPHomeFeatures .VPFeature .icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  margin-bottom: 12px;
-  background: linear-gradient(135deg, rgba(122, 162, 247, 0.15), rgba(187, 154, 247, 0.15));
-  border: 1px solid rgba(122, 162, 247, 0.1);
-}
-
-.VPHomeFeatures .VPFeature:nth-child(2) .icon {
-  background: linear-gradient(135deg, rgba(224, 175, 104, 0.15), rgba(247, 118, 142, 0.15));
-  border-color: rgba(224, 175, 104, 0.1);
-}
-
-.VPHomeFeatures .VPFeature:nth-child(3) .icon {
-  background: linear-gradient(135deg, rgba(158, 206, 106, 0.15), rgba(125, 207, 255, 0.15));
-  border-color: rgba(158, 206, 106, 0.1);
-}
-
-.VPHomeFeatures .VPFeature:nth-child(4) .icon {
-  background: linear-gradient(135deg, rgba(187, 154, 247, 0.15), rgba(247, 118, 142, 0.15));
-  border-color: rgba(187, 154, 247, 0.1);
-}
-
-.VPHomeFeatures .VPFeature .title {
-  font-size: 1.05rem !important;
-  font-weight: 700 !important;
-  color: #c0caf5 !important;
-  margin: 0 0 6px !important;
-  line-height: 1.4;
-}
-
-.VPHomeFeatures .VPFeature .details {
-  font-size: 0.85rem !important;
-  color: #94a3b8 !important;
-  line-height: 1.65 !important;
-  margin-bottom: 0 !important;
-}
-
-.VPHomeFeatures .VPFeature .link {
-  margin-top: 14px !important;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #7aa2f7 !important;
-  transition: gap 0.25s ease;
-}
-
-.VPHomeFeatures .VPFeature .link:hover {
-  gap: 10px;
-}
-
-/* =============================================
- * Features 卡片 - 明暗主题适配修复
- * ============================================= */
-
-.VPHomeFeatures .VPFeature {
-  background: var(--vp-c-bg-soft) !important;
-  border: 1px solid var(--vp-c-divider) !important;
-}
-
-.VPHomeFeatures .VPFeature:hover {
-  border-color: var(--vp-c-brand) !important;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1) !important;
-}
-
-.VPHomeFeatures .VPFeature .title {
-  color: var(--vp-c-text-1) !important;
-}
-
-.VPHomeFeatures .VPFeature .details {
-  color: var(--vp-c-text-2) !important;
-}
-
-.VPHomeFeatures .VPFeature .link-indicator,
-.VPHomeFeatures .VPFeature a {
-  color: var(--vp-c-brand) !important;
 }
 
 /* =============================================
