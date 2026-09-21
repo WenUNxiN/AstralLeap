@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>星跃 | Astral Leap — 个人网站总结报告</title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --bg-card: #131a2e;
+    --bg-card2: #18213a;
+    --border: #26314f;
+    --text: #d8e0f2;
+    --text-dim: #8b97b8;
+    --accent: #7aa2f7;
+    --accent2: #9d7af7;
+    --gold: #e0af68;
+    --green: #9ece6a;
+    --red: #f7768e;
+    --cyan: #7dcfff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    line-height: 1.7;
+    padding: 40px 16px 80px;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.4) 50%, transparent 50%),
+      radial-gradient(1px 1px at 60% 15%, rgba(255,255,255,.3) 50%, transparent 50%),
+      radial-gradient(1.5px 1.5px at 80% 60%, rgba(255,255,255,.35) 50%, transparent 50%),
+      radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,.25) 50%, transparent 50%),
+      radial-gradient(ellipse 60% 40% at 50% -10%, rgba(122,162,247,.12), transparent);
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 36px; }
+  header .logo {
+    width: 64px; height: 64px; border-radius: 16px; margin: 0 auto 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; box-shadow: 0 8px 32px rgba(122,162,247,.35);
+  }
+  h1 { font-size: 30px; letter-spacing: 1px; }
+  h1 .en { color: var(--accent); }
+  .slogan { color: var(--text-dim); font-size: 15px; margin-top: 6px; letter-spacing: 3px; }
+  .one-line {
+    margin-top: 16px; display: inline-block; padding: 8px 18px;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 999px;
+    font-size: 13.5px; color: var(--text);
+  }
+  .one-line b { color: var(--accent); }
+  h2 {
+    font-size: 19px; margin: 40px 0 16px; padding-left: 12px;
+    border-left: 3px solid var(--accent);
+  }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .stat {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px; text-align: center;
+  }
+  .stat .num { font-size: 26px; font-weight: 700; color: var(--accent); }
+  .stat .lbl { font-size: 12.5px; color: var(--text-dim); margin-top: 4px; }
+  .card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 20px 22px; margin-bottom: 14px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--text-dim); font-weight: 600; font-size: 12.5px; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  .tag {
+    display: inline-block; padding: 1px 9px; border-radius: 999px;
+    font-size: 11.5px; border: 1px solid; margin: 1px 2px;
+  }
+  .t-blue { color: var(--accent); border-color: rgba(122,162,247,.4); background: rgba(122,162,247,.08); }
+  .t-green { color: var(--green); border-color: rgba(158,206,106,.4); background: rgba(158,206,106,.08); }
+  .t-gold { color: var(--gold); border-color: rgba(224,175,104,.4); background: rgba(224,175,104,.08); }
+  .t-red { color: var(--red); border-color: rgba(247,118,142,.4); background: rgba(247,118,142,.08); }
+  .t-cyan { color: var(--cyan); border-color: rgba(125,207,255,.4); background: rgba(125,207,255,.08); }
+  .proj-name { font-weight: 700; color: var(--text); }
+  .proj-desc { color: var(--text-dim); font-size: 13px; margin-top: 3px; }
+  .ok { color: var(--green); font-weight: 600; }
+  .warn { color: var(--gold); font-weight: 600; }
+  .bad { color: var(--red); font-weight: 600; }
+  .tree {
+    font-family: Consolas, "Courier New", monospace; font-size: 13px;
+    background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 22px; overflow-x: auto; color: var(--text); line-height: 1.9;
+  }
+  .tree .dir { color: var(--accent); font-weight: 600; }
+  .tree .note { color: var(--text-dim); }
+  ul.plain { list-style: none; }
+  ul.plain li { padding: 6px 0 6px 22px; position: relative; font-size: 13.5px; }
+  ul.plain li::before { content: "✦"; position: absolute; left: 0; color: var(--accent); }
+  footer { text-align: center; color: var(--text-dim); font-size: 12px; margin-top: 48px; }
+  .meta-note { color: var(--text-dim); font-size: 12.5px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="logo">✦</div>
+  <h1>星跃 <span class="en">| Astral Leap</span></h1>
+  <div class="slogan">以星为向 · 以技为跃</div>
+  <div class="one-line">嵌入式工程师 <b>Stellan W</b> 的个人博客 + 项目展示站（VitePress · zh-CN · 子路径部署 <b>/AstralLeap/</b>）</div>
+</header>
+
+<h2>📊 站点概览</h2>
+<div class="stats">
+  <div class="stat"><div class="num">4</div><div class="lbl">在展示项目</div></div>
+  <div class="stat"><div class="num">24</div><div class="lbl">项目文档页</div></div>
+  <div class="stat"><div class="num">3</div><div class="lbl">博客文章</div></div>
+  <div class="stat"><div class="num">35</div><div class="lbl">Markdown 总页数</div></div>
+  <div class="stat"><div class="num">8</div><div class="lbl">自研 Vue 组件</div></div>
+</div>
+<p class="meta-note">技术栈：VitePress 2.0.0-alpha.16（Vue 3 SFC 扩展）· 本地搜索 · 构建/预览脚本齐备 · .vitepress/dist 存在构建产物（可部署状态）</p>
+
+<h2>🗂 站点结构</h2>
+<div class="tree">
+<span class="dir">AstralLeap/</span><br>
+├─ index.md&nbsp;&nbsp;&nbsp;&nbsp;<span class="note">主页：Hero + 项目卡片展示（前 4 个）</span><br>
+├─ <span class="dir">projects/</span>&nbsp;&nbsp;<span class="note">项目文档区（24 页，侧边栏由 project.json 动态生成）</span><br>
+│&nbsp;&nbsp;├─ 1-smart-watch&nbsp;&nbsp;<span class="note">智能手表「星序 AstralOrder」· 11 页 · 文档最全</span><br>
+│&nbsp;&nbsp;├─ 3-edge-ai&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="note">边缘 AI（ONNX/量化/NPU）· 5 页</span><br>
+│&nbsp;&nbsp;├─ 4-smart-home&nbsp;&nbsp;&nbsp;<span class="note">智能家居（Zigbee/MQTT）· 5 页</span><br>
+│&nbsp;&nbsp;└─ 5-open-scope&nbsp;&nbsp;&nbsp;<span class="note">开源示波器（ADC/FPGA）· 4 页</span><br>
+├─ <span class="dir">blog/</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="note">博客：4 分类 + 3 篇文章</span><br>
+│&nbsp;&nbsp;├─ 嵌入式软件 / 硬件设计 / 项目复盘 / 随笔·工具<br>
+│&nbsp;&nbsp;└─ posts/&nbsp;<span class="note">RV1106交叉编译 · 泰山派移植LVGL · Linux驱动开发笔记一</span><br>
+└─ <span class="dir">.vitepress/</span>&nbsp;&nbsp;<span class="note">config.mjs + 自定义主题 + 8 个组件</span>
+</div>
+
+<h2>🚀 项目展示区</h2>
+<div class="card">
+<table>
+  <tr><th>项目</th><th>领域</th><th>文档覆盖</th><th>内容完成度</th></tr>
+  <tr>
+    <td><div class="proj-name">⌚ 智能手表 · 星序 AstralOrder</div>
+        <div class="proj-desc">45×45mm 表盘 · 1.43" AMOLED 466×466 · 双核 1.2GHz · 1GB+16GB · 300mAh 续航 7–10 天</div></td>
+    <td><span class="tag t-blue">穿戴</span><span class="tag t-cyan">嵌入式</span></td>
+    <td>规格/架构/开发指南/手机客户端/FAQ/版本记录等 11 页</td>
+    <td><span class="ok">文档最全</span><br><span class="bad">主页详情页为占位符</span></td>
+  </tr>
+  <tr>
+    <td><div class="proj-name">🧠 边缘 AI（Edge AI）</div>
+        <div class="proj-desc">ONNX 转换 · 量化优化 · NPU 驱动</div></td>
+    <td><span class="tag t-blue">AI</span><span class="tag t-gold">NPU</span></td>
+    <td>5 页</td>
+    <td><span class="warn">框架已建，正文待补充</span></td>
+  </tr>
+  <tr>
+    <td><div class="proj-name">🏠 智能家居（Smart Home）</div>
+        <div class="proj-desc">Zigbee 协议 · MQTT 通信 · 硬件设计 · 接入指南</div></td>
+    <td><span class="tag t-blue">IoT</span><span class="tag t-cyan">协议</span></td>
+    <td>5 页</td>
+    <td><span class="warn">框架已建，正文待补充</span></td>
+  </tr>
+  <tr>
+    <td><div class="proj-name">📡 开源示波器（Open Scope）</div>
+        <div class="proj-desc">ADC 前端 · FPGA 逻辑 · 固件开发</div></td>
+    <td><span class="tag t-blue">仪器</span><span class="tag t-gold">FPGA</span></td>
+    <td>4 页</td>
+    <td><span class="warn">框架已建，正文待补充</span></td>
+  </tr>
+</table>
+</div>
+
+<h2>✍️ 博客内容</h2>
+<div class="card">
+<table>
+  <tr><th>文章</th><th>分类</th><th>日期</th><th>主题</th></tr>
+  <tr><td>泰山派移植 LVGL</td><td><span class="tag t-blue">嵌入式软件</span></td><td>2026-07-10</td><td>LVGL framebuffer 移植与性能优化</td></tr>
+  <tr><td>RV1106 交叉编译</td><td><span class="tag t-gold">随笔/工具</span></td><td>2026-07-03</td><td>Luckfox Pico · Buildroot uclibc 与 glibc 双工具链配置</td></tr>
+  <tr><td>Linux 驱动开发笔记一：内核模块</td><td><span class="tag t-blue">嵌入式软件</span></td><td>—</td><td>内核模块入门笔记</td></tr>
+</table>
+</div>
+
+<h2>✨ 工程亮点</h2>
+<div class="card">
+<ul class="plain">
+  <li><b>project.json 驱动的动态侧边栏</b> — config.mjs 构建时扫描 projects/ 目录并读取各项目的 project.json 自动生成侧边栏，项目按编号倒序，新增项目零配置接入</li>
+  <li><b>ProjectShowcase 项目卡片组件</b> — import.meta.glob 批量加载所有 project.json，带骨架屏加载态、渐变卡片、状态标签、编号倒序排列，主页/项目页复用</li>
+  <li><b>自定义代码块文件名标题</b> — 重写 markdown-it fence 渲染器，支持 <code>```lang title="file"</code> 语法在代码块内注入文件名标题（自动 HTML 转义）</li>
+  <li><b>星空主题</b> — StarfieldBackground 星空背景组件，配合「星跃」品牌视觉</li>
+  <li><b>博客组件体系</b> — BlogHero / BlogStats / BlogCategories / ArticleList / Discussion / Breadcrumb 共 6 个博客组件</li>
+  <li><b>本地搜索中文化</b> — local search 全套中文翻译（按钮/弹窗/空结果等）</li>
+  <li><b>SEO 基础</b> — lang=zh-CN、站点 description、robots.txt、favicon</li>
+</ul>
+</div>
+
+<h2>🔧 完成度审计（诚实版）</h2>
+<div class="card">
+<table>
+  <tr><th>项</th><th>状态</th><th>说明</th></tr>
+  <tr><td>站点框架与构建</td><td class="ok">✅ 完成</td><td>VitePress 配置、主题、组件、构建产物齐全</td></tr>
+  <tr><td>智能手表项目文档</td><td class="ok">✅ 较完整</td><td>硬件规格等有真实参数数据</td></tr>
+  <tr><td>博客文章</td><td class="warn">⚠️ 偏少</td><td>仅 3 篇，4 个分类中「硬件设计」「项目复盘」尚无文章</td></tr>
+  <tr><td>边缘 AI / 智能家居 / 示波器文档</td><td class="warn">⚠️ 占位中</td><td>多数页面为「内容待补充…」</td></tr>
+  <tr><td>星序手表主页详情页</td><td class="bad">❌ 占位符</td><td>仍是 Lorem ipsum 模板文本</td></tr>
+  <tr><td>项目编号连续性</td><td class="bad">❌ 缺 2 号</td><td>现有 1/3/4/5，缺 2-smart-watch 或对应项目</td></tr>
+</table>
+</div>
+
+<footer>
+  本报告由 AI 基于仓库源码静态分析生成 · 2026-09-21 · 数据来源：config.mjs / project.json / 各 md 文件
+</footer>
+
+</div>
+</body>
+</html>
