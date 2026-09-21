@@ -1,0 +1,81 @@
+---
+title: RV1106交叉编译
+date: 2026-07-03
+tags:
+  - Luckfox-RV1106
+  - buildroot
+  - ubuntu
+description: "RV1106 交叉编译环境配置及应用程序编译流程"
+status: done
+platform: "RV1106"
+difficulty: "beginner"
+---
+
+# RV1106交叉编译
+
+> 整理自Luckfox官方文档，适用于RV1106，记录交叉编译环境配置及应用程序编译流程。
+
+
+## 1. 安装交叉编译工具链
+
+Luckfox 提供两套工具链，分别对应 **Buildroot（uclibc）** 和 **Ubuntu（glibc）** 系统。
+
+| 目标系统 | 工具链说明 | 下载地址 |
+|---------|-----------|---------|
+| **Buildroot** | uclibc 工具链，集成在 SDK 内 | [arm-rockchip830-linux-uclibcgnueabihf.tar.gz](https://files.luckfox.com/wiki/Luckfox-Pico/Software/arm-rockchip830-linux-uclibcgnueabihf.tar.gz) |
+| **Ubuntu** | glibc 工具链，需从 ARM 官网获取 | [gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf.tar.gz](https://files.luckfox.com/wiki/Luckfox-Pico/Software/gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf.tar.gz) |
+
+### 解压到用户目录（示例）
+
+```bash title="extract-toolchain.sh"
+tar zxvf arm-rockchip830-linux-uclibcgnueabihf.tar.gz -C ~/
+tar zxvf gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf.tar.gz -C ~/
+```
+
+---
+
+## 2. 编译 Buildroot 系统下的应用程序
+
+### 方式一：通过环境变量（全局生效）
+
+编辑 `~/.bashrc` 或 `~/.profile`：
+
+```bash title="~/.bashrc"
+export ARCH=arm
+export CROSS_COMPILE=arm-rockchip830-linux-uclibcgnueabihf-
+export PATH=/home/stellan/luckfox-pico/tools/linux/toolchain/arm-rockchip830-linux-uclibcgnueabihf/bin:$PATH
+```
+
+验证：
+
+```bash title="verify-toolchain.sh"
+arm-rockchip830-linux-uclibcgnueabihf-gcc --version
+arm-rockchip830-linux-uclibcgnueabihf-gcc hello.c -o hello
+```
+
+---
+
+## 3. 编译 Ubuntu 系统下的应用程序
+
+```bash title="build-ubuntu-app.sh"
+export CROSS_COMPILE=arm-none-linux-gnueabihf-
+export PATH=/home/stellan/gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf/bin:$PATH
+arm-none-linux-gnueabihf-gcc hello.c -o hello
+```
+
+---
+
+## 4. 运行程序
+
+```bash title="run.sh"
+chmod +x hello
+./hello
+```
+
+---
+
+## 注意事项
+
+- 两种工具链（uclibc / glibc）**不可混用**
+- Makefile 中的路径请替换为实际 SDK 解压路径
+

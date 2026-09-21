@@ -76,7 +76,10 @@ export default defineConfig({
     nav: [
       { text: '主页', link: '/' },
       { text: '项目', link: '/projects/' },
-      { text: '博客', link: '/blog/' },
+      { text: '知识库', link: '/knowledge/' },
+      { text: '实验', link: '/experiments/' },
+      { text: '速查', link: '/cheatsheet/' },
+      { text: '关于', link: '/about' },
     ],
     sidebar: (() => {
       const sidebar = {}
@@ -84,13 +87,42 @@ export default defineConfig({
       for (const dir of dirs) {
         sidebar['/projects/' + dir + '/'] = getProjectSidebar(dir)
       }
-      sidebar['/blog/'] = [{ text: '📝 技术博客', items: [
-        { text: '🏠 博客首页', link: '/blog/' },
-        { text: '💻 嵌入式软件', link: '/blog/categories/embedded-sw' },
-        { text: '🔌 硬件设计', link: '/blog/categories/hardware-design' },
-        { text: '📦 项目复盘', link: '/blog/categories/projects' },
-        { text: '✍️ 随笔/工具', link: '/blog/categories/essays-tools' },
+      // 知识库侧边栏（自动发现分类，但侧边栏手动维护，确保排序可控）
+      sidebar['/knowledge/'] = [{ text: '📚 技术知识库', items: [
+        { text: '🏠 知识库首页', link: '/knowledge/' },
+        { text: '🐧 Linux 系统编程', link: '/knowledge/linux/' },
+        { text: '🔌 驱动开发', link: '/knowledge/driver/' },
+        { text: '📷 Camera / V4L2', link: '/knowledge/camera/' },
+        { text: '🎬 视频编解码', link: '/knowledge/video/' },
+        { text: '🎵 音频', link: '/knowledge/audio/' },
+        { text: '🤖 AI / NPU', link: '/knowledge/ai/' },
+        { text: '📡 网络 / RTSP', link: '/knowledge/network/' },
+        { text: '✍️ 思考随笔', link: '/knowledge/thoughts/' },
       ]}]
+
+      // 实验记录侧边栏
+      sidebar['/experiments/'] = [{ text: '🧪 实验记录', items: [
+        { text: '🏠 实验首页', link: '/experiments/' },
+        { text: '📺 最新实验', link: '/experiments/#最新实验' },
+      ]}]
+
+      // 命令速查侧边栏
+      sidebar['/cheatsheet/'] = [{ text: '⚡ 命令速查', items: [
+        { text: '🏠 速查首页', link: '/cheatsheet/' },
+        { text: '🐧 Linux', link: '/cheatsheet/linux' },
+        { text: '📷 V4L2', link: '/cheatsheet/v4l2' },
+        { text: '🎬 FFmpeg', link: '/cheatsheet/ffmpeg' },
+        { text: '🌿 Git', link: '/cheatsheet/git' },
+      ]}]
+
+      // Debug 记录侧边栏
+      sidebar['/debug/'] = [{ text: '🐛 Debug 记录', items: [
+        { text: '🏠 Debug 首页', link: '/debug/' },
+        { text: '📷 Camera', link: '/debug/camera' },
+        { text: '📺 V4L2', link: '/debug/v4l2' },
+        { text: '🎬 MPP', link: '/debug/mpp' },
+      ]}]
+
       return sidebar
     })(),
   },

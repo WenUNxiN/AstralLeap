@@ -6,4 +6,5 @@ cache
 .cache
 .temp
 *.local
+.trae-html-share-packages
 
