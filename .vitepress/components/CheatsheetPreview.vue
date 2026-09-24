@@ -16,7 +16,7 @@
         :href="withBase(item.url)"
         class="cheat-card"
       >
-        <div class="cheat-icon">{{ getIcon(item.slug) }}</div>
+        <div class="cheat-icon">{{ getCheatsheetIcon(item.slug) }}</div>
         <div class="cheat-body">
           <h3 class="cheat-title">{{ item.title }}</h3>
           <p v-if="item.description" class="cheat-desc">{{ item.description }}</p>
@@ -34,6 +34,7 @@
 import { computed } from 'vue'
 import { withBase } from 'vitepress'
 import { data as items } from '../data/cheatsheet.data.ts'
+import { getCheatsheetIcon } from '../utils/content-loader'
 
 const props = defineProps({
   limit: { type: Number, default: 6 },
@@ -44,20 +45,6 @@ const props = defineProps({
 const displayItems = computed(() => {
   return items.slice(0, props.limit)
 })
-
-function getIcon(slug: string): string {
-  const iconMap: Record<string, string> = {
-    'linux': '🐧',
-    'v4l2': '📷',
-    'ffmpeg': '🎬',
-    'git': '🌿',
-    'vim': '📝',
-    'docker': '🐳',
-    'ssh': '🔐',
-    'gdb': '🔍',
-  }
-  return iconMap[slug] || '📋'
-}
 </script>
 
 <style scoped>

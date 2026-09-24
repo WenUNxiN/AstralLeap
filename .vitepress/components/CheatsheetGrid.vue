@@ -6,7 +6,7 @@
       :href="withBase(item.url)"
       class="cheat-card"
     >
-      <div class="cheat-icon">{{ getIcon(item.slug) }}</div>
+      <div class="cheat-icon">{{ getCheatsheetIcon(item.slug) }}</div>
       <div class="cheat-body">
         <h3 class="cheat-title">{{ item.title }}</h3>
         <p class="cheat-desc">{{ item.description || item.excerpt }}</p>
@@ -21,19 +21,7 @@
 <script setup>
 import { withBase } from 'vitepress'
 import { data as cheatsheetList } from '../data/cheatsheet.data.ts'
-
-const iconMap = {
-  linux: '🐧',
-  v4l2: '📷',
-  ffmpeg: '🎬',
-  git: '🌿',
-  vim: '📝',
-  docker: '🐳',
-}
-
-function getIcon(slug) {
-  return iconMap[slug] || '📄'
-}
+import { getCheatsheetIcon } from '../utils/content-loader'
 </script>
 
 <style scoped>

@@ -155,3 +155,22 @@ export function getExpId(slug: string): string {
   const m = slug.match(/^(\d+)/)
   return m ? m[1] : ''
 }
+
+/** 速查表图标映射（CheatsheetPreview / CheatsheetGrid 共用） */
+const cheatsheetIconMap: Record<string, string> = {
+  'linux': '🐧',
+  'v4l2': '📷',
+  'ffmpeg': '🎬',
+  'git': '🌿',
+  'vim': '📝',
+  'docker': '🐳',
+  'ssh': '🔐',
+  'gdb': '🔍',
+}
+
+/**
+ * 速查表图标（按 slug 匹配）
+ */
+export function getCheatsheetIcon(slug: string): string {
+  return cheatsheetIconMap[slug] || '📋'
+}
