@@ -93,9 +93,11 @@ AstralLeap/
 ├── doc/                      # 📄 历史文档
 │   └── ...
 └── .vitepress/
-    ├── config.mjs            # 站点配置
+    ├── config.mjs            # 站点配置（nav / sidebar / sitemap / 搜索分词等）
     ├── components/           # Vue 组件
-    └── utils/                # 工具函数
+    ├── data/                 # createContentLoader 构建时数据加载器（SSR 直出列表）
+    ├── theme/                # 主题入口与全局样式（style.css / sections.css）
+    └── utils/                # 工具函数（content-loader / frontmatter）
 ```
 
 ---

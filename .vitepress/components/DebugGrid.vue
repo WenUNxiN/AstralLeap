@@ -1,6 +1,6 @@
 <template>
   <div class="debug-page-list">
-    <article v-for="item in debugList" :key="item.slug" class="debug-card" :class="{ solved: item.status === 'solved' }">
+    <a v-for="item in displayedDebug" :key="item.slug" :href="withBase(item.url)" class="debug-card" :class="{ solved: item.status === 'solved' }">
       <div class="debug-header">
         <span class="debug-status" :class="getStatusClass(item.status)">
           {{ getStatusText(item.status) }}
@@ -9,26 +9,36 @@
         <span class="debug-platform">{{ firstOf(item.platform) }}</span>
         <span class="debug-date">{{ formatDate(item.date) }}</span>
       </div>
-      <h3 class="debug-title">
-        <a :href="withBase(item.url)">{{ item.title }}</a>
-      </h3>
+      <h3 class="debug-title">{{ item.title }}</h3>
       <p class="debug-desc">{{ item.description || item.excerpt }}</p>
       <div class="debug-footer">
         <span v-if="item.tags && item.tags.length" class="debug-tags">
           <span v-for="t in item.tags.slice(0, 5)" :key="t" class="tag">{{ t }}</span>
         </span>
       </div>
-    </article>
-    <div v-if="debugList.length === 0" class="empty">
+    </a>
+    <div v-if="displayedDebug.length === 0" class="empty">
       <p>暂无 Debug 记录</p>
     </div>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { withBase } from 'vitepress'
 import { data as debugList } from '../data/debug.data.ts'
 import { formatDate, getStatusText, getStatusClass, firstOf } from '../utils/content-loader'
+
+const props = defineProps({
+  limit: { type: Number, default: 0 }
+})
+
+const displayedDebug = computed(() => {
+  if (props.limit > 0) {
+    return debugList.slice(0, props.limit)
+  }
+  return debugList
+})
 </script>
 
 <style scoped>
@@ -39,6 +49,9 @@ import { formatDate, getStatusText, getStatusClass, firstOf } from '../utils/con
 }
 
 .debug-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
   padding: 18px 20px;
   background: var(--vp-c-bg-soft);
   border: 1px solid var(--vp-c-divider);
@@ -83,14 +96,10 @@ import { formatDate, getStatusText, getStatusClass, firstOf } from '../utils/con
   font-weight: 600;
   margin: 4px 0 8px;
   font-family: Consolas, 'Courier New', monospace;
-}
-
-.debug-title a {
   color: var(--vp-c-text-1);
-  text-decoration: none;
 }
 
-.debug-title a:hover {
+.debug-card:hover .debug-title {
   color: var(--vp-c-brand-1);
 }
 

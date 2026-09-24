@@ -162,6 +162,7 @@ export default defineConfig({
       { text: '项目', link: '/projects/' },
       { text: '知识库', link: '/knowledge/' },
       { text: '实验', link: '/experiments/' },
+      { text: 'Debug', link: '/debug/' },
       { text: '速查', link: '/cheatsheet/' },
       { text: '关于', link: '/about' },
     ],

@@ -1,6 +1,6 @@
 <template>
   <div class="exp-page-list">
-    <article v-for="exp in displayedExperiments" :key="exp.slug" class="exp-card">
+    <a v-for="exp in displayedExperiments" :key="exp.slug" :href="withBase(exp.url)" class="exp-card">
       <div class="exp-header">
         <span class="exp-id">#{{ getExpId(exp.slug) }}</span>
         <span class="exp-status" :class="getStatusClass(exp.status)">
@@ -8,9 +8,7 @@
         </span>
         <span class="exp-platform">{{ firstOf(exp.platform) }}</span>
       </div>
-      <h3 class="exp-title">
-        <a :href="withBase(exp.url)">{{ exp.title }}</a>
-      </h3>
+      <h3 class="exp-title">{{ exp.title }}</h3>
       <p class="exp-desc">{{ exp.description || exp.excerpt }}</p>
       <div class="exp-footer">
         <span class="exp-date">{{ formatDate(exp.date) }}</span>
@@ -18,7 +16,7 @@
           <span v-for="t in exp.tags.slice(0, 4)" :key="t" class="tag">{{ t }}</span>
         </span>
       </div>
-    </article>
+    </a>
     <div v-if="displayedExperiments.length === 0" class="empty">
       <p>暂无实验记录</p>
     </div>
@@ -51,6 +49,9 @@ const displayedExperiments = computed(() => {
 }
 
 .exp-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
   padding: 18px 20px;
   background: var(--vp-c-bg-soft);
   border: 1px solid var(--vp-c-divider);
@@ -97,14 +98,10 @@ const displayedExperiments = computed(() => {
   font-size: 16px;
   font-weight: 600;
   margin: 4px 0 8px;
-}
-
-.exp-title a {
   color: var(--vp-c-text-1);
-  text-decoration: none;
 }
 
-.exp-title a:hover {
+.exp-card:hover .exp-title {
   color: var(--vp-c-brand-1);
 }
 
