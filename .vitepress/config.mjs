@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import { readdirSync, statSync, readFileSync } from 'fs'
+import { readdirSync, statSync, readFileSync, existsSync } from 'fs'
 import { join } from 'path'
 
 function getProjectSidebar(dir) {
@@ -30,6 +30,54 @@ function getSortedProjectDirs() {
   return dirs.sort((a, b) => getNum(b) - getNum(a))
 }
 
+/* ===== 中文搜索分词 =====
+ * minisearch 默认按空白/标点切分，对中文几乎无效（整句成一个 token）。
+ * 这里对连续 CJK 串生成「单字 + 相邻双字」token，兼顾召回与精度；
+ * 拉丁/数字串整体成词并小写化。
+ */
+const CJK_RE = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/
+function cjkTokenize(text) {
+  const tokens = []
+  const runs = String(text).match(/[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]+|[A-Za-z0-9_]+/g) || []
+  for (const run of runs) {
+    if (!CJK_RE.test(run)) {
+      tokens.push(run.toLowerCase())
+      continue
+    }
+    for (let i = 0; i < run.length; i++) {
+      tokens.push(run[i])
+      if (i + 1 < run.length) tokens.push(run[i] + run[i + 1])
+    }
+  }
+  return tokens
+}
+function cjkProcessTerm(term) {
+  return typeof term === 'string' ? term.toLowerCase() : null
+}
+
+/* 构建期校验：knowledge/ 下每个分类目录都应出现在知识库侧边栏中。
+ * 分类卡片/标签是自动发现的，但侧边栏手动维护（控制排序），
+ * 新增分类时容易只出现卡片而漏加侧边栏，这里提前警告。 */
+function warnKnowledgeSidebarDrift(sidebarItems) {
+  try {
+    const knowledgeDir = join(process.cwd(), 'knowledge')
+    const diskDirs = readdirSync(knowledgeDir).filter(d => {
+      const p = join(knowledgeDir, d)
+      return statSync(p).isDirectory() && existsSync(join(p, 'index.md'))
+    })
+    const listed = new Set(
+      sidebarItems
+        .map(i => (i.link || '').replace(/^\/knowledge\//, '').replace(/\/$/, ''))
+        .filter(Boolean)
+    )
+    for (const dir of diskDirs) {
+      if (!listed.has(dir)) {
+        console.warn(`[sidebar] 知识分类 "${dir}" 存在于 knowledge/ 但未加入侧边栏，请补充 .vitepress/config.mjs`)
+      }
+    }
+  } catch (e) { /* 校验失败不应阻断构建 */ }
+}
+
 export default defineConfig({
   base: '/AstralLeap/',
   lang: 'zh-CN',
@@ -38,8 +86,32 @@ export default defineConfig({
   head: [['link', { rel: 'icon', href: '/AstralLeap/favicon.ico' }]],
   sitemap: {
     hostname: 'https://wenunxin.github.io/AstralLeap/',
-    // 404 错误页不应被收录进 sitemap
-    transformItems: (items) => items.filter((i) => !i.url.includes('404')),
+    // 404 错误页与 doc/ 内部历史方案不应被主动索引
+    // 注：此处 url 为不含前导斜杠的相对路径（如 doc/xxx.html）
+    transformItems: (items) =>
+      items.filter((i) => !i.url.includes('404') && !/(^|\/)doc\//.test(i.url)),
+  },
+  // 读取 git 时间戳，在文档页脚显示最后更新时间（deploy 已设 fetch-depth: 0）
+  lastUpdated: true,
+  // doc/ 为个人优化方案历史稿，不属于站点内容，不生成页面
+  srcExclude: ['doc/**'],
+  // 社交分享预览（OpenGraph / Twitter 卡片）
+  transformHead({ pageData, siteData, title, description }) {
+    const origin = 'https://wenunxin.github.io'
+    const url = origin + siteData.base + pageData.relativePath
+      .replace(/(^|\/)index\.md$/, '$1')
+      .replace(/\.md$/, '.html')
+    return [
+      ['meta', { property: 'og:site_name', content: siteData.title }],
+      ['meta', { property: 'og:type', content: 'website' }],
+      ['meta', { property: 'og:title', content: title }],
+      ['meta', { property: 'og:description', content: description }],
+      ['meta', { property: 'og:url', content: url }],
+      ['meta', { property: 'og:image', content: origin + siteData.base + 'logo.png' }],
+      ['meta', { name: 'twitter:card', content: 'summary' }],
+      ['meta', { name: 'twitter:title', content: title }],
+      ['meta', { name: 'twitter:description', content: description }],
+    ]
   },
   markdown: {
     config(md) {
@@ -64,6 +136,7 @@ export default defineConfig({
     logo: '/logo.png',
     outline: { label: '页面大纲', level: [2, 3] },
     docFooter: { prev: '上一篇', next: '下一篇' },
+    lastUpdated: { text: '最后更新于' },
     search: {
       provider: 'local',
       options: {
@@ -75,7 +148,13 @@ export default defineConfig({
             resetButtonTitle: '清除查询条件',
             footer: { navigateText: '切换', selectText: '选择', closeText: '关闭', searchByText: '搜索提供者' }
           }
-        }
+        },
+        miniSearch: {
+          options: {
+            tokenize: cjkTokenize,
+            processTerm: cjkProcessTerm,
+          },
+        },
       }
     },
     nav: [
@@ -104,6 +183,7 @@ export default defineConfig({
         { text: '📡 网络 / RTSP', link: '/knowledge/network/' },
         { text: '✍️ 思考随笔', link: '/knowledge/thoughts/' },
       ]}]
+      warnKnowledgeSidebarDrift(sidebar['/knowledge/'][0].items)
 
       // 实验记录侧边栏
       sidebar['/experiments/'] = [{ text: '🧪 实验记录', items: [

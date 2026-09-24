@@ -52,25 +52,6 @@
   font-weight: 500;
 }
 
-.footer-separator {
-  color: var(--vp-c-text-3);
-  font-size: 0.75rem;
-}
-
-.footer-powered {
-  font-size: 0.8rem;
-  color: var(--vp-c-text-3);
-}
-
-.footer-powered a {
-  color: var(--vp-c-brand);
-  text-decoration: none;
-}
-
-.footer-powered a:hover {
-  text-decoration: underline;
-}
-
 .footer-stats {
   gap: 0.75rem;
 }
