@@ -1,11 +1,10 @@
 <template>
-  <div v-if="loading" class="loading">加载中...</div>
-  <div v-else>
+  <div>
     <div class="category-grid">
       <a
         v-for="cat in categories"
         :key="cat.dir"
-        :href="cat.link"
+        :href="withBase(cat.url)"
         class="cat-card"
       >
         <div class="cat-icon">{{ cat.icon }}</div>
@@ -26,42 +25,18 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { discoverKnowledgeCategories } from '../utils/content-loader'
+import { computed } from 'vue'
+import { withBase } from 'vitepress'
+import { data } from '../data/knowledge.data.ts'
 
-defineProps({
-  basePath: { type: String, default: '/AstralLeap/knowledge/' }
-})
-
-const categories = ref([])
-const loading = ref(true)
+const categories = data.categories
 
 const totalCount = computed(() => {
-  return categories.value.reduce((sum, c) => sum + c.count, 0)
-})
-
-onMounted(async () => {
-  // 扫描所有分类的 index.md
-  const indexModules = import.meta.glob('../../knowledge/*/index.md', { query: '?raw', import: 'default' })
-  // 扫描所有分类下的所有文章（用于统计数量）
-  const allArticlesModules = import.meta.glob('../../knowledge/*/*.md', { query: '?raw', import: 'default' })
-
-  categories.value = await discoverKnowledgeCategories(
-    indexModules,
-    allArticlesModules,
-    '/AstralLeap/knowledge/'
-  )
-  loading.value = false
+  return categories.reduce((sum, c) => sum + c.count, 0)
 })
 </script>
 
 <style scoped>
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: var(--vp-c-text-2);
-}
-
 .category-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));

@@ -9,13 +9,11 @@
       <p class="section-sub">从现象到根因到解决方案，积累可检索的问题库</p>
     </div>
 
-    <div v-if="loading" class="loading">加载中...</div>
-
-    <div v-else class="debug-list">
+    <div class="debug-list">
       <a
         v-for="item in displayedDebug"
         :key="item.slug"
-        :href="item.link"
+        :href="withBase(item.url)"
         class="debug-item"
         :class="{ solved: item.status === 'solved' }"
       >
@@ -28,15 +26,17 @@
       </a>
     </div>
 
-    <div v-if="showMore && !loading" class="section-more">
-      <a :href="moreLink">浏览全部 Debug 记录 →</a>
+    <div v-if="showMore" class="section-more">
+      <a :href="withBase(moreLink)">浏览全部 Debug 记录 →</a>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { parseContentList, getStatusText, firstOf } from '../utils/content-loader'
+import { computed } from 'vue'
+import { withBase } from 'vitepress'
+import { data as debugList } from '../data/debug.data.ts'
+import { getStatusText, firstOf } from '../utils/content-loader'
 
 const props = defineProps({
   limit: { type: Number, default: 0 },
@@ -44,70 +44,15 @@ const props = defineProps({
   moreLink: { type: String, default: '/debug/' }
 })
 
-const debugList = ref([])
-const loading = ref(true)
-
 const displayedDebug = computed(() => {
   if (props.limit > 0) {
-    return debugList.value.slice(0, props.limit)
+    return debugList.slice(0, props.limit)
   }
-  return debugList.value
-})
-
-onMounted(async () => {
-  const modules = import.meta.glob('../../debug/*.md', { query: '?raw', import: 'default' })
-  debugList.value = await parseContentList(modules, '/AstralLeap/debug/')
-  loading.value = false
+  return debugList
 })
 </script>
 
 <style scoped>
-.debug-section {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 36px 0;
-  border-top: 1px solid var(--vp-c-divider);
-}
-
-.section-header {
-  margin-bottom: 20px;
-}
-
-.section-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--vp-c-text-1);
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.section-title .icon {
-  font-size: 20px;
-}
-
-.badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 7px;
-  background: var(--vp-c-brand-soft);
-  color: var(--vp-c-brand-1);
-  border-radius: 4px;
-}
-
-.section-sub {
-  font-size: 13px;
-  color: var(--vp-c-text-2);
-}
-
-.loading {
-  text-align: center;
-  padding: 30px;
-  color: var(--vp-c-text-3);
-  font-size: 13px;
-}
-
 .debug-list {
   display: flex;
   flex-direction: column;
@@ -188,30 +133,8 @@ onMounted(async () => {
   text-align: right;
 }
 
-.section-more {
-  text-align: right;
-  margin-top: 16px;
-}
-
-.section-more a {
-  font-size: 12.5px;
-  color: var(--vp-c-brand-1);
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.section-more a:hover {
-  text-decoration: underline;
-}
-
 /* 响应式 */
 @media (max-width: 640px) {
-  .debug-section {
-    padding: 28px 0;
-  }
-  .section-title {
-    font-size: 16px;
-  }
   .debug-cat {
     display: none;
   }

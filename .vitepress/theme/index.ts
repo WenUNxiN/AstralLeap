@@ -2,6 +2,7 @@ import { h } from "vue"
 import type { Theme } from "vitepress"
 import DefaultTheme from "vitepress/theme"
 import "./style.css"
+import "./sections.css"
 import StarfieldBackground from "../components/StarfieldBackground.vue"
 import MicroInteractions from "../components/MicroInteractions.vue"
 

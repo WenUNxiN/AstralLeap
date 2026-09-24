@@ -1,7 +1,5 @@
 <template>
-  <div v-if="loading" class="loading">加载中...</div>
-
-  <div v-else class="article-list">
+  <div class="article-list">
     <div v-if="articles.length === 0" class="empty">
       暂无文章，敬请期待
     </div>
@@ -9,12 +7,12 @@
     <a
       v-for="item in articles"
       :key="item.slug"
-      :href="item.link"
+      :href="withBase(item.url)"
       class="article-item"
     >
       <div class="article-header">
         <h3 class="article-title">{{ item.title }}</h3>
-        <span v-if="item.status" :class="['status-tag', item.status]">
+        <span v-if="item.status" :class="['status-tag', getStatusClass(item.status)]">
           {{ getStatusText(item.status) }}
         </span>
       </div>
@@ -39,40 +37,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { getKnowledgeCategoryArticles, getStatusText, formatShortDate } from '../utils/content-loader'
+import { computed } from 'vue'
+import { withBase } from 'vitepress'
+import { data } from '../data/knowledge.data.ts'
+import { getStatusText, getStatusClass, getDifficultyText, formatShortDate } from '../utils/content-loader'
 
 const props = defineProps({
   category: { type: String, required: true }
 })
 
-const articles = ref([])
-const loading = ref(true)
-
-function getDifficultyText(d: string): string {
-  const map: Record<string, string> = {
-    'beginner': '入门',
-    'intermediate': '进阶',
-    'advanced': '高级',
-  }
-  return map[d] || d
-}
-
-onMounted(async () => {
-  // 扫描所有分类下的所有文章，然后按分类过滤
-  const allModules = import.meta.glob('../../knowledge/*/*.md', { query: '?raw', import: 'default' })
-  articles.value = await getKnowledgeCategoryArticles(allModules, props.category, '/AstralLeap/knowledge/')
-  loading.value = false
-})
+const articles = computed(() => data.articles.filter(a => a.dir === props.category))
 </script>
 
 <style scoped>
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: var(--vp-c-text-2);
-}
-
 .empty {
   text-align: center;
   padding: 40px;
@@ -126,18 +103,14 @@ onMounted(async () => {
   border-radius: 4px;
 }
 
-.status-tag.learning,
-.status-tag.doing,
-.status-tag.debugging {
-  background: rgba(255, 193, 7, 0.15);
-  color: #f59e0b;
+.status-tag.doing {
+  background: rgba(224, 175, 106, 0.12);
+  color: var(--vp-c-yellow, #e0af68);
 }
 
-.status-tag.done,
-.status-tag.verified,
-.status-tag.solved {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
+.status-tag.done {
+  background: rgba(158, 206, 106, 0.12);
+  color: var(--vp-c-green, #9ece6a);
 }
 
 .article-excerpt {

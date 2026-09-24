@@ -9,13 +9,11 @@
       <p class="section-sub">常用命令速查表，随时翻找，不用再搜</p>
     </div>
 
-    <div v-if="loading" class="loading">加载中...</div>
-
-    <div v-else class="cheat-grid">
+    <div class="cheat-grid">
       <a
         v-for="item in displayItems"
         :key="item.slug"
-        :href="item.link"
+        :href="withBase(item.url)"
         class="cheat-card"
       >
         <div class="cheat-icon">{{ getIcon(item.slug) }}</div>
@@ -26,15 +24,16 @@
       </a>
     </div>
 
-    <div v-if="showMore && !loading" class="section-more">
-      <a :href="moreLink">查看全部速查表 →</a>
+    <div v-if="showMore" class="section-more">
+      <a :href="withBase(moreLink)">查看全部速查表 →</a>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { parseContentList } from '../utils/content-loader'
+import { computed } from 'vue'
+import { withBase } from 'vitepress'
+import { data as items } from '../data/cheatsheet.data.ts'
 
 const props = defineProps({
   limit: { type: Number, default: 6 },
@@ -42,11 +41,8 @@ const props = defineProps({
   moreLink: { type: String, default: '/cheatsheet/' }
 })
 
-const items = ref<any[]>([])
-const loading = ref(true)
-
 const displayItems = computed(() => {
-  return items.value.slice(0, props.limit)
+  return items.slice(0, props.limit)
 })
 
 function getIcon(slug: string): string {
@@ -62,61 +58,9 @@ function getIcon(slug: string): string {
   }
   return iconMap[slug] || '📋'
 }
-
-onMounted(async () => {
-  const modules = import.meta.glob('../../cheatsheet/*.md', { query: '?raw', import: 'default' })
-  items.value = await parseContentList(modules, '/AstralLeap/cheatsheet/')
-  loading.value = false
-})
 </script>
 
 <style scoped>
-.cheatsheet-section {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 36px 0;
-  border-top: 1px solid var(--vp-c-divider);
-}
-
-.section-header {
-  margin-bottom: 20px;
-}
-
-.section-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--vp-c-text-1);
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.section-title .icon {
-  font-size: 20px;
-}
-
-.badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 7px;
-  background: var(--vp-c-brand-soft);
-  color: var(--vp-c-brand-1);
-  border-radius: 4px;
-}
-
-.section-sub {
-  font-size: 13px;
-  color: var(--vp-c-text-2);
-}
-
-.loading {
-  text-align: center;
-  padding: 30px;
-  color: var(--vp-c-text-3);
-  font-size: 13px;
-}
-
 .cheat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -170,30 +114,8 @@ onMounted(async () => {
   overflow: hidden;
 }
 
-.section-more {
-  text-align: right;
-  margin-top: 16px;
-}
-
-.section-more a {
-  font-size: 12.5px;
-  color: var(--vp-c-brand-1);
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.section-more a:hover {
-  text-decoration: underline;
-}
-
 /* 响应式 */
 @media (max-width: 640px) {
-  .cheatsheet-section {
-    padding: 28px 0;
-  }
-  .section-title {
-    font-size: 16px;
-  }
   .cheat-grid {
     grid-template-columns: 1fr 1fr;
   }

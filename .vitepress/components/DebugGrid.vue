@@ -1,6 +1,5 @@
 <template>
-  <div v-if="loading" class="loading">加载中...</div>
-  <div v-else class="debug-page-list">
+  <div class="debug-page-list">
     <article v-for="item in debugList" :key="item.slug" class="debug-card" :class="{ solved: item.status === 'solved' }">
       <div class="debug-header">
         <span class="debug-status" :class="getStatusClass(item.status)">
@@ -11,7 +10,7 @@
         <span class="debug-date">{{ formatDate(item.date) }}</span>
       </div>
       <h3 class="debug-title">
-        <a :href="item.link">{{ item.title }}</a>
+        <a :href="withBase(item.url)">{{ item.title }}</a>
       </h3>
       <p class="debug-desc">{{ item.description || item.excerpt }}</p>
       <div class="debug-footer">
@@ -27,26 +26,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { parseContentList, formatDate, getStatusText, getStatusClass, firstOf } from '../utils/content-loader'
-
-const debugList = ref([])
-const loading = ref(true)
-
-onMounted(async () => {
-  const modules = import.meta.glob('../../debug/*.md', { query: '?raw', import: 'default' })
-  debugList.value = await parseContentList(modules, '/AstralLeap/debug/')
-  loading.value = false
-})
+import { withBase } from 'vitepress'
+import { data as debugList } from '../data/debug.data.ts'
+import { formatDate, getStatusText, getStatusClass, firstOf } from '../utils/content-loader'
 </script>
 
 <style scoped>
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: var(--vp-c-text-2);
-}
-
 .debug-page-list {
   display: flex;
   flex-direction: column;

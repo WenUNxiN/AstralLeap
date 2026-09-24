@@ -1,7 +1,6 @@
 <template>
-  <div v-if="loading" class="loading">加载中...</div>
-  <div v-else class="exp-page-list">
-    <article v-for="exp in experiments" :key="exp.slug" class="exp-card">
+  <div class="exp-page-list">
+    <article v-for="exp in displayedExperiments" :key="exp.slug" class="exp-card">
       <div class="exp-header">
         <span class="exp-id">#{{ getExpId(exp.slug) }}</span>
         <span class="exp-status" :class="getStatusClass(exp.status)">
@@ -10,7 +9,7 @@
         <span class="exp-platform">{{ firstOf(exp.platform) }}</span>
       </div>
       <h3 class="exp-title">
-        <a :href="exp.link">{{ exp.title }}</a>
+        <a :href="withBase(exp.url)">{{ exp.title }}</a>
       </h3>
       <p class="exp-desc">{{ exp.description || exp.excerpt }}</p>
       <div class="exp-footer">
@@ -20,37 +19,31 @@
         </span>
       </div>
     </article>
-    <div v-if="experiments.length === 0" class="empty">
+    <div v-if="displayedExperiments.length === 0" class="empty">
       <p>暂无实验记录</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { parseContentList, formatDate, getStatusText, getStatusClass, getExpId, firstOf } from '../utils/content-loader'
+import { computed } from 'vue'
+import { withBase } from 'vitepress'
+import { data as experiments } from '../data/experiments.data.ts'
+import { formatDate, getStatusText, getStatusClass, getExpId, firstOf } from '../utils/content-loader'
 
-defineProps({
+const props = defineProps({
   limit: { type: Number, default: 0 }
 })
 
-const experiments = ref([])
-const loading = ref(true)
-
-onMounted(async () => {
-  const modules = import.meta.glob('../../experiments/*.md', { query: '?raw', import: 'default' })
-  experiments.value = await parseContentList(modules, '/AstralLeap/experiments/')
-  loading.value = false
+const displayedExperiments = computed(() => {
+  if (props.limit > 0) {
+    return experiments.slice(0, props.limit)
+  }
+  return experiments
 })
 </script>
 
 <style scoped>
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: var(--vp-c-text-2);
-}
-
 .exp-page-list {
   display: flex;
   flex-direction: column;

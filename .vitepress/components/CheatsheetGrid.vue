@@ -1,10 +1,9 @@
 <template>
-  <div v-if="loading" class="loading">加载中...</div>
-  <div v-else class="cheatsheet-grid">
+  <div class="cheatsheet-grid">
     <a
       v-for="item in cheatsheetList"
       :key="item.slug"
-      :href="item.link"
+      :href="withBase(item.url)"
       class="cheat-card"
     >
       <div class="cheat-icon">{{ getIcon(item.slug) }}</div>
@@ -20,11 +19,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { parseContentList } from '../utils/content-loader'
-
-const cheatsheetList = ref([])
-const loading = ref(true)
+import { withBase } from 'vitepress'
+import { data as cheatsheetList } from '../data/cheatsheet.data.ts'
 
 const iconMap = {
   linux: '🐧',
@@ -38,21 +34,9 @@ const iconMap = {
 function getIcon(slug) {
   return iconMap[slug] || '📄'
 }
-
-onMounted(async () => {
-  const modules = import.meta.glob('../../cheatsheet/*.md', { query: '?raw', import: 'default' })
-  cheatsheetList.value = await parseContentList(modules, '/AstralLeap/cheatsheet/')
-  loading.value = false
-})
 </script>
 
 <style scoped>
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: var(--vp-c-text-2);
-}
-
 .cheatsheet-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
