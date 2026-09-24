@@ -15,6 +15,7 @@
         :key="cat.dir"
         :href="withBase(cat.url)"
         class="k-tag"
+        :class="{ 'k-tag-empty': cat.count === 0 }"
       >
         <span class="icon">{{ cat.icon }}</span>
         <span class="name">{{ cat.name }}</span>
@@ -87,6 +88,14 @@ const categories = data.categories
 .k-tag:hover .count {
   color: var(--vp-c-brand-1);
   background: var(--vp-c-bg);
+}
+
+.k-tag-empty {
+  opacity: 0.5;
+}
+
+.k-tag-empty:hover {
+  opacity: 0.8;
 }
 
 </style>

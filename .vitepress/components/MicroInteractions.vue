@@ -88,7 +88,9 @@ const watchCodeBlocks = () => {
     scanPending = true
     queueMicrotask(scanCodeBlocks)
   })
-  codeObserver.observe(document.body, { childList: true, subtree: true })
+  /* 只监听内容区域，避免 nav/sidebar/footer 变更触发扫描 */
+  const content = document.querySelector('.vp-doc') || document.querySelector('#app')
+  codeObserver.observe(content, { childList: true, subtree: true })
 }
 
 onMounted(() => {

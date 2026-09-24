@@ -9,7 +9,7 @@
 .cheatsheet-section {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 36px 0;
+  padding: 48px 0;
   border-top: 1px solid var(--vp-c-divider);
 }
 
@@ -66,9 +66,36 @@
   .debug-section,
   .knowledge-section,
   .cheatsheet-section {
-    padding: 28px 0;
+    padding: 36px 0;
   }
   .section-title {
     font-size: 16px;
   }
+}
+
+/* =============================================
+ * 公共状态标签样式
+ * 由 ExperimentList / ExperimentGrid / DebugList / DebugGrid 共用
+ * ============================================= */
+.exp-status,
+.debug-status {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.exp-status.done,
+.debug-status.done,
+.debug-status.solved {
+  color: var(--vp-c-green, #9ece6a);
+  background: rgba(158, 206, 106, 0.12);
+}
+
+.exp-status.doing,
+.debug-status.doing,
+.debug-status.debugging {
+  color: var(--vp-c-yellow, #e0af68);
+  background: rgba(224, 175, 104, 0.12);
 }

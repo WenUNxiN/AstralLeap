@@ -55,6 +55,8 @@ export default createContentLoader('knowledge/*/*.md', {
 
     const categories: KnowledgeCategory[] = Object.keys(meta)
       .map(dir => ({ dir, ...meta[dir], count: counts[dir] || 0, url: `/knowledge/${dir}/` }))
+      // 隐藏 0 篇文章的空分类，避免首页出现点进去为空的卡片/标签
+      .filter(cat => cat.count > 0)
       .sort((a, b) => b.count - a.count)
 
     sortByDateDesc(articles)

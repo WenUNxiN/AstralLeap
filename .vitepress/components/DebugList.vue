@@ -106,17 +106,6 @@ const displayedDebug = computed(() => {
   white-space: nowrap;
 }
 
-.debug-status.solved {
-  color: var(--vp-c-green, #9ece6a);
-  background: rgba(158, 206, 106, 0.1);
-}
-
-.debug-status.debugging,
-.debug-status.doing {
-  color: var(--vp-c-yellow, #e0af68);
-  background: rgba(224, 175, 104, 0.1);
-}
-
 .debug-cat {
   font-size: 11.5px;
   color: var(--vp-c-text-3);

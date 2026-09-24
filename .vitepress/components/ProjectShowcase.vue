@@ -68,7 +68,7 @@ const displayedProjects = computed(() => {
 @media (max-width: 640px) { .projects-grid { grid-template-columns: 1fr; } }
 
 /* 实际项目卡片 */
-.project-card { display: flex; flex-direction: column; position: relative; height: 260px; background: var(--vp-c-bg-soft); border: 1px solid var(--vp-c-divider); border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; transition: all 0.3s; animation: cardIn 0.5s ease both; }
+.project-card { display: flex; flex-direction: column; position: relative; min-height: 260px; background: var(--vp-c-bg-soft); border: 1px solid var(--vp-c-divider); border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; transition: all 0.3s; animation: cardIn 0.5s ease both; }
 @keyframes cardIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .project-card:hover { border-color: var(--vp-c-brand); transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
 .card-accent { height: 3px; width: 100%; flex-shrink: 0; }
@@ -80,7 +80,7 @@ const displayedProjects = computed(() => {
 .card-status { font-size: 0.65rem; font-weight: 600; padding: 2px 8px; border: 1px solid currentColor; border-radius: 20px; }
 .card-tech { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
 .tech-tag { font-size: 0.65rem; color: var(--vp-c-brand); background: var(--vp-c-brand-soft); padding: 2px 8px; border-radius: 4px; }
-.card-desc { font-size: 0.8rem; color: var(--vp-c-text-2); line-height: 1.5; margin: 0; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.card-desc { font-size: 0.8rem; color: var(--vp-c-text-2); line-height: 1.5; margin: 0; flex: 1; }
 .card-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 600; color: var(--vp-c-brand); padding: 6px 0; margin-top: auto; }
 .project-card:hover .card-btn { gap: 10px; }
 

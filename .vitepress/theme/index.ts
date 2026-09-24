@@ -5,6 +5,7 @@ import "./style.css"
 import "./sections.css"
 import StarfieldBackground from "../components/StarfieldBackground.vue"
 import MicroInteractions from "../components/MicroInteractions.vue"
+import NotFound from "../components/NotFound.vue"
 
 const SocialIcons = {
   render() {
@@ -17,6 +18,7 @@ const SocialIcons = {
       links.map(l => h("a", {
         href: l.href,
         target: "_blank",
+        rel: "noopener",
         title: l.label,
         class: "social-icon-link",
         style: { display: "flex", alignItems: "center", justifyContent: "center", width: "28px", height: "28px" }
@@ -39,7 +41,7 @@ const SiteFooter = {
     if (typeof window === 'undefined' || busuanziLoaded) return
     busuanziLoaded = true
     const script = document.createElement('script')
-    script.src = '//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js'
+    script.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js'
     script.async = true
     document.body.appendChild(script)
   },
@@ -80,7 +82,8 @@ export default {
     return h(DefaultTheme.Layout, null, {
       "layout-top": () => [h(StarfieldBackground), h(MicroInteractions)],
       "nav-bar-content-after": () => h(SocialIcons),
-      "layout-bottom": () => h(SiteFooter)
+      "layout-bottom": () => h(SiteFooter),
+      "not-found": () => h(NotFound)
     })
   },
   enhanceApp({ app, router }) {

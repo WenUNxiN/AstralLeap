@@ -111,6 +111,7 @@ export function getStatusText(status: string): string {
     'done': '✓ 已验证',
     'verified': '✓ 已验证',
     'doing': '⟳ 进行中',
+    'in-progress': '⟳ 进行中',
     'solved': '✓ 已解决',
     'debugging': '🔍 排查中',
     'learning': '📖 学习中',
@@ -123,7 +124,7 @@ export function getStatusText(status: string): string {
  */
 export function getStatusClass(status: string): string {
   if (['done', 'verified', 'solved'].includes(status)) return 'done'
-  if (['doing', 'debugging', 'learning'].includes(status)) return 'doing'
+  if (['doing', 'in-progress', 'debugging', 'learning'].includes(status)) return 'doing'
   return ''
 }
 
