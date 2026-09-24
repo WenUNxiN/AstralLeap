@@ -51,7 +51,7 @@ description: 关于 Stellan W 和这个知识花园
 
 如果你也在做嵌入式视频开发，欢迎交流：
 
-- **GitHub**：[github.com/stellan-w](https://github.com/)
+- **GitHub**：[github.com/WenUNxiN](https://github.com/WenUNxiN)
 - **微信**：关注公众号「星跃AstralLeap」后台留言
 - **邮箱**：stellan.w [at] outlook.com
 
@@ -61,7 +61,7 @@ description: 关于 Stellan W 和这个知识花园
 
 - **框架**：VitePress 2
 - **部署**：GitHub Pages
-- **域名**：stellan-w.github.io/AstralLeap
+- **域名**：wenunxin.github.io/AstralLeap
 - **图标**：Lucide Icons
 
 ---

@@ -44,11 +44,19 @@
   background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.03), transparent);
   animation: scan 8s linear infinite;
   opacity: 0.5;
+  will-change: transform;
 }
 
+/* 用 transform 而非 top 驱动，避免每帧触发布局重排，走合成层更省电 */
 @keyframes scan {
-  0% { top: -2px; }
-  100% { top: 100vh; }
+  0% { transform: translateY(-2px); }
+  100% { transform: translateY(100vh); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-line {
+    animation: none;
+  }
 }
 
 /* 角落装饰 — 像示波器的边角标记 */

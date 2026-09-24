@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://astral-leap.dev/sitemap.xml
+Sitemap: https://wenunxin.github.io/AstralLeap/sitemap.xml
 
 # Crawl-delay
 Crawl-delay: 1

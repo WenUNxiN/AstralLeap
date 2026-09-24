@@ -36,6 +36,11 @@ export default defineConfig({
   title: "星跃 | Astral Leap",
   description: "嵌入式工程师 Stellan W 的个人博客",
   head: [['link', { rel: 'icon', href: '/AstralLeap/favicon.ico' }]],
+  sitemap: {
+    hostname: 'https://wenunxin.github.io/AstralLeap/',
+    // 404 错误页不应被收录进 sitemap
+    transformItems: (items) => items.filter((i) => !i.url.includes('404')),
+  },
   markdown: {
     config(md) {
       /* 代码块文件名标题：```bash title="build.sh" 语法 → 在包装 div 内注入 <span class="title"> */

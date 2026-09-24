@@ -11,7 +11,7 @@ const SocialIcons = {
     const links = [
       { href: "https://space.bilibili.com/242636527", icon: "bilibili", label: "B站" },
       { href: "https://github.com/WenUNxiN", icon: "github", label: "GitHub" },
-      { href: "https://oshwhub.com/eda_vmqaugwah/works", icon: "lcsc", label: "立创" }
+      { href: "https://oshwhub.com/eda_vmqaugwah", icon: "lcsc", label: "立创" }
     ]
     return h("div", { style: { display: "flex", alignItems: "center", gap: "6px", marginLeft: "12px", marginRight: "12px", paddingLeft: "12px", borderLeft: "1px solid var(--vp-c-divider)" } },
       links.map(l => h("a", {
