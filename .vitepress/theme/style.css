@@ -1,5 +1,14 @@
 
 /* Social icons - 亮色显示原彩色 PNG，暗色反色保证可见 */
+.site-social-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 12px;
+  padding-left: 12px;
+  border-left: 1px solid var(--vp-c-divider);
+}
+
 .social-icon-img {
   transition: filter 0.2s ease;
 }
@@ -410,6 +419,10 @@ input:focus {
 
 /* 小屏手机 */
 @media (max-width: 480px) {
+  .site-social-links {
+    display: none;
+  }
+
   .VPHomeHero {
     padding: 2rem 1rem;
   }

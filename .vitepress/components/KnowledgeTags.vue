@@ -4,7 +4,6 @@
       <h2 class="section-title">
         <span class="icon">📚</span>
         技术知识库
-        <span class="badge">NEW</span>
       </h2>
       <p class="section-sub">系统化的嵌入式技术知识，从基础到进阶，持续更新中</p>
     </div>
@@ -24,7 +23,7 @@
     </div>
 
     <div v-if="showMore" class="section-more">
-      <a :href="withBase(moreLink)">浏览全部知识库 →</a>
+      <a :href="withBase(moreLink)">浏览技术知识库 →</a>
     </div>
   </div>
 </template>

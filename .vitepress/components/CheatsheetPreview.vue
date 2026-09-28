@@ -4,7 +4,6 @@
       <h2 class="section-title">
         <span class="icon">⚡</span>
         命令速查
-        <span class="badge">NEW</span>
       </h2>
       <p class="section-sub">常用命令速查表，随时翻找，不用再搜</p>
     </div>

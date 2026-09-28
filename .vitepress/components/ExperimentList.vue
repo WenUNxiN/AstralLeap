@@ -4,7 +4,6 @@
       <h2 class="section-title">
         <span class="icon">🧪</span>
         最新实验
-        <span class="badge">NEW</span>
       </h2>
       <p class="section-sub">每次实验一个明确目标，完整记录环境、步骤、代码与结果</p>
     </div>

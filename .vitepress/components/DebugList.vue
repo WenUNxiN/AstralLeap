@@ -4,7 +4,6 @@
       <h2 class="section-title">
         <span class="icon">🐛</span>
         Debug 记录
-        <span class="badge">NEW</span>
       </h2>
       <p class="section-sub">从现象到根因到解决方案，积累可检索的问题库</p>
     </div>

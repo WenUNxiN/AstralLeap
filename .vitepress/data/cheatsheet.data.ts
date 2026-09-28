@@ -1,5 +1,5 @@
 import { createContentLoader } from 'vitepress'
-import { toContentItem, sortByDateDesc, type ContentItem } from '../utils/content-loader'
+import { toContentItem, sortByDateDesc, type ContentItem } from '../utils/content-loader.ts'
 
 /**
  * 命令速查数据加载器（构建时执行，SSR 直接可用）

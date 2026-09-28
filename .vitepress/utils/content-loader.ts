@@ -4,7 +4,7 @@
  * 这里只提供：将加载器条目规范化为 ContentItem、排序、以及展示格式化函数。
  * 注意：本文件会被构建时（Node）与运行时同时引用，禁止引入 vitepress 客户端 API（如 withBase）。
  */
-import { getExcerpt } from './frontmatter'
+import { getExcerpt } from './frontmatter.ts'
 
 export interface ContentItem {
   title: string
@@ -77,6 +77,7 @@ export function toContentItem(entry: RawContentEntry): ContentItem {
  */
 export function sortByDateDesc<T extends { date: string }>(items: T[]): T[] {
   return items.sort((a, b) => {
+    if (!a.date && !b.date) return 0
     if (!a.date) return 1
     if (!b.date) return -1
     return new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -90,7 +91,7 @@ export function formatDate(dateStr: string): string {
   if (!dateStr) return ''
   const d = new Date(dateStr)
   if (isNaN(d.getTime())) return dateStr
-  return d.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })
+  return d.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })
 }
 
 /**
@@ -98,9 +99,10 @@ export function formatDate(dateStr: string): string {
  */
 export function formatShortDate(d: string): string {
   if (!d) return ''
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d
   const date = new Date(d)
   if (isNaN(date.getTime())) return d
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`
 }
 
 /**

@@ -1,5 +1,5 @@
 import { createContentLoader } from 'vitepress'
-import { toContentItem, sortByDateDesc, type ContentItem } from '../utils/content-loader'
+import { toContentItem, sortByDateDesc, type ContentItem } from '../utils/content-loader.ts'
 
 export interface KnowledgeCategory {
   name: string

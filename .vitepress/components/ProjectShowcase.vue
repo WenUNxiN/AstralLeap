@@ -30,6 +30,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { withBase } from 'vitepress'
 
 const props = defineProps({
   limit: { type: Number, default: 0 }
@@ -37,14 +38,18 @@ const props = defineProps({
 
 // project.json 非 markdown，无法用 createContentLoader；
 // 改用 eager glob 在构建/SSR 阶段同步读取，避免客户端闪烁。
-const modules = import.meta.glob('../../projects/*/project.json', { eager: true, query: '?raw', import: 'default' })
+const modules = import.meta.glob('../../src/projects/*/project.json', { eager: true, query: '?raw', import: 'default' })
 
 const projects = Object.entries(modules).map(([path, raw]) => {
   try {
     const data = typeof raw === 'string' ? JSON.parse(raw.replace(/^\uFEFF/, '')) : raw
     const linkMatch = path.match(/projects\/(.+?)\/project\.json$/)
     const slug = linkMatch ? linkMatch[1] : ''
-    const link = data.link || ('/AstralLeap/projects/' + slug + '/' + slug)
+    const target = data.link || (`/projects/${slug}/${slug}`)
+    const isExternal = /^(?:[a-z]+:)?\/\//i.test(target)
+    // 卡片使用普通 a 标签；GitHub Pages 需要指向实际生成的 .html 文件。
+    const pageLink = isExternal || /\.html(?:[?#]|$)/.test(target) ? target : target + '.html'
+    const link = isExternal ? pageLink : withBase(pageLink)
     return { ...data, folder: slug, link, statusColor: data.statusColor || 'var(--vp-c-brand)' }
   } catch (e) {
     return null
@@ -71,12 +76,13 @@ const displayedProjects = computed(() => {
 .project-card { display: flex; flex-direction: column; position: relative; min-height: 260px; background: var(--vp-c-bg-soft); border: 1px solid var(--vp-c-divider); border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; transition: all 0.3s; animation: cardIn 0.5s ease both; }
 @keyframes cardIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .project-card:hover { border-color: var(--vp-c-brand); transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+.project-card:focus-visible { outline: 3px solid var(--vp-c-brand-1); outline-offset: 4px; border-color: var(--vp-c-brand-1); }
 .card-accent { height: 3px; width: 100%; flex-shrink: 0; }
 .card-body { display: flex; flex-direction: column; flex: 1; padding: 1.25rem; }
 .card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .card-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
 .card-title-box { flex: 1; min-width: 0; }
-.card-title-box h3 { font-size: 0.95rem; font-weight: 700; color: var(--vp-c-text-1); margin: 0 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-title-box h3 { font-size: 0.95rem; font-weight: 700; color: var(--vp-c-text-1); margin: 0 0 4px; line-height: 1.35; overflow-wrap: anywhere; }
 .card-status { font-size: 0.65rem; font-weight: 600; padding: 2px 8px; border: 1px solid currentColor; border-radius: 20px; }
 .card-tech { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
 .tech-tag { font-size: 0.65rem; color: var(--vp-c-brand); background: var(--vp-c-brand-soft); padding: 2px 8px; border-radius: 4px; }

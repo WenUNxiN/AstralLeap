@@ -6,8 +6,8 @@
     <p>你访问的页面可能已被删除、更名或暂时不可用</p>
     <div class="not-found-actions">
       <a :href="withBase('/')" class="btn btn-primary">🏠 返回首页</a>
-      <a :href="withBase('/knowledge/')" class="btn btn-secondary">📚 浏览知识库</a>
-      <a :href="withBase('/projects/')" class="btn btn-secondary">💼 查看项目</a>
+      <a :href="withBase('/knowledge/')" class="btn btn-secondary">📚 浏览技术知识库</a>
+      <a :href="withBase('/projects/')" class="btn btn-secondary">💼 查看项目展示</a>
     </div>
     <p v-if="showCountdown" class="not-found-hint">将在 <span class="countdown">{{ countdown }}</span> 秒后自动返回...</p>
   </div>

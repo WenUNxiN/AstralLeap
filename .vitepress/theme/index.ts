@@ -1,4 +1,5 @@
 import { h } from "vue"
+import { withBase } from "vitepress"
 import type { Theme } from "vitepress"
 import DefaultTheme from "vitepress/theme"
 import "./style.css"
@@ -14,7 +15,7 @@ const SocialIcons = {
       { href: "https://github.com/WenUNxiN", icon: "github", label: "GitHub" },
       { href: "https://oshwhub.com/eda_vmqaugwah", icon: "lcsc", label: "立创" }
     ]
-    return h("div", { style: { display: "flex", alignItems: "center", gap: "6px", marginLeft: "12px", marginRight: "12px", paddingLeft: "12px", borderLeft: "1px solid var(--vp-c-divider)" } },
+    return h("div", { class: "site-social-links" },
       links.map(l => h("a", {
         href: l.href,
         target: "_blank",
@@ -24,7 +25,7 @@ const SocialIcons = {
         style: { display: "flex", alignItems: "center", justifyContent: "center", width: "28px", height: "28px" }
       }, [
         h("img", {
-          src: `/AstralLeap/icons/${l.icon}.png`,
+          src: withBase(`/icons/${l.icon}.png`),
           alt: l.label,
           class: "social-icon-img",
           style: { width: "20px", height: "20px", display: "block" }
@@ -87,8 +88,8 @@ export default {
     })
   },
   enhanceApp({ app, router }) {
-    router.onAfterRouteChange = () => {
-      if (typeof window === "undefined") return
+    router.onAfterRouteChange = (to) => {
+      if (typeof window === "undefined" || to.includes("#")) return
       window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }
