@@ -12,8 +12,10 @@
         <p class="cheat-desc">{{ item.description || item.excerpt }}</p>
       </div>
     </a>
-    <div v-if="cheatsheetList.length === 0" class="empty">
-      <p>暂无速查表</p>
+    <div v-if="cheatsheetList.length === 0" class="empty-state">
+      <div class="empty-icon">🌱</div>
+      <p class="empty-text">暂无速查表</p>
+      <p class="empty-hint">相关内容正在整理，敬请期待</p>
     </div>
   </div>
 </template>
@@ -77,13 +79,6 @@ import { getCheatsheetIcon } from '../utils/content-loader'
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.empty {
-  text-align: center;
-  padding: 40px;
-  color: var(--vp-c-text-3);
-  grid-column: 1 / -1;
 }
 
 @media (max-width: 640px) {

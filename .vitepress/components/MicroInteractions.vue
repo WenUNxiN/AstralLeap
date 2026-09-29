@@ -88,9 +88,10 @@ const watchCodeBlocks = () => {
     scanPending = true
     queueMicrotask(scanCodeBlocks)
   })
-  /* 只监听内容区域，避免 nav/sidebar/footer 变更触发扫描 */
-  const content = document.querySelector('.vp-doc') || document.querySelector('#app')
-  codeObserver.observe(content, { childList: true, subtree: true })
+  /* 监听 #app：路由切换（文档页↔首页）会重建 .vp-doc 节点，
+     若监听 .vp-doc 本身，导航后旧节点脱离 DOM 将收不到变更，折叠按钮丢失 */
+  const target = document.getElementById('app') || document.body
+  codeObserver.observe(target, { childList: true, subtree: true })
 }
 
 onMounted(() => {

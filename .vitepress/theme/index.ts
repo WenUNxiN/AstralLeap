@@ -6,6 +6,7 @@ import "./style.css"
 import "./sections.css"
 import StarfieldBackground from "../components/StarfieldBackground.vue"
 import MicroInteractions from "../components/MicroInteractions.vue"
+import Breadcrumb from "../components/Breadcrumb.vue"
 import NotFound from "../components/NotFound.vue"
 
 const SocialIcons = {
@@ -21,14 +22,12 @@ const SocialIcons = {
         target: "_blank",
         rel: "noopener",
         title: l.label,
-        class: "social-icon-link",
-        style: { display: "flex", alignItems: "center", justifyContent: "center", width: "28px", height: "28px" }
+        class: "social-icon-link"
       }, [
         h("img", {
           src: withBase(`/icons/${l.icon}.png`),
           alt: l.label,
-          class: "social-icon-img",
-          style: { width: "20px", height: "20px", display: "block" }
+          class: "social-icon-img"
         })
       ]))
     )
@@ -82,6 +81,7 @@ export default {
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
       "layout-top": () => [h(StarfieldBackground), h(MicroInteractions)],
+      "doc-top": () => h(Breadcrumb),
       "nav-bar-content-after": () => h(SocialIcons),
       "layout-bottom": () => h(SiteFooter),
       "not-found": () => h(NotFound)

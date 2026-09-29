@@ -55,18 +55,18 @@ const displayedDebug = computed(() => {
 .debug-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .debug-item {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 12px 16px;
+  padding: 14px 18px;
   background: var(--vp-c-bg-soft);
   border: 1px solid var(--vp-c-divider);
   border-left: 3px solid var(--vp-c-yellow, #e0af68);
-  border-radius: 0 10px 10px 0;
+  border-radius: 0 12px 12px 0;
   transition: all 0.2s;
   text-decoration: none;
   color: inherit;
@@ -74,7 +74,8 @@ const displayedDebug = computed(() => {
 
 .debug-item:hover {
   background: var(--vp-c-bg-soft-up);
-  transform: translateX(2px);
+  transform: translateX(3px);
+  box-shadow: 0 2px 12px rgba(224, 175, 104, 0.08);
 }
 
 .debug-item.solved {
@@ -100,8 +101,8 @@ const displayedDebug = computed(() => {
 .debug-status {
   font-size: 10.5px;
   font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 4px;
+  padding: 3px 9px;
+  border-radius: 6px;
   white-space: nowrap;
 }
 

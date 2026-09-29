@@ -100,9 +100,13 @@ export default defineConfig({
   // 社交分享预览（OpenGraph / Twitter 卡片）
   transformHead({ pageData, siteData, title, description }) {
     const origin = SITE_ORIGIN
-    const url = origin + siteData.base + pageData.relativePath
+    const relativeUrl = pageData.relativePath
       .replace(/(^|\/)index\.md$/, '$1')
       .replace(/\.md$/, '.html')
+      .split('/')
+      .map(encodeURIComponent)
+      .join('/')
+    const url = origin + siteData.base + relativeUrl
     return [
       ['meta', { property: 'og:site_name', content: siteData.title }],
       ['meta', { property: 'og:type', content: 'website' }],
@@ -183,6 +187,7 @@ export default defineConfig({
             displayDetails: '显示详情',
             noResultsText: '无法找到相关结果',
             resetButtonTitle: '清除查询条件',
+            backButtonTitle: '关闭搜索',
             footer: { navigateText: '切换', selectText: '选择', closeText: '关闭', searchByText: '搜索提供者' }
           }
         },

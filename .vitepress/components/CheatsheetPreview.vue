@@ -55,25 +55,27 @@ const displayItems = computed(() => {
 
 .cheat-card {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 18px 20px;
   background: var(--vp-c-bg-soft);
   border: 1px solid var(--vp-c-divider);
-  border-radius: 10px;
+  border-radius: 12px;
   text-decoration: none;
   color: inherit;
   transition: all 0.2s;
 }
 
 .cheat-card:hover {
-  border-color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft);
-  transform: translateY(-1px);
+  border-color: var(--vp-c-cyan, #7dcfff);
+  background: var(--vp-c-bg-soft-up);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(125, 207, 255, 0.08);
 }
 
 .cheat-icon {
-  font-size: 26px;
+  font-size: 30px;
   line-height: 1;
   flex-shrink: 0;
 }
@@ -84,18 +86,19 @@ const displayItems = computed(() => {
 }
 
 .cheat-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  margin: 0 0 2px;
+  margin: 0;
   color: var(--vp-c-text-1);
 }
 
 .cheat-desc {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--vp-c-text-3);
   margin: 0;
+  line-height: 1.5;
   display: -webkit-box;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

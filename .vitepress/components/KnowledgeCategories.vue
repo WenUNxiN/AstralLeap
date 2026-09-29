@@ -7,11 +7,12 @@
         :href="withBase(cat.url)"
         class="cat-card"
       >
-        <div class="cat-icon">{{ cat.icon }}</div>
-        <div class="cat-body">
+        <div class="cat-header">
+          <div class="cat-icon">{{ cat.icon }}</div>
           <h3 class="cat-name">{{ cat.name }}</h3>
-          <p class="cat-count">{{ cat.count }} 篇文章</p>
+          <span class="cat-count">{{ cat.count }} 篇</span>
         </div>
+        <p v-if="cat.description" class="cat-desc">{{ cat.description }}</p>
       </a>
     </div>
 
@@ -46,45 +47,80 @@ const totalCount = computed(() => {
 
 .cat-card {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 18px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 20px 22px;
   background: var(--vp-c-bg-soft);
   border: 1px solid var(--vp-c-divider);
-  border-radius: 12px;
+  border-radius: 14px;
   text-decoration: none;
   color: inherit;
   transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* hover 顶部渐变线 */
+.cat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--vp-c-brand-1), var(--vp-c-purple, #bb9af7));
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
 .cat-card:hover {
   border-color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft);
-  transform: translateY(-1px);
+  background: var(--vp-c-bg-soft-up);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.cat-card:hover::before {
+  opacity: 1;
+}
+
+.cat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
 }
 
 .cat-icon {
-  font-size: 28px;
+  font-size: 32px;
   line-height: 1;
   flex-shrink: 0;
 }
 
-.cat-body {
-  min-width: 0;
-  flex: 1;
-}
-
 .cat-name {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
-  margin: 0 0 4px;
+  margin: 0;
   color: var(--vp-c-text-1);
+  flex: 1;
+  min-width: 0;
 }
 
 .cat-count {
-  font-size: 12px;
-  color: var(--vp-c-text-3);
+  font-size: 11px;
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+  padding: 2px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.cat-desc {
   margin: 0;
+  font-size: 12.5px;
+  color: var(--vp-c-text-3);
+  line-height: 1.5;
 }
 
 .progress-section {
@@ -114,6 +150,9 @@ const totalCount = computed(() => {
 @media (max-width: 640px) {
   .category-grid {
     grid-template-columns: 1fr 1fr;
+  }
+  .cat-card {
+    padding: 16px 18px;
   }
   .cat-name {
     font-size: 13.5px;

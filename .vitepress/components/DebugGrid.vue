@@ -17,8 +17,10 @@
         </span>
       </div>
     </a>
-    <div v-if="displayedDebug.length === 0" class="empty">
-      <p>暂无 Debug 记录</p>
+    <div v-if="displayedDebug.length === 0" class="empty-state">
+      <div class="empty-icon">🌱</div>
+      <p class="empty-text">暂无 Debug 记录</p>
+      <p class="empty-hint">相关内容正在整理，敬请期待</p>
     </div>
   </div>
 </template>
@@ -127,12 +129,6 @@ const displayedDebug = computed(() => {
   background: var(--vp-c-bg-elv);
   padding: 1px 7px;
   border-radius: 4px;
-}
-
-.empty {
-  text-align: center;
-  padding: 40px;
-  color: var(--vp-c-text-3);
 }
 
 @media (max-width: 640px) {

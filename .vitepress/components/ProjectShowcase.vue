@@ -23,7 +23,11 @@
           </div>
         </div>
       </a>
-      <div v-if="!displayedProjects.length" class="projects-empty">暂无项目</div>
+      <div v-if="!displayedProjects.length" class="empty-state">
+        <div class="empty-icon">🌱</div>
+        <p class="empty-text">暂无项目</p>
+        <p class="empty-hint">相关内容正在整理，敬请期待</p>
+      </div>
     </div>
   </div>
 </template>
@@ -73,9 +77,9 @@ const displayedProjects = computed(() => {
 @media (max-width: 640px) { .projects-grid { grid-template-columns: 1fr; } }
 
 /* 实际项目卡片 */
-.project-card { display: flex; flex-direction: column; position: relative; min-height: 260px; background: var(--vp-c-bg-soft); border: 1px solid var(--vp-c-divider); border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; transition: all 0.3s; animation: cardIn 0.5s ease both; }
+.project-card { display: flex; flex-direction: column; position: relative; min-height: 260px; background: var(--vp-c-bg-soft); border: 1px solid var(--vp-c-divider); border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit; transition: all 0.3s; animation: cardIn 0.5s ease both; }
 @keyframes cardIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.project-card:hover { border-color: var(--vp-c-brand); transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+.project-card:hover { border-color: var(--vp-c-brand); transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.2), 0 0 0 1px var(--vp-c-brand-1); }
 .project-card:focus-visible { outline: 3px solid var(--vp-c-brand-1); outline-offset: 4px; border-color: var(--vp-c-brand-1); }
 .card-accent { height: 3px; width: 100%; flex-shrink: 0; }
 .card-body { display: flex; flex-direction: column; flex: 1; padding: 1.25rem; }
@@ -90,6 +94,4 @@ const displayedProjects = computed(() => {
 .card-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 600; color: var(--vp-c-brand); padding: 6px 0; margin-top: auto; }
 .project-card:hover .card-btn { gap: 10px; }
 
-/* 空状态 */
-.projects-empty { grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--vp-c-text-3); }
 </style>

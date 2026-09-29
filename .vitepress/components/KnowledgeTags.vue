@@ -50,11 +50,11 @@ const categories = data.categories
 .k-tag {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 13px;
+  gap: 7px;
+  padding: 10px 18px;
   background: var(--vp-c-bg-soft);
   border: 1px solid var(--vp-c-divider);
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 13px;
   color: var(--vp-c-text-1);
   transition: all 0.2s;
@@ -65,7 +65,8 @@ const categories = data.categories
   border-color: var(--vp-c-brand-1);
   color: var(--vp-c-brand-1);
   background: var(--vp-c-brand-soft);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(122, 162, 247, 0.08);
 }
 
 .k-tag .icon {
@@ -80,8 +81,8 @@ const categories = data.categories
   font-size: 10.5px;
   color: var(--vp-c-text-3);
   background: var(--vp-c-bg-elv);
-  padding: 1px 6px;
-  border-radius: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
 }
 
 .k-tag:hover .count {

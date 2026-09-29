@@ -20,7 +20,7 @@
   position: relative;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 48px 0;
+  padding: 52px 0;
 }
 
 .experiment-section::before,
@@ -41,7 +41,7 @@
 }
 
 .section-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--vp-c-text-1);
   margin-bottom: 4px;
@@ -52,16 +52,16 @@
 
 .section-title .icon {
   display: inline-grid;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   place-items: center;
-  border-radius: 9px;
+  border-radius: 10px;
   background: var(--astral-accent-soft);
   font-size: 16px;
 }
 
 .section-sub {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--vp-c-text-2);
 }
 
@@ -118,4 +118,35 @@
 .debug-status.debugging {
   color: var(--vp-c-yellow, #e0af68);
   background: rgba(224, 175, 104, 0.12);
+}
+
+/* =============================================
+ * 公共空状态样式（虚线卡片 + 引导文案）
+ * 由 ExperimentGrid / DebugGrid / CheatsheetGrid /
+ * KnowledgeArticleList / ProjectShowcase 共用
+ * ============================================= */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 24px;
+  background: var(--vp-c-bg-soft);
+  border: 1px dashed var(--vp-c-divider);
+  border-radius: 12px;
+}
+
+.empty-state .empty-icon {
+  font-size: 42px;
+  margin-bottom: 12px;
+}
+
+.empty-state .empty-text {
+  margin: 0;
+  font-size: 14px;
+  color: var(--vp-c-text-2);
+}
+
+.empty-state .empty-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--vp-c-text-3);
 }

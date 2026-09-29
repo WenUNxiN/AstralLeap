@@ -55,17 +55,18 @@ const displayedExperiments = computed(() => {
 .exp-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .exp-item {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 12px 16px;
+  padding: 14px 18px;
   background: var(--vp-c-bg-soft);
   border: 1px solid var(--vp-c-divider);
-  border-radius: 10px;
+  border-left: 3px solid transparent;
+  border-radius: 12px;
   transition: all 0.2s;
   text-decoration: none;
   color: inherit;
@@ -73,8 +74,16 @@ const displayedExperiments = computed(() => {
 
 .exp-item:hover {
   border-color: var(--vp-c-cyan);
+  border-left-color: var(--vp-c-brand-1);
   background: var(--vp-c-bg-soft-up);
-  transform: translateX(2px);
+  transform: translateX(3px);
+  box-shadow: 0 2px 12px rgba(122, 162, 247, 0.1);
+}
+
+/* 状态徽章略放大，覆盖 sections.css 的公共尺寸 */
+.exp-status {
+  padding: 3px 9px;
+  border-radius: 6px;
 }
 
 .exp-id {

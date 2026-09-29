@@ -1,7 +1,9 @@
 <template>
   <div class="article-list">
-    <div v-if="articles.length === 0" class="empty">
-      暂无文章，敬请期待
+    <div v-if="articles.length === 0" class="empty-state">
+      <div class="empty-icon">🌱</div>
+      <p class="empty-text">暂无文章</p>
+      <p class="empty-hint">相关内容正在整理，敬请期待</p>
     </div>
 
     <a
@@ -50,13 +52,6 @@ const articles = computed(() => data.articles.filter(a => a.dir === props.catego
 </script>
 
 <style scoped>
-.empty {
-  text-align: center;
-  padding: 40px;
-  color: var(--vp-c-text-3);
-  font-size: 14px;
-}
-
 .article-list {
   display: flex;
   flex-direction: column;
