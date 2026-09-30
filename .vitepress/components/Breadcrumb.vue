@@ -59,11 +59,9 @@ const crumbs = computed(() => {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  padding: 8px 14px;
-  background: var(--vp-c-bg-soft);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 8px;
-  margin-bottom: 20px;
+  gap: 2px 0;
+  padding: 4px 0;
+  margin-bottom: 16px;
   font-size: 12px;
   color: var(--vp-c-text-3);
 }
