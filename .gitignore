@@ -8,3 +8,9 @@ cache
 *.local
 .trae-html-share-packages
 
+# IDE / 本地环境产物
+.vs/
+.uploads/
+debug.log
+*.log
+
