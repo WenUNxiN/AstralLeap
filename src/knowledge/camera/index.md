@@ -22,8 +22,6 @@ Sensor → I2C → Power/Clock/Reset → MIPI CSI → Media Controller
   → V4L2 Subdev → Video Node → VI → ISP → YUV → RGA → MPP → H.264 → RTSP
 ```
 
-> 💡 每篇文章都会包含：原理说明、示例代码、常见问题、相关实验。
-
 <script setup>
 import KnowledgeArticleList from '../../../.vitepress/components/KnowledgeArticleList.vue'
 </script>

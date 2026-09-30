@@ -13,14 +13,6 @@ icon: 🔌
 
 <KnowledgeArticleList category="driver" />
 
----
-
-## 驱动开发路线
-
-```
-设备树 → GPIO → I2C → SPI → UART → Platform Bus → 字符设备 → 中断
-```
-
 <script setup>
 import KnowledgeArticleList from '../../../.vitepress/components/KnowledgeArticleList.vue'
 </script>

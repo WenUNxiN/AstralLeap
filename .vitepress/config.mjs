@@ -88,15 +88,11 @@ export default defineConfig({
   head: [['link', { rel: 'icon', href: `${SITE_BASE}favicon.ico` }]],
   sitemap: {
     hostname: `${SITE_ORIGIN}${SITE_BASE}`,
-    // 404 错误页与 doc/ 内部历史方案不应被主动索引
-    // 注：此处 url 为不含前导斜杠的相对路径（如 doc/xxx.html）
-    transformItems: (items) =>
-      items.filter((i) => !i.url.includes('404') && !/(^|\/)doc\//.test(i.url)),
+    // 404 错误页不应被主动索引
+    transformItems: (items) => items.filter((i) => !i.url.includes('404')),
   },
   // 读取 git 时间戳，在文档页脚显示最后更新时间（deploy 已设 fetch-depth: 0）
   lastUpdated: true,
-  // doc/ 为个人优化方案历史稿，不属于站点内容，不生成页面
-  srcExclude: ['doc/**'],
   // 社交分享预览（OpenGraph / Twitter 卡片）
   transformHead({ pageData, siteData, title, description }) {
     const origin = SITE_ORIGIN
@@ -224,7 +220,6 @@ export default defineConfig({
         { text: '🎵 音频', link: '/knowledge/audio/' },
         { text: '🤖 AI / NPU', link: '/knowledge/ai/' },
         { text: '📡 网络通信', link: '/knowledge/network/' },
-        { text: '✍️ 思考随笔', link: '/knowledge/thoughts/' },
       ]}]
       warnKnowledgeSidebarDrift(sidebar['/knowledge/'][0].items)
 
