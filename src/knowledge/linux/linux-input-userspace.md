@@ -14,7 +14,7 @@ platform:
 status: learning
 difficulty: beginner
 ---
-# Linux Input 子系统用户空间使用
+#  Linux Input 子系统用户空间使用
 
 ## 概述
 
