@@ -1,36 +1,31 @@
 <template>
-  <div class="knowledge-section">
-    <div class="section-header">
-      <h2 class="section-title">
-        <span class="icon">📚</span>
-        技术知识库
-      </h2>
-      <p class="section-sub">系统化的嵌入式技术知识，从基础到进阶，持续更新中</p>
+  <section class="knowledge-section knowledge-preview" aria-labelledby="knowledge-preview-title">
+    <div class="section-header knowledge-preview-heading">
+      <div>
+        <p class="knowledge-overline">KNOWLEDGE / 持续积累</p>
+        <h2 id="knowledge-preview-title" class="section-title"><span class="knowledge-heading-icon"><AboutIcon name="book" /></span>技术知识库</h2>
+        <p class="section-sub">从底层原理到开发实践，让零散的知识慢慢连成体系。</p>
+      </div>
+      <a v-if="showMore" :href="withBase(moreLink)" class="knowledge-view-all">浏览知识库 <AboutIcon name="arrow" /></a>
     </div>
 
-    <div class="knowledge-tags">
-      <a
-        v-for="cat in categories"
-        :key="cat.dir"
-        :href="withBase(cat.url)"
-        class="k-tag"
-        :class="{ 'k-tag-empty': cat.count === 0 }"
-      >
-        <span class="icon">{{ cat.icon }}</span>
-        <span class="name">{{ cat.name }}</span>
-        <span class="count">{{ cat.count }} 篇</span>
+    <div v-if="categories.length" class="knowledge-preview-grid">
+      <a v-for="cat in categories" :key="cat.dir" :href="withBase(cat.url)" class="knowledge-preview-card">
+        <span class="knowledge-topic-icon"><AboutIcon :name="categoryIcon(cat.dir)" /></span>
+        <h3>{{ cat.name }}</h3>
+        <p v-if="cat.description">{{ cat.description }}</p>
+        <div class="knowledge-preview-footer"><span>{{ cat.count }} 篇笔记</span><AboutIcon name="arrow" /></div>
       </a>
     </div>
-
-    <div v-if="showMore" class="section-more">
-      <a :href="withBase(moreLink)">浏览技术知识库 →</a>
-    </div>
-  </div>
+    <p v-else class="knowledge-preview-empty">笔记正在整理，知识花园会随着学习持续生长。</p>
+  </section>
 </template>
 
 <script setup>
 import { withBase } from 'vitepress'
 import { data } from '../data/knowledge.data.ts'
+import AboutIcon from './AboutIcon.vue'
+import '../theme/knowledge.css'
 
 defineProps({
   showMore: { type: Boolean, default: true },
@@ -38,64 +33,6 @@ defineProps({
 })
 
 const categories = data.categories
+const icons = { linux: 'terminal', driver: 'chip', camera: 'camera', video: 'film', audio: 'radio', ai: 'sparkles', network: 'radio', thoughts: 'book' }
+const categoryIcon = dir => icons[dir] || 'book'
 </script>
-
-<style scoped>
-.knowledge-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.k-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 10px 18px;
-  background: var(--vp-c-bg-soft);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 12px;
-  font-size: 13px;
-  color: var(--vp-c-text-1);
-  transition: all 0.2s;
-  text-decoration: none;
-}
-
-.k-tag:hover {
-  border-color: var(--vp-c-brand-1);
-  color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(122, 162, 247, 0.08);
-}
-
-.k-tag .icon {
-  font-size: 14px;
-}
-
-.k-tag .name {
-  font-weight: 500;
-}
-
-.k-tag .count {
-  font-size: 10.5px;
-  color: var(--vp-c-text-3);
-  background: var(--vp-c-bg-elv);
-  padding: 2px 8px;
-  border-radius: 6px;
-}
-
-.k-tag:hover .count {
-  color: var(--vp-c-brand-1);
-  background: var(--vp-c-bg);
-}
-
-.k-tag-empty {
-  opacity: 0.5;
-}
-
-.k-tag-empty:hover {
-  opacity: 0.8;
-}
-
-</style>

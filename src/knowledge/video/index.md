@@ -2,18 +2,21 @@
 title: 视频编解码
 description: 视频编解码知识：YUV、H.264、MPP、RGA、FFmpeg
 icon: 🎬
+pageClass: knowledge-category
+aside: false
 ---
 
-# 🎬 视频编解码
+<div class="knowledge-category-header">
 
-> 从像素格式到编码原理到硬件实现，视频处理全链路知识。
-> 自动扫描本分类下所有文章。
+<p class="knowledge-overline">KNOWLEDGE / VIDEO PROCESSING</p>
 
----
+# 视频编解码
+
+从像素格式，到编码原理与硬件实现。围绕 YUV、H.264、MPP、RGA 与 FFmpeg，串起视频处理的完整链路。
+
+</div>
 
 <KnowledgeArticleList category="video" />
-
----
 
 ## 视频处理全链路
 

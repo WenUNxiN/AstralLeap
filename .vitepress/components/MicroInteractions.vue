@@ -3,6 +3,9 @@
   <button
     ref="backTop"
     class="back-to-top"
+    :class="{ visible: showBackTop }"
+    :tabindex="showBackTop ? 0 : -1"
+    :aria-hidden="!showBackTop"
     aria-label="返回顶部"
     title="返回顶部"
     @click="scrollToTop"
@@ -14,6 +17,7 @@ import { onMounted, onBeforeUnmount, ref } from 'vue'
 
 const progressBar = ref(null)
 const backTop = ref(null)
+const showBackTop = ref(false)
 
 /* 滚动处理：rAF 节流；进度条用 transform 缩放，避免每帧触发布局重排 */
 let ticking = false
@@ -25,9 +29,7 @@ const updateScrollUI = () => {
   if (progressBar.value) {
     progressBar.value.style.transform = `scaleX(${ratio})`
   }
-  if (backTop.value) {
-    backTop.value.classList.toggle('visible', h.scrollTop > 300)
-  }
+  showBackTop.value = h.scrollTop > 400
 }
 
 const onScroll = () => {
@@ -37,7 +39,7 @@ const onScroll = () => {
 }
 
 const scrollToTop = () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
 }
 
 /* VPButton 涟漪效果（事件委托） */
@@ -65,9 +67,11 @@ const enhanceCodeBlock = (block) => {
   btn.textContent = '▾'
   btn.title = '折叠 / 展开'
   btn.setAttribute('aria-label', '折叠或展开代码块')
+  btn.setAttribute('aria-expanded', 'true')
   btn.addEventListener('click', () => {
     const collapsed = block.classList.toggle('collapsed')
     btn.textContent = collapsed ? '▸' : '▾'
+    btn.setAttribute('aria-expanded', String(!collapsed))
   })
   block.appendChild(btn)
 }

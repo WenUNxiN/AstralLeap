@@ -4,10 +4,16 @@ import type { Theme } from "vitepress"
 import DefaultTheme from "vitepress/theme"
 import "./style.css"
 import "./sections.css"
+import "./site.css"
+import "./sidebar.css"
 import StarfieldBackground from "../components/StarfieldBackground.vue"
 import MicroInteractions from "../components/MicroInteractions.vue"
 import Breadcrumb from "../components/Breadcrumb.vue"
 import NotFound from "../components/NotFound.vue"
+import SiteFooter from "../components/SiteFooter.vue"
+import ArticleContext from "../components/ArticleContext.vue"
+import VisitorCounter from "../components/VisitorCounter.vue"
+import SidebarIntro from "../components/SidebarIntro.vue"
 
 const SocialIcons = {
   render() {
@@ -20,8 +26,9 @@ const SocialIcons = {
       links.map(l => h("a", {
         href: l.href,
         target: "_blank",
-        rel: "noopener",
+        rel: "noopener noreferrer",
         title: l.label,
+        "aria-label": `${l.label}（在新标签页打开）`,
         class: "social-icon-link"
       }, [
         h("img", {
@@ -34,54 +41,14 @@ const SocialIcons = {
   }
 }
 
-let busuanziLoaded = false
-
-const SiteFooter = {
-  mounted() {
-    if (typeof window === 'undefined' || busuanziLoaded) return
-    busuanziLoaded = true
-    const script = document.createElement('script')
-    script.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js'
-    script.async = true
-    document.body.appendChild(script)
-  },
-  render() {
-    return h("footer", { class: "site-footer" }, [
-      h("div", { class: "footer-divider" }),
-      h("div", { class: "footer-content" }, [
-        h("div", { class: "footer-row" }, [
-          h("span", { class: "footer-copyright" }, "© 2026 Stellan W")
-        ]),
-        h("div", { class: "footer-row footer-stats" }, [
-          h("span", { class: "stat-pill" }, [
-            h("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", class: "stat-icon" }, [
-              h("path", { d: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" }),
-              h("circle", { cx: "12", cy: "12", r: "3" })
-            ]),
-            h("span", { id: "busuanzi_value_site_pv" }, "--"), " 次访问"
-          ]),
-          h("span", { class: "stat-pill" }, [
-            h("svg", { viewBox: "0 0 24 24", width: "14", height: "14", fill: "none", stroke: "currentColor", strokeWidth: "2", class: "stat-icon" }, [
-              h("path", { d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" }),
-              h("circle", { cx: "9", cy: "7", r: "4" }),
-              h("path", { d: "M23 21v-2a4 4 0 0 0-3-3.87" }),
-              h("path", { d: "M16 3.13a4 4 0 0 1 0 7.75" })
-            ]),
-            h("span", { id: "busuanzi_value_site_uv" }, "--"), " 位访客"
-          ])
-        ]),
-        h("div", { class: "footer-row footer-tagline" }, "以星为向，以技为跃 ✦ Astral Leap")
-      ])
-    ])
-  }
-}
-
 export default {
   extends: DefaultTheme,
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
-      "layout-top": () => [h(StarfieldBackground), h(MicroInteractions)],
-      "doc-top": () => h(Breadcrumb),
+      "layout-top": () => [h(StarfieldBackground), h(MicroInteractions), h(VisitorCounter)],
+      "doc-before": () => [h(Breadcrumb), h(ArticleContext)],
+      "doc-after": () => h(SiteFooter, { compact: true }),
+      "sidebar-nav-before": () => h(SidebarIntro),
       "nav-bar-content-after": () => h(SocialIcons),
       "layout-bottom": () => h(SiteFooter),
       "not-found": () => h(NotFound)
@@ -90,7 +57,7 @@ export default {
   enhanceApp({ app, router }) {
     router.onAfterRouteChange = (to) => {
       if (typeof window === "undefined" || to.includes("#")) return
-      window.scrollTo({ top: 0, behavior: "smooth" })
+      window.scrollTo({ top: 0, behavior: "instant" })
     }
   }
 } satisfies Theme

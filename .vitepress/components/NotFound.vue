@@ -1,141 +1,38 @@
-<template>
-  <div class="not-found">
-    <div class="not-found-code">404</div>
-    <div class="not-found-divider"></div>
-    <h1>页面迷失在星空中</h1>
-    <p>你访问的页面可能已被删除、更名或暂时不可用</p>
-    <div class="not-found-actions">
-      <a :href="withBase('/')" class="btn btn-primary">🏠 返回首页</a>
-      <a :href="withBase('/knowledge/')" class="btn btn-secondary">📚 浏览技术知识库</a>
-      <a :href="withBase('/projects/')" class="btn btn-secondary">💼 查看项目展示</a>
-    </div>
-    <p v-if="showCountdown" class="not-found-hint">将在 <span class="countdown">{{ countdown }}</span> 秒后自动返回...</p>
-  </div>
-</template>
-
-<script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+<script setup>
 import { withBase } from 'vitepress'
-
-const showCountdown = ref(false)
-const countdown = ref(3)
-let timer: ReturnType<typeof setInterval> | null = null
-
-onMounted(() => {
-  if (typeof document === 'undefined') return
-  const referrer = document.referrer
-  if (referrer && referrer.indexOf(location.hostname) !== -1) {
-    showCountdown.value = true
-    timer = setInterval(() => {
-      countdown.value--
-      if (countdown.value <= 0) {
-        if (timer) clearInterval(timer)
-        history.back()
-      }
-    }, 1000)
-  }
-})
-
-onBeforeUnmount(() => {
-  if (timer) clearInterval(timer)
-})
+import AboutIcon from './AboutIcon.vue'
 </script>
 
+<template>
+  <main class="error-shell" aria-labelledby="error-title">
+    <p class="error-eyebrow">LOST IN EXPLORATION</p>
+    <div class="error-code" aria-hidden="true">404<span>✦</span></div>
+    <h1 id="error-title">这一次，偏离了轨道。</h1>
+    <p class="error-description">这个页面可能已更名或暂时不可用。<br>换个入口，继续探索这座知识花园。</p>
+    <div class="error-actions">
+      <a class="error-primary" :href="withBase('/')">返回首页 <AboutIcon name="arrow" /></a>
+      <a class="error-secondary" :href="withBase('/knowledge/')">浏览知识库 <AboutIcon name="book" /></a>
+    </div>
+    <a class="error-projects" :href="withBase('/projects/')">也可以看看我正在做的项目 <AboutIcon name="arrow-up" /></a>
+  </main>
+</template>
+
 <style scoped>
-.not-found {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 70vh;
-  text-align: center;
-  padding: 2rem;
-}
-
-.not-found-code {
-  font-size: 7rem;
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--vp-c-brand-1), var(--vp-c-indigo-1));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1;
-  letter-spacing: -0.05em;
-}
-
-.not-found-divider {
-  width: 80px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--vp-c-brand-1), var(--vp-c-indigo-1));
-  border-radius: 2px;
-  margin: 1.5rem 0;
-}
-
-.not-found h1 {
-  font-size: 1.6rem;
-  margin: 0 0 0.75rem;
-  color: var(--vp-c-text-1);
-}
-
-.not-found p {
-  color: var(--vp-c-text-2);
-  margin: 0 0 2rem;
-  font-size: 0.95rem;
-}
-
-.not-found-actions {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 2rem;
-}
-
-.btn {
-  padding: 0.65rem 1.4rem;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-
-.btn-primary {
-  background: var(--vp-c-brand-3);
-  color: var(--vp-button-brand-text);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-}
-
-.btn-secondary {
-  background: var(--vp-c-bg-soft);
-  color: var(--vp-c-text-1);
-  border: 1px solid var(--vp-c-divider);
-}
-
-.btn-secondary:hover {
-  border-color: var(--vp-c-brand-1);
-  color: var(--vp-c-brand-1);
-}
-
-.not-found-hint {
-  font-size: 0.85rem !important;
-  color: var(--vp-c-text-3) !important;
-}
-
-.countdown {
-  font-weight: 700;
-  color: var(--vp-c-brand-1);
-}
-
-@media (max-width: 640px) {
-  .not-found-code { font-size: 4.5rem; }
-  .not-found h1 { font-size: 1.3rem; }
-  .not-found-actions { flex-direction: column; }
-  .btn { text-align: center; }
-}
+.error-shell { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 1000px; margin: 0 auto; padding: 80px 24px; min-height: 65vh; text-align: center; }
+.error-eyebrow { margin: 0; font: 11px var(--vp-font-family-mono); letter-spacing: .14em; color: var(--vp-c-brand-1); }
+.error-code { position: relative; margin: 32px 0 26px; font: 700 clamp(90px, 16vw, 150px)/1 var(--vp-font-family-mono); letter-spacing: -.08em; color: var(--vp-c-brand-1); background: linear-gradient(120deg, var(--vp-c-brand-1), var(--vp-c-purple)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.error-code > span { position: absolute; top: 0; right: -32px; font-size: 28px; -webkit-text-fill-color: var(--astral-accent); }
+h1 { margin: 0; font-size: 30px; font-weight: 650; line-height: 1.6; letter-spacing: -.03em; }
+.error-description { margin: 16px 0 0; font-size: 14px; line-height: 1.95; color: var(--vp-c-text-2); }
+.error-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 30px; }
+.error-actions a { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 44px; padding: 10px 18px; border: 1px solid var(--vp-c-divider); border-radius: 9px; font-size: 13px; font-weight: 600; text-decoration: none; }
+.error-actions .about-icon { width: 16px; height: 16px; }
+.error-primary { background: var(--vp-c-brand-3); color: #fff; border-color: transparent !important; }
+.error-primary:hover { background: var(--vp-c-brand-2); }
+.error-secondary { color: var(--vp-c-text-1); background: var(--vp-c-bg); }
+.error-secondary:hover { background: var(--vp-c-brand-soft); border-color: var(--vp-c-brand-1); }
+.error-projects { display: inline-flex; align-items: center; gap: 8px; margin-top: 24px; min-height: 36px; font-size: 12px; color: var(--vp-c-text-2); text-decoration: none; }
+.error-projects .about-icon { width: 14px; height: 14px; }
+.error-projects:hover { color: var(--vp-c-brand-1); }
+@media(max-width: 640px) { .error-shell { padding: 56px 20px; } h1 { font-size: 24px; } }
 </style>

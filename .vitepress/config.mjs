@@ -1,37 +1,12 @@
 import { defineConfig } from 'vitepress'
-import { readdirSync, statSync, readFileSync, writeFileSync, existsSync } from 'fs'
+import { writeFileSync } from 'fs'
 import { join } from 'path'
+import { fileURLToPath } from 'node:url'
+import { createSidebar, sidebarContentPlugin } from './utils/sidebar.mjs'
 
 const SITE_BASE = '/AstralLeap/'
 const SITE_ORIGIN = 'https://wenunxin.github.io'
-
-function getProjectSidebar(dir) {
-  try {
-    const json = JSON.parse(readFileSync(join('src', 'projects', dir, 'project.json'), 'utf-8'))
-    if (json.sidebar && json.sidebar.length > 0) {
-      const base = '/projects/' + dir + '/'
-      const addBase = (items) => items.map(item => {
-        const result = { text: item.text }
-        if (item.link) result.link = base + item.link
-        if (item.collapsed !== undefined) result.collapsed = item.collapsed
-        if (item.items) result.items = addBase(item.items)
-        return result
-      })
-      return [{ text: json.name || dir, collapsed: false, items: addBase(json.sidebar) }]
-    }
-  } catch (e) { console.warn('Failed:', dir) }
-  return [{ text: dir, collapsed: false, items: [] }]
-}
-
-function getSortedProjectDirs() {
-  const projectsDir = join(process.cwd(), 'src', 'projects')
-  const dirs = readdirSync(projectsDir).filter(d => statSync(join(projectsDir, d)).isDirectory())
-  const getNum = (name) => {
-    const m = name.match(/^(\d+)/)
-    return m ? parseInt(m[1]) : 0
-  }
-  return dirs.sort((a, b) => getNum(b) - getNum(a))
-}
+const SOURCE_DIR = fileURLToPath(new URL('../src/', import.meta.url))
 
 /* ===== 中文搜索分词 =====
  * minisearch 默认按空白/标点切分，对中文几乎无效（整句成一个 token）。
@@ -56,35 +31,13 @@ function cjkProcessTerm(term) {
   return typeof term === 'string' ? term.toLowerCase() : null
 }
 
-/* 构建期校验：knowledge/ 下每个分类目录都应出现在知识库侧边栏中。
- * 分类卡片/标签是自动发现的，但侧边栏手动维护（控制排序），
- * 新增分类时容易只出现卡片而漏加侧边栏，这里提前警告。 */
-function warnKnowledgeSidebarDrift(sidebarItems) {
-  try {
-    const knowledgeDir = join(process.cwd(), 'src', 'knowledge')
-    const diskDirs = readdirSync(knowledgeDir).filter(d => {
-      const p = join(knowledgeDir, d)
-      return statSync(p).isDirectory() && existsSync(join(p, 'index.md'))
-    })
-    const listed = new Set(
-      sidebarItems
-        .map(i => (i.link || '').replace(/^\/knowledge\//, '').replace(/\/$/, ''))
-        .filter(Boolean)
-    )
-    for (const dir of diskDirs) {
-      if (!listed.has(dir)) {
-        console.warn(`[sidebar] 知识分类 "${dir}" 存在于 knowledge/ 但未加入侧边栏，请补充 .vitepress/config.mjs`)
-      }
-    }
-  } catch (e) { /* 校验失败不应阻断构建 */ }
-}
-
 export default defineConfig({
   srcDir: 'src',
   base: SITE_BASE,
   lang: 'zh-CN',
   title: "星跃 | Astral Leap",
-  description: "嵌入式工程师 Stellan W 的个人博客",
+  description: "Stellan W 的技术探索知识花园，记录学习、实验、项目与思考，让知识随探索持续生长。",
+  vite: { plugins: [sidebarContentPlugin(SOURCE_DIR)] },
   head: [['link', { rel: 'icon', href: `${SITE_BASE}favicon.ico` }]],
   sitemap: {
     hostname: `${SITE_ORIGIN}${SITE_BASE}`,
@@ -158,11 +111,16 @@ export default defineConfig({
   },
   themeConfig: {
     logo: '/logo.png',
-    sidebarMenuLabel: '目录',
+    sidebarMenuLabel: '浏览目录',
     mobileMenuLabel: '导航菜单',
     navMenuLabel: '主导航',
     extraMenuLabel: '更多选项',
-    outline: { label: '页面大纲', level: [2, 3] },
+    darkModeSwitchLabel: '外观',
+    lightModeSwitchTitle: '切换为浅色模式',
+    darkModeSwitchTitle: '切换为深色模式',
+    returnToTopLabel: '返回顶部',
+    skipToContentLabel: '跳转到正文',
+    outline: { label: '本页目录', level: [2, 3] },
     docFooter: { prev: '上一篇', next: '下一篇' },
     lastUpdated: { text: '最后更新于' },
     search: {
@@ -204,49 +162,6 @@ export default defineConfig({
       { text: '速查', link: '/cheatsheet/' },
       { text: '关于', link: '/about' },
     ],
-    sidebar: (() => {
-      const sidebar = {}
-      const dirs = getSortedProjectDirs()
-      for (const dir of dirs) {
-        sidebar['/projects/' + dir + '/'] = getProjectSidebar(dir)
-      }
-      // 知识库侧边栏（自动发现分类，但侧边栏手动维护，确保排序可控）
-      sidebar['/knowledge/'] = [{ text: '📚 技术知识库', items: [
-        { text: '🏠 技术知识库首页', link: '/knowledge/' },
-        { text: '🐧 嵌入式 Linux', link: '/knowledge/linux/' },
-        { text: '🔌 Linux 驱动开发', link: '/knowledge/driver/' },
-        { text: '📷 Camera / V4L2', link: '/knowledge/camera/' },
-        { text: '🎬 视频编解码', link: '/knowledge/video/' },
-        { text: '🎵 音频', link: '/knowledge/audio/' },
-        { text: '🤖 AI / NPU', link: '/knowledge/ai/' },
-        { text: '📡 网络通信', link: '/knowledge/network/' },
-      ]}]
-      warnKnowledgeSidebarDrift(sidebar['/knowledge/'][0].items)
-
-      // 实验记录侧边栏
-      sidebar['/experiments/'] = [{ text: '🧪 实验记录', items: [
-        { text: '🏠 实验记录首页', link: '/experiments/' },
-        { text: '🧪 最新实验', link: '/experiments/#最新实验' },
-      ]}]
-
-      // 命令速查侧边栏
-      sidebar['/cheatsheet/'] = [{ text: '⚡ 命令速查', items: [
-        { text: '🏠 命令速查首页', link: '/cheatsheet/' },
-        { text: '🐧 Linux', link: '/cheatsheet/linux' },
-        { text: '📷 V4L2', link: '/cheatsheet/v4l2' },
-        { text: '🎬 FFmpeg', link: '/cheatsheet/ffmpeg' },
-        { text: '🌿 Git', link: '/cheatsheet/git' },
-      ]}]
-
-      // Debug 记录侧边栏
-      sidebar['/debug/'] = [{ text: '🐛 Debug 记录', items: [
-        { text: '🏠 Debug 记录首页', link: '/debug/' },
-        { text: '📷 Camera', link: '/debug/camera' },
-        { text: '📺 V4L2', link: '/debug/v4l2' },
-        { text: '🎬 MPP', link: '/debug/mpp' },
-      ]}]
-
-      return sidebar
-    })(),
+    sidebar: createSidebar(SOURCE_DIR),
   },
 })

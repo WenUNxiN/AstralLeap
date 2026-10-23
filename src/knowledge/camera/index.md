@@ -2,18 +2,21 @@
 title: Camera / V4L2
 description: Camera 和 V4L2 知识：Sensor、MIPI CSI、V4L2、Media Controller、ISP
 icon: 📷
+pageClass: knowledge-category
+aside: false
 ---
 
-# 📷 Camera / V4L2
+<div class="knowledge-category-header">
 
-> Camera 全链路知识：从 Sensor 到 MIPI 到 V4L2 到 ISP。
-> 自动扫描本分类下所有文章，按日期倒序排列。
+<p class="knowledge-overline">KNOWLEDGE / CAMERA & VIDEO</p>
 
----
+# Camera / V4L2
+
+Camera 全链路知识：从 Sensor 到 MIPI CSI，再到 V4L2 与 ISP。把图像如何从硬件进入应用，逐层拆开。
+
+</div>
 
 <KnowledgeArticleList category="camera" />
-
----
 
 ## Camera 完整链路
 

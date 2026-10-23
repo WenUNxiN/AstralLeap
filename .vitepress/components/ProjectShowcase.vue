@@ -1,25 +1,23 @@
 <template>
-  <div class="projects-page">
+  <div class="project-showcase" :class="{ 'is-preview': limit > 0 }">
     <div class="projects-grid">
-      <a v-for="(project, i) in displayedProjects" :key="project.name" :href="project.link" class="project-card" :style="{ animationDelay: i * 0.1 + 's' }">
-        <div class="card-accent" :style="{ background: project.gradient }"></div>
+      <a v-for="project in displayedProjects" :key="project.folder" :href="project.link" class="project-card" :style="{ '--project-gradient': project.gradient }">
         <div class="card-body">
           <div class="card-top">
-            <div class="card-icon" :style="{ background: project.gradient }">
-              <span>{{ project.icon }}</span>
-            </div>
-            <div class="card-title-box">
-              <h3>{{ project.name }}</h3>
-              <span class="card-status" :style="{ color: project.statusColor }">{{ project.status }}</span>
-            </div>
+            <span class="card-number">PROJECT / {{ project.number }}</span>
+            <span v-if="project.status" class="card-status" :class="project.statusClass"><span aria-hidden="true"></span>{{ project.status }}</span>
           </div>
+          <div class="card-heading">
+            <span class="card-icon" aria-hidden="true">{{ project.icon }}</span>
+            <h3>{{ project.name }}</h3>
+          </div>
+          <p class="card-desc">{{ project.desc }}</p>
           <div class="card-tech">
             <span v-for="t in project.tech" :key="t" class="tech-tag">{{ t }}</span>
           </div>
-          <p class="card-desc">{{ project.desc }}</p>
-          <div class="card-btn">
-            查看详情
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <div class="card-footer">
+            <span>查看项目文档</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="17" height="17" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
           </div>
         </div>
       </a>
@@ -50,11 +48,14 @@ const projects = Object.entries(modules).map(([path, raw]) => {
     const linkMatch = path.match(/projects\/(.+?)\/project\.json$/)
     const slug = linkMatch ? linkMatch[1] : ''
     const target = data.link || (`/projects/${slug}/${slug}`)
-    const isExternal = /^(?:[a-z]+:)?\/\//i.test(target)
-    // 卡片使用普通 a 标签；GitHub Pages 需要指向实际生成的 .html 文件。
-    const pageLink = isExternal || /\.html(?:[?#]|$)/.test(target) ? target : target + '.html'
+    const isExternal = /^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(target)
+    // Cards are native anchors: directory routes keep '/', articles need '.html'.
+    const [, pathname, suffix = ''] = target.match(/^([^?#]*)(.*)$/)
+    const pageLink = isExternal || /(?:\/|\.html)$/.test(pathname) ? target : pathname.replace(/\.md$/, '') + '.html' + suffix
     const link = isExternal ? pageLink : withBase(pageLink)
-    return { ...data, folder: slug, link, statusColor: data.statusColor || 'var(--vp-c-brand)' }
+    const number = (slug.match(/^(\d+)/) || [null, ''])[1].padStart(2, '0')
+    const statusClass = /完成|发布|已验证/.test(data.status) ? 'complete' : /规划|构思/.test(data.status) ? 'planned' : 'active'
+    return { ...data, folder: slug, number, link, statusClass }
   } catch (e) {
     return null
   }
@@ -71,27 +72,38 @@ const displayedProjects = computed(() => {
 </script>
 
 <style scoped>
-.projects-page { max-width: 1200px; margin: 0 auto; }
-.projects-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
-@media (max-width: 1024px) { .projects-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 640px) { .projects-grid { grid-template-columns: 1fr; } }
-
-/* 实际项目卡片 */
-.project-card { display: flex; flex-direction: column; position: relative; min-height: 260px; background: var(--vp-c-bg-soft); border: 1px solid var(--vp-c-divider); border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit; transition: all 0.3s; animation: cardIn 0.5s ease both; }
-@keyframes cardIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.project-card:hover { border-color: var(--vp-c-brand); transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.2), 0 0 0 1px var(--vp-c-brand-1); }
-.project-card:focus-visible { outline: 3px solid var(--vp-c-brand-1); outline-offset: 4px; border-color: var(--vp-c-brand-1); }
-.card-accent { height: 3px; width: 100%; flex-shrink: 0; }
-.card-body { display: flex; flex-direction: column; flex: 1; padding: 1.25rem; }
-.card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-.card-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
-.card-title-box { flex: 1; min-width: 0; }
-.card-title-box h3 { font-size: 0.95rem; font-weight: 700; color: var(--vp-c-text-1); margin: 0 0 4px; line-height: 1.35; overflow-wrap: anywhere; }
-.card-status { font-size: 0.65rem; font-weight: 600; padding: 2px 8px; border: 1px solid currentColor; border-radius: 20px; }
-.card-tech { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
-.tech-tag { font-size: 0.65rem; color: var(--vp-c-brand); background: var(--vp-c-brand-soft); padding: 2px 8px; border-radius: 4px; }
-.card-desc { font-size: 0.8rem; color: var(--vp-c-text-2); line-height: 1.5; margin: 0; flex: 1; }
-.card-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 600; color: var(--vp-c-brand); padding: 6px 0; margin-top: auto; }
-.project-card:hover .card-btn { gap: 10px; }
-
+.project-showcase { width: 100%; min-width: 0; }
+.projects-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.project-card { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 286px; overflow: hidden; border: 1px solid var(--vp-c-divider); border-radius: 13px; background: var(--vp-c-bg); color: inherit; text-decoration: none; transition: border-color .2s, transform .2s, box-shadow .2s; }
+.project-card::before { content: ''; position: absolute; top: 0; left: 24px; right: 24px; height: 2px; background: var(--project-gradient, var(--vp-c-brand-1)); opacity: .65; }
+.project-card:hover { border-color: color-mix(in srgb, var(--vp-c-brand-1) 50%, var(--vp-c-divider)); transform: translateY(-3px); box-shadow: 0 8px 28px rgb(40 50 100 / 6%); }
+.project-card:focus-visible { outline: 2px solid var(--vp-c-brand-1); outline-offset: 4px; border-color: var(--vp-c-brand-1); }
+.card-body { display: flex; flex-direction: column; flex: 1; min-width: 0; padding: 24px 25px 18px; }
+.card-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 22px; }
+.card-number { color: var(--vp-c-text-3); font-family: var(--vp-font-family-mono); font-size: 10px; letter-spacing: .08em; }
+.card-status { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 5px; background: var(--vp-c-brand-soft); color: var(--vp-c-brand-1); font-size: 10px; line-height: 1.7; white-space: nowrap; }
+.card-status > span { width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
+.card-status.planned { background: var(--vp-c-default-soft); color: var(--vp-c-text-2); }
+.card-status.complete { background: var(--astral-accent-soft); color: var(--astral-accent); }
+.card-heading { display: flex; align-items: center; gap: 12px; }
+.card-icon { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--vp-c-divider); border-radius: 10px; background: var(--vp-c-bg-soft); font-size: 20px; flex-shrink: 0; }
+.card-heading h3 { margin: 0; color: var(--vp-c-text-1); font-size: 17px; font-weight: 600; line-height: 1.6; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.card-body .card-desc { margin: 13px 0 0; color: var(--vp-c-text-2); font-size: 13px; line-height: 1.85; }
+.card-tech { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 17px; padding-bottom: 22px; }
+.tech-tag { padding: 3px 7px; border: 1px solid var(--vp-c-divider); border-radius: 4px; background: var(--vp-c-bg-soft); color: var(--vp-c-text-2); font-family: var(--vp-font-family-mono); font-size: 10px; line-height: 1.6; }
+.card-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: auto; padding-top: 15px; border-top: 1px solid var(--vp-c-divider); color: var(--vp-c-text-2); font-size: 11px; transition: color .2s; }
+.card-footer svg { color: var(--vp-c-brand-1); transition: transform .2s; }
+.project-card:hover .card-footer { color: var(--vp-c-brand-1); }
+.project-card:hover .card-footer svg { transform: translateX(3px); }
+@media (max-width: 640px) {
+  .projects-grid { grid-template-columns: 1fr; gap: 12px; }
+  .project-card { min-height: 268px; }
+  .card-body { padding: 21px 22px 17px; }
+  .card-top { margin-bottom: 18px; }
+  .card-heading h3 { font-size: 16px; }
+  .card-desc { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-card:hover, .project-card:hover .card-footer svg { transform: none; }
+}
 </style>

@@ -1,154 +1,49 @@
+<script setup>
+import { computed, ref } from 'vue'
+import { withBase } from 'vitepress'
+import AboutIcon from './AboutIcon.vue'
+import { data as experiments } from '../data/experiments.data.ts'
+import { formatShortDate, getStatusClass, getExpId, getDifficultyText } from '../utils/content-loader'
+import '../theme/collections.css'
+
+const props = defineProps({ limit: { type: Number, default: 0 } })
+const query = ref('')
+const state = ref('all')
+const filters = [{ value: 'all', label: '全部' }, { value: 'done', label: '已验证' }, { value: 'doing', label: '进行中' }]
+const filteredExperiments = computed(() => {
+  const keyword = query.value.trim().toLowerCase()
+  return experiments.filter(item => {
+    const searchable = [item.title, item.description, item.slug, ...(item.tags || []), ...asArray(item.platform), ...asArray(item.category)].join(' ').toLowerCase()
+    return (!keyword || searchable.includes(keyword)) && (state.value === 'all' || getStatusClass(item.status) === state.value)
+  })
+})
+const displayedExperiments = computed(() => props.limit > 0 ? filteredExperiments.value.slice(0, props.limit) : filteredExperiments.value)
+const isFiltered = computed(() => query.value.trim() !== '' || state.value !== 'all')
+function asArray(value) { return Array.isArray(value) ? value : value ? [value] : [] }
+function statusText(status) { return ({ done: '已验证', verified: '已验证', doing: '进行中', 'in-progress': '进行中' })[status] || status }
+function resetFilters() { query.value = ''; state.value = 'all' }
+</script>
+
 <template>
-  <div class="exp-page-list">
-    <a v-for="exp in displayedExperiments" :key="exp.slug" :href="withBase(exp.url)" class="exp-card">
-      <div class="exp-header">
-        <span class="exp-id">#{{ getExpId(exp.slug) }}</span>
-        <span class="exp-status" :class="getStatusClass(exp.status)">
-          {{ getStatusText(exp.status) }}
-        </span>
-        <span class="exp-platform">{{ firstOf(exp.platform) }}</span>
+  <div class="collection-browser">
+    <div v-if="limit === 0" class="collection-toolbar">
+      <div class="collection-filter-group" role="group" aria-label="按实验状态筛选">
+        <button v-for="filter in filters" :key="filter.value" type="button" :aria-pressed="state === filter.value" @click="state = filter.value">{{ filter.label }}</button>
       </div>
-      <h3 class="exp-title">{{ exp.title }}</h3>
-      <p class="exp-desc">{{ exp.description || exp.excerpt }}</p>
-      <div class="exp-footer">
-        <span class="exp-date">{{ formatDate(exp.date) }}</span>
-        <span v-if="exp.tags && exp.tags.length" class="exp-tags">
-          <span v-for="t in exp.tags.slice(0, 4)" :key="t" class="tag">{{ t }}</span>
-        </span>
+      <label class="collection-search"><AboutIcon name="code" /><span class="collection-sr-only">筛选实验标题、标签或平台</span><input v-model="query" type="search" placeholder="标题、标签或平台" /></label>
+    </div>
+    <div v-if="limit === 0" class="collection-result-line"><span role="status" aria-live="polite">{{ isFiltered ? '找到' : '共' }} {{ filteredExperiments.length }} 篇实验记录</span><button v-if="isFiltered" type="button" @click="resetFilters">重置筛选</button><span v-else>最近记录在前</span></div>
+    <div class="collection-cards">
+      <a v-for="exp in displayedExperiments" :key="exp.slug" :href="withBase(exp.url)" class="collection-card collection-experiment">
+        <div class="collection-card-top"><span class="collection-record-id">EXP / {{ getExpId(exp.slug) || 'NOTE' }}</span><span v-if="exp.status" class="collection-state" :class="getStatusClass(exp.status)"><span aria-hidden="true"></span>{{ statusText(exp.status) }}</span></div>
+        <h3>{{ exp.title }}</h3>
+        <p class="collection-card-description">{{ exp.description || exp.excerpt }}</p>
+        <div class="collection-card-meta"><span v-if="asArray(exp.platform).length"><AboutIcon name="chip" />{{ asArray(exp.platform).join(' · ') }}</span><span v-if="exp.difficulty">{{ getDifficultyText(exp.difficulty) }}</span><time v-if="exp.date" :datetime="exp.date">{{ formatShortDate(exp.date) }}</time></div>
+        <div class="collection-card-footer"><div class="collection-card-tags"><span v-for="tag in (exp.tags || []).slice(0, 4)" :key="tag">{{ tag }}</span></div><span class="collection-read-link">阅读实验 <AboutIcon name="arrow" /></span></div>
+      </a>
+      <div v-if="displayedExperiments.length === 0" class="collection-empty">
+        <AboutIcon name="flask" /><h3>{{ experiments.length ? '没有找到匹配的实验' : '实验正在酝酿中' }}</h3><p>{{ experiments.length ? '换个关键词，或清除当前筛选再看看。' : '下一次动手的过程与发现，会记录在这里。' }}</p><button v-if="isFiltered" type="button" @click="resetFilters">查看全部实验</button>
       </div>
-    </a>
-    <div v-if="displayedExperiments.length === 0" class="empty-state">
-      <div class="empty-icon">🌱</div>
-      <p class="empty-text">暂无实验记录</p>
-      <p class="empty-hint">相关内容正在整理，敬请期待</p>
     </div>
   </div>
 </template>
-
-<script setup>
-import { computed } from 'vue'
-import { withBase } from 'vitepress'
-import { data as experiments } from '../data/experiments.data.ts'
-import { formatDate, getStatusText, getStatusClass, getExpId, firstOf } from '../utils/content-loader'
-
-const props = defineProps({
-  limit: { type: Number, default: 0 }
-})
-
-const displayedExperiments = computed(() => {
-  if (props.limit > 0) {
-    return experiments.slice(0, props.limit)
-  }
-  return experiments
-})
-</script>
-
-<style scoped>
-.exp-page-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.exp-card {
-  display: block;
-  text-decoration: none;
-  color: inherit;
-  padding: 18px 20px;
-  background: var(--vp-c-bg-soft);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 12px;
-  transition: all 0.2s;
-}
-
-.exp-card:hover {
-  border-color: var(--vp-c-brand-1);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-}
-
-.exp-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.exp-id {
-  font-family: Consolas, 'Courier New', monospace;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--vp-c-cyan);
-  background: rgba(0, 180, 200, 0.1);
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.exp-status {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.exp-platform {
-  font-size: 11.5px;
-  color: var(--vp-c-text-3);
-}
-
-.exp-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 4px 0 8px;
-  color: var(--vp-c-text-1);
-}
-
-.exp-card:hover .exp-title {
-  color: var(--vp-c-brand-1);
-}
-
-.exp-desc {
-  font-size: 13.5px;
-  color: var(--vp-c-text-2);
-  line-height: 1.6;
-  margin: 0 0 10px;
-}
-
-.exp-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.exp-date {
-  font-size: 12px;
-  color: var(--vp-c-text-3);
-}
-
-.exp-tags {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.tag {
-  font-size: 11px;
-  color: var(--vp-c-text-2);
-  background: var(--vp-c-bg-elv);
-  padding: 1px 7px;
-  border-radius: 4px;
-}
-
-@media (max-width: 640px) {
-  .exp-card {
-    padding: 14px 16px;
-  }
-  .exp-title {
-    font-size: 14px;
-  }
-  .exp-desc {
-    font-size: 12.5px;
-  }
-}
-</style>

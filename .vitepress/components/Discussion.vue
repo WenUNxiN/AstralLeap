@@ -1,7 +1,8 @@
 <template>
   <div class="giscus-container">
-    <h3>💬 讨论区</h3>
+    <div class="discussion-heading"><span class="discussion-eyebrow">LET’S DISCUSS</span><h3>一起讨论，让想法继续生长。</h3><p>欢迎提问、交流使用心得，或分享你的实践。</p></div>
     <div id="giscus-comments"></div>
+    <a class="discussion-fallback" href="https://github.com/WenUNxiN/StellanW-Discussions/discussions" target="_blank" rel="noopener noreferrer">也可以前往 GitHub 参与讨论 ↗<span class="discussion-sr-only">（在新标签页打开）</span></a>
   </div>
 </template>
 
@@ -64,12 +65,20 @@ watch(isDark, () => {
 <style scoped>
 .giscus-container {
   margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--vp-c-divider);
+  padding: 24px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 14px;
+  background: var(--vp-c-bg);
 }
 
 .giscus-container h3 {
-  margin-bottom: 1.5rem;
-  font-size: 1.25rem;
+  margin: 8px 0 10px;
+  font-size: 20px;
+  letter-spacing: -.025em;
 }
+.discussion-eyebrow { font: 10px var(--vp-font-family-mono); letter-spacing: .12em; color: var(--vp-c-brand-1); }
+.discussion-heading p { margin: 0 0 24px; color: var(--vp-c-text-2); font-size: 13px; }
+.discussion-fallback { display: inline-block; margin-top: 20px; font-size: 12px; color: var(--vp-c-brand-1); }
+.discussion-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 640px) { .giscus-container { padding: 20px 16px; } }
 </style>

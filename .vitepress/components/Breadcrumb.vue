@@ -2,9 +2,9 @@
   <nav v-if="crumbs.length" class="vp-breadcrumb" aria-label="面包屑导航">
     <a :href="withBase('/')">首页</a>
     <template v-for="(c, i) in crumbs" :key="i">
-      <span class="sep">/</span>
+      <span class="sep" aria-hidden="true">/</span>
       <a v-if="c.url" :href="withBase(c.url)">{{ c.label }}</a>
-      <span v-else class="current">{{ c.label }}</span>
+      <span v-else class="current" aria-current="page">{{ c.label }}</span>
     </template>
   </nav>
 </template>
@@ -32,7 +32,7 @@ const crumbs = computed(() => {
   const parts = rel.replace(/\.md$/, '').split('/')
   const isIndex = parts[parts.length - 1] === 'index'
   const meta = topMap[parts[0]]
-  const pageLabel = frontmatter.value.title || title.value
+  const pageLabel = frontmatter.value.title || page.value.title || title.value
   const out = []
 
   if (meta) {

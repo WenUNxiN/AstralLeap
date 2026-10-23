@@ -1,145 +1,49 @@
+<script setup>
+import { computed, ref } from 'vue'
+import { withBase } from 'vitepress'
+import AboutIcon from './AboutIcon.vue'
+import { data as debugList } from '../data/debug.data.ts'
+import { formatShortDate, getStatusClass, firstOf } from '../utils/content-loader'
+import '../theme/collections.css'
+
+const props = defineProps({ limit: { type: Number, default: 0 } })
+const query = ref('')
+const state = ref('all')
+const filters = [{ value: 'all', label: '全部' }, { value: 'done', label: '已解决' }, { value: 'doing', label: '排查中' }]
+const filteredDebug = computed(() => {
+  const keyword = query.value.trim().toLowerCase()
+  return debugList.filter(item => {
+    const searchable = [item.title, item.description, ...(item.tags || []), ...asArray(item.platform), ...asArray(item.category)].join(' ').toLowerCase()
+    return (!keyword || searchable.includes(keyword)) && (state.value === 'all' || getStatusClass(item.status) === state.value)
+  })
+})
+const displayedDebug = computed(() => props.limit > 0 ? filteredDebug.value.slice(0, props.limit) : filteredDebug.value)
+const isFiltered = computed(() => query.value.trim() !== '' || state.value !== 'all')
+function asArray(value) { return Array.isArray(value) ? value : value ? [value] : [] }
+function statusText(status) { return ({ solved: '已解决', debugging: '排查中', doing: '排查中', 'in-progress': '排查中' })[status] || status }
+function resetFilters() { query.value = ''; state.value = 'all' }
+</script>
+
 <template>
-  <div class="debug-page-list">
-    <a v-for="item in displayedDebug" :key="item.slug" :href="withBase(item.url)" class="debug-card" :class="{ solved: item.status === 'solved' }">
-      <div class="debug-header">
-        <span class="debug-status" :class="getStatusClass(item.status)">
-          {{ getStatusText(item.status) }}
-        </span>
-        <span class="debug-category">{{ firstOf(item.category) }}</span>
-        <span class="debug-platform">{{ firstOf(item.platform) }}</span>
-        <span class="debug-date">{{ formatDate(item.date) }}</span>
+  <div class="collection-browser">
+    <div v-if="limit === 0" class="collection-toolbar">
+      <div class="collection-filter-group" role="group" aria-label="按问题状态筛选">
+        <button v-for="filter in filters" :key="filter.value" type="button" :aria-pressed="state === filter.value" @click="state = filter.value">{{ filter.label }}</button>
       </div>
-      <h3 class="debug-title">{{ item.title }}</h3>
-      <p class="debug-desc">{{ item.description || item.excerpt }}</p>
-      <div class="debug-footer">
-        <span v-if="item.tags && item.tags.length" class="debug-tags">
-          <span v-for="t in item.tags.slice(0, 5)" :key="t" class="tag">{{ t }}</span>
-        </span>
+      <label class="collection-search"><AboutIcon name="code" /><span class="collection-sr-only">筛选问题标题、标签或平台</span><input v-model="query" type="search" placeholder="错误关键词、标签或平台" /></label>
+    </div>
+    <div v-if="limit === 0" class="collection-result-line"><span role="status" aria-live="polite">{{ isFiltered ? '找到' : '共' }} {{ filteredDebug.length }} 篇问题记录</span><button v-if="isFiltered" type="button" @click="resetFilters">重置筛选</button><span v-else>最近记录在前</span></div>
+    <div class="collection-cards">
+      <a v-for="item in displayedDebug" :key="item.slug" :href="withBase(item.url)" class="collection-card collection-debug">
+        <div class="collection-card-top"><span class="collection-record-id"><AboutIcon name="bug" />{{ firstOf(item.category) || 'DEBUG' }}</span><span v-if="item.status" class="collection-state" :class="getStatusClass(item.status)"><span aria-hidden="true"></span>{{ statusText(item.status) }}</span></div>
+        <h3>{{ item.title }}</h3>
+        <p class="collection-card-description">{{ item.description || item.excerpt }}</p>
+        <div class="collection-card-meta"><span v-if="asArray(item.platform).length"><AboutIcon name="chip" />{{ asArray(item.platform).join(' · ') }}</span><time v-if="item.date" :datetime="item.date">{{ formatShortDate(item.date) }}</time></div>
+        <div class="collection-card-footer"><div class="collection-card-tags"><span v-for="tag in (item.tags || []).slice(0, 4)" :key="tag">{{ tag }}</span></div><span class="collection-read-link">查看排查 <AboutIcon name="arrow" /></span></div>
+      </a>
+      <div v-if="displayedDebug.length === 0" class="collection-empty">
+        <AboutIcon name="bug" /><h3>{{ debugList.length ? '没有找到匹配的问题' : '还没有问题记录' }}</h3><p>{{ debugList.length ? '换个关键词，或清除当前筛选再看看。' : '遇到的问题与排查过程，会持续整理在这里。' }}</p><button v-if="isFiltered" type="button" @click="resetFilters">查看全部问题</button>
       </div>
-    </a>
-    <div v-if="displayedDebug.length === 0" class="empty-state">
-      <div class="empty-icon">🌱</div>
-      <p class="empty-text">暂无 Debug 记录</p>
-      <p class="empty-hint">相关内容正在整理，敬请期待</p>
     </div>
   </div>
 </template>
-
-<script setup>
-import { computed } from 'vue'
-import { withBase } from 'vitepress'
-import { data as debugList } from '../data/debug.data.ts'
-import { formatDate, getStatusText, getStatusClass, firstOf } from '../utils/content-loader'
-
-const props = defineProps({
-  limit: { type: Number, default: 0 }
-})
-
-const displayedDebug = computed(() => {
-  if (props.limit > 0) {
-    return debugList.slice(0, props.limit)
-  }
-  return debugList
-})
-</script>
-
-<style scoped>
-.debug-page-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.debug-card {
-  display: block;
-  text-decoration: none;
-  color: inherit;
-  padding: 18px 20px;
-  background: var(--vp-c-bg-soft);
-  border: 1px solid var(--vp-c-divider);
-  border-left: 3px solid var(--vp-c-yellow, #e0af68);
-  border-radius: 0 12px 12px 0;
-  transition: all 0.2s;
-}
-
-.debug-card.solved {
-  border-left-color: var(--vp-c-green, #9ece6a);
-}
-
-.debug-card:hover {
-  background: var(--vp-c-bg-soft-up);
-  transform: translateX(2px);
-}
-
-.debug-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
-}
-
-.debug-status {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.debug-category,
-.debug-platform,
-.debug-date {
-  font-size: 11.5px;
-  color: var(--vp-c-text-3);
-}
-
-.debug-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 4px 0 8px;
-  font-family: Consolas, 'Courier New', monospace;
-  color: var(--vp-c-text-1);
-}
-
-.debug-card:hover .debug-title {
-  color: var(--vp-c-brand-1);
-}
-
-.debug-desc {
-  font-size: 13.5px;
-  color: var(--vp-c-text-2);
-  line-height: 1.6;
-  margin: 0 0 10px;
-}
-
-.debug-footer {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.debug-tags {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.tag {
-  font-size: 11px;
-  color: var(--vp-c-text-2);
-  background: var(--vp-c-bg-elv);
-  padding: 1px 7px;
-  border-radius: 4px;
-}
-
-@media (max-width: 640px) {
-  .debug-card {
-    padding: 14px 16px;
-  }
-  .debug-title {
-    font-size: 13.5px;
-  }
-  .debug-desc {
-    font-size: 12.5px;
-  }
-}
-</style>
