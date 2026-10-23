@@ -12,9 +12,7 @@ categoryPage: true
 
 ## 记录列表
 
-| 标题 | 状态 | 平台 | 日期 |
-|---|---|---|---|
-| [Sensor 画面偏绿 - Bayer 顺序](sensor-bayer-green) | ✅ 已解决 | RV1106G2 | 2026-09-07 |
+<DebugCategoryList category="camera" />
 
 ---
 
@@ -44,3 +42,7 @@ categoryPage: true
 ::: tip 排查顺序
 Sensor 电源 → I2C → MIPI → ISP → V4L2
 :::
+
+<script setup>
+import DebugCategoryList from '../../.vitepress/components/DebugCategoryList.vue'
+</script>

@@ -2,6 +2,16 @@
 
 这是个人知识库与项目展示站。写下已学习、已实践、已确认的内容即可；不需要把笔记写成面向他人的教程。站点使用 VitePress，内容在 `src/`，配置在 `.vitepress/`。
 
+## 内容扩展原则
+
+**新增文章只需把 `.md` 文件放到对应目录，列表、侧边栏和搜索索引自动更新，不需要编辑其他文章、组件或导航配置。** 栏目目录下可以继续创建子目录来整理文章；分类首页与导航页不作为普通文章计数。
+
+- 项目文章：放到 `src/projects/<项目>/` 或其子目录，自动进入项目侧边栏。已有 `project.json.sidebar` 只用于自定义分组、顺序和名称；未登记文章会自动补充。
+- 新知识分类：添加分类目录、`index.md` 和文章。分类首页提供元信息和文章列表组件，侧边栏自动生成；卡片只展示有文章的分类。
+- 新实验、Debug 或速查文章：放到对应栏目目录或子目录，列表和侧边栏递归发现。Debug 文章放到 `debug/camera/`、`debug/mpp/` 或 `debug/v4l2/` 时，也会自动进入对应分类页，无需修改记录表格。
+
+新增文章与创建全新的栏目、分类或项目是两回事。新知识分类仍需设置一次分类首页，新项目展示卡片仍由 `project.json` 提供介绍，新增顶级栏目仍需配置全站导航。现有位置下添加文章不需要这些操作。开发服务器会随文件新增、修改和删除刷新列表及导航，正式站点在正常构建部署后更新。
+
 ## 本地预览与发布
 
 在仓库根目录运行：
@@ -54,7 +64,7 @@ status: learning
 记录自己的理解与验证结果。
 ```
 
-`title` 建议填写；缺省时列表会显示文件名。`description` 用于列表摘要，缺省时会尝试从正文提取。`date` 用 `YYYY-MM-DD` 格式，列表按日期倒序；没有日期的文章排在后面。`tags`、`platform`、`difficulty` 都是可选字段。常用 `status`：知识笔记用 `learning` / `done`，实验用 `doing` / `done`，Debug 用 `debugging` / `solved`。
+`title` 可选；缺省时列表和导航读取正文的一级标题，再缺省才显示文件名。无需 frontmatter 也能添加文章。`description` 用于列表摘要，缺省时会尝试从正文提取。`date` 用 `YYYY-MM-DD` 格式，列表按日期倒序；没有日期的文章排在后面。`tags`、`platform`、`difficulty` 都是可选字段。常用 `status`：知识笔记用 `learning` / `done`，实验用 `doing` / `done`，Debug 用 `debugging` / `solved`。
 
 不要把占位文字或未经验证的结果写成已完成内容。实验尚未完成时保留实际观察结果，并使用 `doing`；问题还没解决时使用 `debugging`。
 
@@ -70,17 +80,27 @@ description: 常用工具笔记
 ---
 ```
 
-新增分类时，还要在分类首页放入 `KnowledgeArticleList` 组件，并在 `.vitepress/config.mjs` 的知识库侧边栏中添加入口。分类卡片和首页标签会自动发现**至少有一篇文章**的分类；只有 `index.md` 的空分类不会出现在这些卡片中。
+分类首页需要放入文章列表组件，例如 `src/knowledge/tools/index.md`：
+
+```markdown
+<script setup>
+import KnowledgeArticleList from '../../../.vitepress/components/KnowledgeArticleList.vue'
+</script>
+
+<KnowledgeArticleList category="tools" />
+```
+
+`category` 与分类目录名保持一致。侧边栏会自动发现分类及文章，**无需修改 `.vitepress/config.mjs`**。分类卡片和首页标签会自动发现**至少有一篇文章**的分类；只有 `index.md` 的空分类不会出现在这些卡片中。
 
 ### 实验与 Debug
 
 实验文件建议按现有习惯编号，例如 `023-isp-test.md`。写清实际使用的板卡与软件版本、操作步骤、预期和实际结果。Debug 文件名建议直接描述问题，例如 `v4l2-dqbuf-timeout.md`；记录排查证据，解决后再把 `status` 改为 `solved`。
 
-实验、Debug 和速查页面的列表会扫描对应目录的 Markdown 文件。它们的 `index.md` 是栏目首页，不会作为普通条目出现。Debug 分类导航页使用 `categoryPage: true`，也不会混入 Debug 记录列表。新增速查页面如果还需要出现在左侧导航，请同步编辑 `.vitepress/config.mjs`。
+实验、Debug 和速查页面的列表会递归扫描对应目录及子目录的 Markdown 文件。各级 `index.md` 与 `categoryPage: true` 导航页不会作为普通文章出现。左侧导航自动更新，无需在 `.vitepress/config.mjs` 中逐篇登记。Debug 分类页按 `category`（支持数组）匹配；未填写时按分类子目录自动匹配，例如 `src/debug/camera/new-note.md` 自动进入 Camera 分类。
 
 ## 添加项目
 
-每个项目放在 `src/projects/` 下的独立目录中，如 `6-new-project/`。目录里的 `project.json` 提供项目卡片及侧边栏配置；项目正文仍是普通 Markdown 文件。
+每个项目放在 `src/projects/` 下的独立目录中，如 `6-new-project/`。目录里的 `project.json` 提供项目卡片和可选的侧边栏排序；项目正文仍是普通 Markdown 文件。
 
 ```json
 {
@@ -98,6 +118,8 @@ description: 常用工具笔记
 ```
 
 同时创建 `src/projects/6-new-project/项目介绍.md`。`link` 指向卡片点击后的页面，不写 `.md` 或 `.html`；侧边栏中的 `link` 相对于项目目录，也不写后缀。链接指向的 Markdown 文件必须存在。项目卡片按目录开头的数字倒序排列。
+
+已有项目中新增文章时，只需添加 `.md` 文件；无需更新 `sidebar`，新文章会自动追加到侧边栏。
 
 只要存在 `project.json`，项目就会出现在展示列表中。暂时不想展示的构思或空白页，可以先留在本地记录，等有可展示的内容再添加 `project.json`。项目配置的更多字段可参考已有项目。
 
@@ -137,7 +159,7 @@ v4l2-ctl -d /dev/video0 --all
 
 **新文章没有出现在列表？** 检查目录是否正确、文件是否为 `.md`、是否误用了 `index.md`，再刷新开发页面或重新构建。
 
-**新分类没有出现在首页？** 检查分类目录是否有 `index.md` 和至少一篇文章。侧边栏入口需要在 `.vitepress/config.mjs` 单独添加。
+**新分类没有出现在首页？** 检查分类目录是否有 `index.md` 和至少一篇文章。分类卡片与侧边栏会自动生成，不用手动登记入口。
 
 **项目卡片打开后是 404？** 检查 `project.json` 中的 `link` 与实际 Markdown 文件名是否一致，并运行 `npm run docs:build`。
 

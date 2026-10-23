@@ -1,5 +1,5 @@
 <template>
-  <div ref="progressBar" class="scroll-progress"></div>
+  <div ref="progressBar" class="scroll-progress" aria-hidden="true"></div>
   <button
     ref="backTop"
     class="back-to-top"
@@ -20,9 +20,9 @@ const backTop = ref(null)
 const showBackTop = ref(false)
 
 /* 滚动处理：rAF 节流；进度条用 transform 缩放，避免每帧触发布局重排 */
-let ticking = false
+let scrollFrame = 0
 const updateScrollUI = () => {
-  ticking = false
+  scrollFrame = 0
   const h = document.documentElement
   const max = h.scrollHeight - h.clientHeight
   const ratio = max > 0 ? h.scrollTop / max : 0
@@ -33,9 +33,8 @@ const updateScrollUI = () => {
 }
 
 const onScroll = () => {
-  if (ticking) return
-  ticking = true
-  requestAnimationFrame(updateScrollUI)
+  if (scrollFrame) return
+  scrollFrame = requestAnimationFrame(updateScrollUI)
 }
 
 const scrollToTop = () => {
@@ -44,6 +43,7 @@ const scrollToTop = () => {
 
 /* VPButton 涟漪效果（事件委托） */
 const onClick = (e) => {
+  if (!(e.target instanceof Element) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
   const btn = e.target.closest('.VPButton')
   if (!btn) return
   const rect = btn.getBoundingClientRect()
@@ -77,35 +77,52 @@ const enhanceCodeBlock = (block) => {
 }
 
 let codeObserver = null
-let scanPending = false
+let codeFrame = 0
+const pendingRoots = new Set()
+const codeSelector = 'div[class*="language-"]:not([data-enhanced])'
 
 const scanCodeBlocks = () => {
-  scanPending = false
-  document.querySelectorAll('div[class*="language-"]:not([data-enhanced])').forEach(enhanceCodeBlock)
+  codeFrame = 0
+  for (const root of pendingRoots) {
+    if (!root.isConnected) continue
+    if (root.matches(codeSelector)) enhanceCodeBlock(root)
+    root.querySelectorAll(codeSelector).forEach(enhanceCodeBlock)
+  }
+  pendingRoots.clear()
+  onScroll()
 }
 
 const watchCodeBlocks = () => {
-  scanCodeBlocks()
-  codeObserver = new MutationObserver(() => {
-    /* 微任务合并：同批 DOM 变更只扫描一次，避免自身插入按钮再触发扫描 */
-    if (scanPending) return
-    scanPending = true
-    queueMicrotask(scanCodeBlocks)
-  })
-  /* 监听 #app：路由切换（文档页↔首页）会重建 .vp-doc 节点，
-     若监听 .vp-doc 本身，导航后旧节点脱离 DOM 将收不到变更，折叠按钮丢失 */
   const target = document.getElementById('app') || document.body
+  pendingRoots.add(target)
+  scanCodeBlocks()
+  codeObserver = new MutationObserver(records => {
+    for (const record of records) {
+      for (const node of record.addedNodes) {
+        // Ignore text updates and our own controls; inspect only inserted subtrees.
+        if (node instanceof Element && !node.matches('.code-fold, .btn-ripple')) {
+          pendingRoots.add(node.closest('div[class*="language-"]') || node)
+        }
+      }
+    }
+    if (pendingRoots.size && !codeFrame) codeFrame = requestAnimationFrame(scanCodeBlocks)
+  })
   codeObserver.observe(target, { childList: true, subtree: true })
 }
 
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
+  window.addEventListener('resize', onScroll, { passive: true })
   document.addEventListener('click', onClick)
   onScroll()
   watchCodeBlocks()
 })
 
 onBeforeUnmount(() => {
+  cancelAnimationFrame(scrollFrame)
+  cancelAnimationFrame(codeFrame)
+  pendingRoots.clear()
+  window.removeEventListener('resize', onScroll)
   window.removeEventListener('scroll', onScroll)
   document.removeEventListener('click', onClick)
   if (codeObserver) {

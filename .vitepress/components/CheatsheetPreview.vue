@@ -11,7 +11,7 @@
     <div class="cheat-grid">
       <a
         v-for="item in displayItems"
-        :key="item.slug"
+        :key="item.url"
         :href="withBase(item.url)"
         class="cheat-card"
       >

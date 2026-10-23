@@ -11,7 +11,7 @@
     <div class="debug-list">
       <a
         v-for="item in displayedDebug"
-        :key="item.slug"
+        :key="item.url"
         :href="withBase(item.url)"
         class="debug-item"
         :class="{ solved: item.status === 'solved' }"

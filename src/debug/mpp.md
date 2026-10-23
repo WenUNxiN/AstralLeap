@@ -12,9 +12,7 @@ categoryPage: true
 
 ## 记录列表
 
-| 标题 | 状态 | 平台 | 日期 |
-|---|---|---|---|
-| [MPP 编码输出花屏](mpp-encode-corrupt) | 🔍 排查中 | RK3566 | 2026-09-21 |
+<DebugCategoryList category="mpp" />
 
 ---
 
@@ -46,3 +44,7 @@ categoryPage: true
 3. 打开 MPP 的 debug 日志
 4. 用官方 mpi_enc_test 工具对比
 :::
+
+<script setup>
+import DebugCategoryList from '../../.vitepress/components/DebugCategoryList.vue'
+</script>

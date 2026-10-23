@@ -4,7 +4,7 @@
  * 这里只提供：将加载器条目规范化为 ContentItem、排序、以及展示格式化函数。
  * 注意：本文件会被构建时（Node）与运行时同时引用，禁止引入 vitepress 客户端 API（如 withBase）。
  */
-import { getExcerpt } from './frontmatter.ts'
+import { getExcerpt, getMarkdownTitle } from './frontmatter.ts'
 
 export interface ContentItem {
   title: string
@@ -58,11 +58,13 @@ export function toContentItem(entry: RawContentEntry): ContentItem {
   const fm = entry.frontmatter || {}
   const slug = slugFromUrl(entry.url)
   return {
-    title: fm.title || slug,
+    title: fm.title || getMarkdownTitle(entry.src) || slug,
     description: fm.description || '',
     date: normalizeDate(fm.date),
     category: fm.category || '',
-    tags: fm.tags || [],
+    tags: (Array.isArray(fm.tags) ? fm.tags : [fm.tags]).filter(
+      (tag: unknown): tag is string => typeof tag === 'string' && tag.trim().length > 0
+    ).map((tag: string) => tag.trim()),
     status: fm.status || '',
     platform: fm.platform || '',
     difficulty: fm.difficulty || '',
@@ -80,7 +82,11 @@ export function sortByDateDesc<T extends { date: string }>(items: T[]): T[] {
     if (!a.date && !b.date) return 0
     if (!a.date) return 1
     if (!b.date) return -1
-    return new Date(b.date).getTime() - new Date(a.date).getTime()
+    const left = Date.parse(a.date)
+    const right = Date.parse(b.date)
+    if (Number.isNaN(left)) return Number.isNaN(right) ? 0 : 1
+    if (Number.isNaN(right)) return -1
+    return right - left
   })
 }
 

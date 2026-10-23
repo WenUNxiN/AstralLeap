@@ -11,7 +11,7 @@
     <div class="exp-list">
       <a
         v-for="exp in displayedExperiments"
-        :key="exp.slug"
+        :key="exp.url"
         :href="withBase(exp.url)"
         class="exp-item"
       >

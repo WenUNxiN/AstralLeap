@@ -17,7 +17,7 @@ function toolFor(slug) { return tools[slug] || fallback }
 
 <template>
   <div class="collection-cards collection-cheatsheets">
-    <a v-for="item in cheatsheetList" :key="item.slug" :href="withBase(item.url)" class="collection-card collection-cheat">
+    <a v-for="item in cheatsheetList" :key="item.url" :href="withBase(item.url)" class="collection-card collection-cheat">
       <div class="collection-card-top"><span class="collection-tool-icon"><AboutIcon :name="toolFor(item.slug).icon" /></span><span class="collection-record-id">{{ toolFor(item.slug).label }}</span></div>
       <h3>{{ item.title }}</h3>
       <p class="collection-card-description">{{ item.description || item.excerpt }}</p>

@@ -1,15 +1,8 @@
 import { createContentLoader } from 'vitepress'
-import { toContentItem, sortByDateDesc, type ContentItem } from '../utils/content-loader.ts'
+import { collectArticles } from '../utils/content-collections.ts'
 
-/**
- * 实验记录数据加载器（构建时执行，SSR 直接可用）
- * 扫描 experiments/*.md，排除 index.md，按日期倒序。
- */
-export default createContentLoader('experiments/*.md', {
+/** 递归扫描实验记录，排除各级首页和分类导航页。 */
+export default createContentLoader('experiments/**/*.md', {
   includeSrc: true,
-  transform(raw): ContentItem[] {
-    return sortByDateDesc(
-      raw.filter(e => !e.url.endsWith('/')).map(e => toContentItem(e))
-    )
-  }
+  transform: collectArticles
 })

@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { createMarkdownRenderer, disposeMdItInstance } from 'vitepress'
+import { getMarkdownTitle } from './frontmatter.ts'
 
 // Reuse VitePress's public frontmatter parser, rendering only the YAML block.
 // Release its global cache so the site's actual Markdown options initialize later.
@@ -36,7 +37,7 @@ function documentInfo(file, srcDir) {
     ...meta,
     path,
     slug,
-    text: cleanSidebarText(meta.title || slug),
+    text: cleanSidebarText(meta.title || getMarkdownTitle(source) || slug),
     link: '/' + path.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '.html'),
     isIndex: slug === 'index',
   }
@@ -67,18 +68,41 @@ function projectLink(base, target) {
   return path.replace(/\.md$/, '') + '.html' + suffix
 }
 
+// Compare page identities rather than anchor/query variants or encoded paths.
+function projectPageKey(link) {
+  if (/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(link)) return null
+  let path = new URL(link, 'https://astralleap.invalid').pathname
+  try { path = decodeURIComponent(path) } catch { /* Preserve malformed escapes as-is. */ }
+  return path.replace(/\.(?:md|html)$/, '').replace(/\/index$/, '/').replace(/\/$/, '')
+}
+
 function projectSidebar(srcDir, dir) {
-  const file = join(srcDir, 'projects', dir, 'project.json')
-  if (!existsSync(file)) return [{ text: cleanSidebarText(dir), collapsed: false, items: [] }]
-  const project = JSON.parse(readFileSync(file, 'utf8').replace(/^\uFEFF/, ''))
+  const root = join(srcDir, 'projects', dir)
+  const file = join(root, 'project.json')
+  const project = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8').replace(/^\uFEFF/, '')) : {}
   const base = `/projects/${dir}/`
-  const mapItems = items => items.map(item => ({
-    ...item,
-    text: cleanSidebarText(item.text),
-    ...(item.link ? { link: projectLink(base, item.link) } : {}),
-    ...(item.items ? { items: mapItems(item.items) } : {}),
-  }))
-  return [{ text: cleanSidebarText(project.name || dir), collapsed: false, items: mapItems(project.sidebar || []) }]
+  const configuredPages = new Set()
+  const mapItems = items => items.map(item => {
+    const link = item.link ? projectLink(base, item.link) : null
+    if (link) {
+      const key = projectPageKey(link)
+      if (key) configuredPages.add(key)
+    }
+    return {
+      ...item,
+      text: cleanSidebarText(item.text),
+      ...(link ? { link } : {}),
+      ...(item.items ? { items: mapItems(item.items) } : {}),
+    }
+  })
+  const items = mapItems(project.sidebar || [])
+  const discovered = markdownFiles(root).map(file => documentInfo(file, srcDir)).sort(byDateAndNumber)
+    .filter(doc => !configuredPages.has(projectPageKey(doc.link)))
+  return [{
+    text: cleanSidebarText(project.name || dir),
+    collapsed: false,
+    items: [...items, ...discovered.map(doc => leaf(doc))],
+  }]
 }
 
 function recordSidebar(srcDir, section, label, showNumber = false) {
@@ -98,8 +122,15 @@ function debugSidebar(srcDir) {
   const groups = indexes.map(doc => ({ doc, records: [] }))
   const ungrouped = []
   for (const doc of records) {
-    const categories = Array.isArray(doc.category) ? doc.category : [doc.category]
-    const match = categories.map(category => groups.find(group => group.doc.slug.toLowerCase() === String(category || '').toLowerCase())).find(Boolean)
+    const rawCategories = Array.isArray(doc.category) ? doc.category : [doc.category]
+    const categories = rawCategories.filter(category => typeof category === 'string' && category.trim()).map(category => category.trim())
+    const groupName = group => group.doc.isIndex ? group.doc.path.split('/').at(-2) : group.doc.slug
+    const explicit = categories.map(category => groups.find(group => groupName(group).toLowerCase() === String(category || '').toLowerCase())).find(Boolean)
+    const directory = groups.filter(group => {
+      const prefix = group.doc.isIndex ? group.doc.path.replace(/index\.md$/, '') : group.doc.path.replace(/\.md$/, '/')
+      return doc.path.toLowerCase().startsWith(prefix.toLowerCase())
+    }).sort((a, b) => b.doc.path.length - a.doc.path.length)[0]
+    const match = categories.length ? explicit : directory
     if (match) match.records.push(doc)
     else ungrouped.push(doc)
   }
@@ -142,7 +173,7 @@ export function sidebarContentPlugin(srcDir) {
     hotUpdate({ file, server }) {
       if (this.environment.name !== 'client') return
       const path = relative(root, file).replace(/\\/g, '/')
-      if (!/^(?:knowledge|experiments|debug|cheatsheet)\/.*\.md$/.test(path) && !/^projects\/[^/]+\/project\.json$/.test(path)) return
+      if (!/^(?:knowledge|experiments|debug|cheatsheet)\/.*\.md$/.test(path) && !/^projects\/[^/]+\/(?:project\.json|.*\.md)$/.test(path)) return
       const site = server.config.vitepress?.site
       if (!site) return
       const nextSidebar = createSidebar(root)

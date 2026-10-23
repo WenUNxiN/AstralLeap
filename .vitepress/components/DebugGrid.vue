@@ -34,7 +34,7 @@ function resetFilters() { query.value = ''; state.value = 'all' }
     </div>
     <div v-if="limit === 0" class="collection-result-line"><span role="status" aria-live="polite">{{ isFiltered ? '找到' : '共' }} {{ filteredDebug.length }} 篇问题记录</span><button v-if="isFiltered" type="button" @click="resetFilters">重置筛选</button><span v-else>最近记录在前</span></div>
     <div class="collection-cards">
-      <a v-for="item in displayedDebug" :key="item.slug" :href="withBase(item.url)" class="collection-card collection-debug">
+      <a v-for="item in displayedDebug" :key="item.url" :href="withBase(item.url)" class="collection-card collection-debug">
         <div class="collection-card-top"><span class="collection-record-id"><AboutIcon name="bug" />{{ firstOf(item.category) || 'DEBUG' }}</span><span v-if="item.status" class="collection-state" :class="getStatusClass(item.status)"><span aria-hidden="true"></span>{{ statusText(item.status) }}</span></div>
         <h3>{{ item.title }}</h3>
         <p class="collection-card-description">{{ item.description || item.excerpt }}</p>
