@@ -29,7 +29,12 @@ export interface ExploreFilters {
 const textList = (value: unknown): string[] => (Array.isArray(value) ? value : [value])
   .filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
   .map(item => item.trim())
-const topicId = (value: string): string => value.normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en')
+const normalizeText = (value: string): string => value.normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en')
+const topicId = (value: string): string => {
+  const normalized = normalizeText(value)
+  // Keep the default filter distinct from real names, including the escape prefix itself.
+  return normalized === 'all' || normalized.startsWith('~') ? `~${normalized}` : normalized
+}
 function urlPath(url: string): string {
   const path = url.split(/[?#]/, 1)[0]
   try { return decodeURI(path) } catch { return path }
@@ -109,14 +114,14 @@ export function collectExplore(entries: RawContentEntry[]): ExploreData {
 /** Pure filtering, shared by the explorer UI and regression tests. */
 export function filterExplore(articles: ExploreArticle[], filters: ExploreFilters = {}): ExploreArticle[] {
   const active = (value?: string) => !!value && value !== 'all'
-  const terms = topicId(filters.query || '').split(/\s+/).filter(Boolean)
+  const terms = normalizeText(filters.query || '').split(/\s+/).filter(Boolean)
   const matches = articles.filter(article => {
     if (active(filters.section) && article.section !== filters.section) return false
     if (active(filters.status) && article.status !== filters.status) return false
-    if (active(filters.topic) && !article.topics.some(topic => topic.id === topicId(filters.topic!))) return false
-    if (active(filters.tag) && !article.topics.some(topic => topic.id === topicId(filters.tag!))) return false
+    if (active(filters.topic) && !article.topics.some(topic => topic.id === normalizeText(filters.topic!))) return false
+    if (active(filters.tag) && !article.topics.some(topic => topic.id === normalizeText(filters.tag!))) return false
     if (!terms.length) return true
-    const text = topicId([
+    const text = normalizeText([
       article.title, article.description, article.excerpt,
       ...article.tags, ...textList(article.category), ...textList(article.platform),
       ...article.topics.map(topic => topic.label),
@@ -154,12 +159,18 @@ export function countExploreFacets(articles: ExploreArticle[], filters: ExploreF
   }
 }
 
+/** Resolve the same note from a source path or an encoded browser URL. */
+export function findExploreArticle(articles: ExploreArticle[], currentUrl: string): ExploreArticle | undefined {
+  const path = urlPath(currentUrl)
+  return articles.find(article => urlPath(article.url) === path)
+}
+
 /** Recommend real notes sharing topics; never fill empty slots with unrelated records. */
 export function relatedExplore(articles: ExploreArticle[], currentUrl: string, limit = 3): ExploreArticle[] {
   const maximum = Number.isNaN(limit) ? 0 : Math.min(3, Math.max(0, Math.floor(limit)))
   if (!maximum) return []
   const currentPath = urlPath(currentUrl)
-  const current = articles.find(article => urlPath(article.url) === currentPath)
+  const current = findExploreArticle(articles, currentUrl)
   if (!current?.topics.length) return []
   const topics = new Set(current.topics.map(topic => topic.id))
   const seen = new Set([currentPath])

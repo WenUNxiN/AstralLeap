@@ -20,7 +20,10 @@ const filteredExperiments = computed(() => {
 const displayedExperiments = computed(() => props.limit > 0 ? filteredExperiments.value.slice(0, props.limit) : filteredExperiments.value)
 const isFiltered = computed(() => query.value.trim() !== '' || state.value !== 'all')
 function asArray(value) { return Array.isArray(value) ? value : value ? [value] : [] }
-function statusText(status) { return ({ done: '已验证', verified: '已验证', doing: '进行中', 'in-progress': '进行中' })[status] || status }
+function statusText(status) {
+  const labels = { done: '已验证', verified: '已验证', doing: '进行中', 'in-progress': '进行中' }
+  return Object.hasOwn(labels, status) ? labels[status] : status
+}
 function resetFilters() { query.value = ''; state.value = 'all' }
 </script>
 

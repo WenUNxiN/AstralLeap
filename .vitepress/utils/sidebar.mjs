@@ -4,6 +4,7 @@ import { createMarkdownRenderer, disposeMdItInstance } from 'vitepress'
 import { getMarkdownTitle } from './frontmatter.ts'
 import { projectLink, projectPageKey } from './project-links.mjs'
 import { exploreSections, sectionForPath } from './sections.ts'
+import { debugCategoryId, matchesDebugCategory } from './debug-category.ts'
 
 // Reuse VitePress's public frontmatter parser, rendering only the YAML block.
 // Release its global cache so the site's actual Markdown options initialize later.
@@ -105,17 +106,14 @@ function debugSidebar(srcDir, section) {
   const docs = markdownFiles(join(srcDir, 'debug')).map(file => documentInfo(file, srcDir)).filter(doc => doc.path !== 'debug/index.md')
   const indexes = docs.filter(doc => doc.categoryPage === true || doc.isIndex).sort((a, b) => a.text.localeCompare(b.text, 'zh-CN'))
   const records = docs.filter(doc => doc.categoryPage !== true && !doc.isIndex).sort(byDateAndNumber)
-  const groups = indexes.map(doc => ({ doc, records: [] }))
+  const groups = indexes.map(doc => ({ doc, category: debugCategoryId(doc.link), records: [] }))
   const ungrouped = []
   for (const doc of records) {
     const rawCategories = Array.isArray(doc.category) ? doc.category : [doc.category]
     const categories = rawCategories.filter(category => typeof category === 'string' && category.trim()).map(category => category.trim())
-    const groupName = group => group.doc.isIndex ? group.doc.path.split('/').at(-2) : group.doc.slug
-    const explicit = categories.map(category => groups.find(group => groupName(group).toLowerCase() === String(category || '').toLowerCase())).find(Boolean)
-    const directory = groups.filter(group => {
-      const prefix = group.doc.isIndex ? group.doc.path.replace(/index\.md$/, '') : group.doc.path.replace(/\.md$/, '/')
-      return doc.path.toLowerCase().startsWith(prefix.toLowerCase())
-    }).sort((a, b) => b.doc.path.length - a.doc.path.length)[0]
+    const explicit = categories.map(category => groups.find(group => matchesDebugCategory({ category, url: doc.link }, group.category))).find(Boolean)
+    const directory = groups.filter(group => matchesDebugCategory({ url: doc.link }, group.category))
+      .sort((a, b) => b.category.length - a.category.length)[0]
     const match = categories.length ? explicit : directory
     if (match) match.records.push(doc)
     else ungrouped.push(doc)

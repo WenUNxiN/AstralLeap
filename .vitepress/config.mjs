@@ -4,6 +4,7 @@ import { join } from 'path'
 import { fileURLToPath } from 'node:url'
 import { createSidebar, sidebarContentPlugin } from './utils/sidebar.mjs'
 import { checkSiteLinks } from './utils/site-links.mjs'
+import { codeTitles } from './utils/code-titles.mjs'
 import { exploreSections } from './utils/sections.ts'
 
 const SITE_BASE = '/AstralLeap/'
@@ -99,23 +100,8 @@ export default defineConfig({
       dts: 'c',
       kconfig: 'make',
     },
-    config(md) {
-      /* 代码块文件名标题：```bash title="build.sh" 语法 → 在包装 div 内注入 <span class="title"> */
-      const originalFence = md.renderer.rules.fence
-      md.renderer.rules.fence = (tokens, idx, options, env, self) => {
-        const rendered = originalFence(tokens, idx, options, env, self)
-        const info = tokens[idx].info || ''
-        const m = info.match(/title\s*=\s*["']([^"']*)["']/)
-        if (!m) return rendered
-        let title = m[1]
-        try { title = decodeURIComponent(title) } catch { /* 保留原文 */ }
-        const escaped = md.utils.escapeHtml(title)
-        return rendered.replace(
-          /(<div class="language-[^"]*"[^>]*>)/,
-          `$1<span class="title">${escaped}</span>`
-        )
-      }
-    }
+    // 代码块文件名标题：```bash title="build.sh"。
+    config: codeTitles,
   },
   themeConfig: {
     logo: '/logo.png',

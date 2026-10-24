@@ -28,6 +28,6 @@ const paths = {
 
 <template>
   <svg class="about-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-    <path v-for="(d, index) in paths[name]" :key="index" :d="d" />
+    <path v-for="(d, index) in (Object.hasOwn(paths, name) ? paths[name] : paths.book)" :key="index" :d="d" />
   </svg>
 </template>

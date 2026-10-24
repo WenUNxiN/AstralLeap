@@ -29,12 +29,18 @@ export interface RawContentEntry {
   src?: string
 }
 
+const optionalText = (value: unknown): string => typeof value === 'string' ? value.trim() : ''
+const textList = (value: unknown): string[] => (Array.isArray(value) ? value : [value])
+  .map(optionalText).filter(Boolean)
+const textOrList = (value: unknown): string | string[] => Array.isArray(value) ? textList(value) : optionalText(value)
+
 /**
  * 将日期规范化为 YYYY-MM-DD 字符串（gray-matter 会把 YAML 日期解析成 Date 对象）
  * 统一用 UTC 取值，避免时区导致跨天。
  */
 export function normalizeDate(d: any): string {
   if (!d) return ''
+  if (!(d instanceof Date) && typeof d !== 'string' && (typeof d !== 'number' || !Number.isFinite(d))) return ''
   const date = d instanceof Date ? d : new Date(d)
   if (isNaN(date.getTime())) return String(d)
   const y = date.getUTCFullYear()
@@ -57,20 +63,19 @@ export function slugFromUrl(url: string): string {
 export function toContentItem(entry: RawContentEntry): ContentItem {
   const fm = entry.frontmatter || {}
   const slug = slugFromUrl(entry.url)
+  const title = optionalText(fm.title) || (typeof fm.title === 'number' && Number.isFinite(fm.title) ? String(fm.title) : '')
   return {
-    title: fm.title || getMarkdownTitle(entry.src) || slug,
-    description: fm.description || '',
+    title: title || getMarkdownTitle(entry.src) || slug,
+    description: optionalText(fm.description),
     date: normalizeDate(fm.date),
-    category: fm.category || '',
-    tags: (Array.isArray(fm.tags) ? fm.tags : [fm.tags]).filter(
-      (tag: unknown): tag is string => typeof tag === 'string' && tag.trim().length > 0
-    ).map((tag: string) => tag.trim()),
-    status: fm.status || '',
-    platform: fm.platform || '',
-    difficulty: fm.difficulty || '',
+    category: textOrList(fm.category),
+    tags: textList(fm.tags),
+    status: optionalText(fm.status),
+    platform: textOrList(fm.platform),
+    difficulty: optionalText(fm.difficulty),
     url: entry.url,
     slug,
-    excerpt: fm.excerpt || getExcerpt(entry.src || '', 120)
+    excerpt: optionalText(fm.excerpt) || getExcerpt(entry.src || '', 120)
   }
 }
 
@@ -114,7 +119,7 @@ export function formatShortDate(d: string): string {
 /**
  * 状态显示文本
  */
-export function getStatusText(status: string): string {
+export function getStatusText(status: unknown): string {
   const map: Record<string, string> = {
     'done': '✓ 已验证',
     'verified': '✓ 已验证',
@@ -124,7 +129,8 @@ export function getStatusText(status: string): string {
     'debugging': '🔍 排查中',
     'learning': '📖 学习中',
   }
-  return map[status] || status || ''
+  const value = optionalText(status)
+  return Object.hasOwn(map, value) ? map[value] : value
 }
 
 /**
@@ -139,21 +145,21 @@ export function getStatusClass(status: string): string {
 /**
  * 难度显示文本
  */
-export function getDifficultyText(d: string): string {
+export function getDifficultyText(d: unknown): string {
   const map: Record<string, string> = {
     'beginner': '入门',
     'intermediate': '进阶',
     'advanced': '高级',
   }
-  return map[d] || d || ''
+  const value = optionalText(d)
+  return Object.hasOwn(map, value) ? map[value] : value
 }
 
 /**
  * 取数组第一个元素（兼容字符串和数组）
  */
-export function firstOf(v: string | string[] | undefined): string {
-  if (!v) return ''
-  return Array.isArray(v) ? v[0] : v
+export function firstOf(v: unknown): string {
+  return textList(v)[0] || ''
 }
 
 /**
@@ -180,5 +186,5 @@ const cheatsheetIconMap: Record<string, string> = {
  * 速查表图标（按 slug 匹配）
  */
 export function getCheatsheetIcon(slug: string): string {
-  return cheatsheetIconMap[slug] || '📋'
+  return Object.hasOwn(cheatsheetIconMap, slug) ? cheatsheetIconMap[slug] : '📋'
 }

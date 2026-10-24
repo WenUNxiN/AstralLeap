@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { matchesDebugCategory } from '../.vitepress/utils/debug-category.ts'
+import { debugCategoryId, matchesDebugCategory } from '../.vitepress/utils/debug-category.ts'
 
 test('Debug classification accepts existing category strings and arrays case-insensitively', () => {
   assert.equal(matchesDebugCategory({ url: '/debug/note.html', category: ' Camera ' }, 'camera'), true)
@@ -20,4 +20,17 @@ test('new Debug notes inherit classification from their directory without metada
 
 test('Debug directory matching handles encoded Unicode and URL suffixes', () => {
   assert.equal(matchesDebugCategory({ url: '/debug/%E7%9B%B8%E6%9C%BA/note.html?view=1#section' }, '相机'), true)
+})
+
+test('nested Debug category pages retain their full path and distinguish repeated names', () => {
+  const board = debugCategoryId('/debug/board/camera/index.html')
+  const host = debugCategoryId('/debug/host/camera/')
+  assert.equal(board, 'board/camera')
+  assert.equal(host, 'host/camera')
+  assert.equal(debugCategoryId('/debug/camera.html'), 'camera')
+  assert.equal(debugCategoryId('debug/board/camera.md'), board)
+  assert.equal(matchesDebugCategory({ url: '/debug/board/camera/note.html' }, board), true)
+  assert.equal(matchesDebugCategory({ url: '/debug/board/camera/note.html' }, host), false)
+  assert.equal(matchesDebugCategory({ url: '/debug/note.html', category: ' Board/Camera ' }, board), true)
+  assert.equal(matchesDebugCategory({ url: '/debug/note.html', category: 'board/camera' }, host), false)
 })

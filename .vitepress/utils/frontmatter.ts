@@ -11,8 +11,22 @@ function markdownBody(content: string): string {
   const source = content.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n')
   const fmMatch = source.match(/^---[\t ]*\r?\n[\s\S]*?\r?\n(?:---|\.\.\.)[\t ]*(?:\r?\n|$)/)
   let body = fmMatch ? source.substring(fmMatch[0].length) : source
-  // Remove fenced code and non-content blocks before stripping Markdown syntax.
-  body = body.replace(/^ {0,3}(`{3,}|~{3,})[^\r\n]*\r?\n[\s\S]*?^ {0,3}\1[\t ]*$/gm, '')
+  // A closing fence may be longer than its opener; an unclosed fence consumes
+  // the rest of the document. Never use headings inside examples as page titles.
+  let fence: { marker: string; length: number } | undefined
+  body = body.split('\n').map(line => {
+    if (fence) {
+      const close = line.match(/^ {0,3}(`+|~+)[\t ]*$/)
+      if (close && close[1][0] === fence.marker && close[1].length >= fence.length) fence = undefined
+      return ''
+    }
+    const open = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/)
+    if (open && (open[1][0] !== '`' || !open[2].includes('`'))) {
+      fence = { marker: open[1][0], length: open[1].length }
+      return ''
+    }
+    return line
+  }).join('\n')
   body = body.replace(/<!--[^]*?-->/g, '')
   body = body.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, '')
   return body

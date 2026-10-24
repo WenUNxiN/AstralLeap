@@ -1,6 +1,12 @@
 /* Reading changes are limited to document pages; the existing home stays intact. */
 .article-navigation { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .article-navigation > .vp-breadcrumb { flex: 1; min-width: 0; }
+.article-context-topics { display: flex; flex-basis: 100%; flex-wrap: wrap; align-items: center; gap: 6px 16px; font-size: 11px; line-height: 1.8; }
+.article-context-topics > span { color: var(--vp-c-text-3); }
+.article-context-topics a { display: inline-flex; align-items: center; gap: 4px; min-height: 28px; color: var(--vp-c-text-2); }
+.article-context-topics .about-icon { width: 11px; height: 11px; }
+.article-context-topics a:hover { color: var(--vp-c-brand-1); }
+.article-context-topics a:focus-visible { outline: 2px solid var(--vp-c-brand-1); outline-offset: 3px; border-radius: 2px; }
 .reading-controls { flex: none; margin: -5px 0 20px; }
 .reading-controls button { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 5px 9px; border: 1px solid var(--vp-c-divider); border-radius: 6px; background: var(--vp-c-bg); color: var(--vp-c-text-2); font-size: 10px; line-height: 1.8; }
 .reading-controls button:hover, .reading-controls button[aria-pressed='true'] { color: var(--vp-c-brand-1); border-color: var(--vp-c-brand-1); background: var(--vp-c-brand-soft); }

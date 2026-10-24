@@ -99,13 +99,6 @@
 .about-page .about-socials h3 { font-size: 13px; font-weight: 600; line-height: 1.7; }
 .about-page .about-socials p { margin-top: 3px; color: var(--about-muted); font-size: 11px; line-height: 1.8; }
 .about-page .about-socials > a > .about-icon { width: 15px; height: 15px; margin-left: auto; color: var(--vp-c-text-3); }
-.about-page .about-colophon { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 0 10px; border-top: 1px solid var(--about-border); color: var(--about-muted); font-size: 11px; line-height: 1.8; }
-.about-page .about-colophon > div,
-.about-page .about-colophon > a { display: flex; align-items: center; gap: 10px; }
-.about-page .about-colophon-star { color: var(--vp-c-purple); font-size: 17px; }
-.about-page .about-colophon > a { color: var(--about-muted); }
-.about-page .about-colophon > a:hover { color: var(--vp-c-brand-1); }
-.about-page .about-colophon .about-icon { width: 13px; height: 13px; }
 .about-page .about-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* Equal places for actual practice and explicitly future curiosity. */
@@ -172,7 +165,6 @@
   .about-page .about-garden-links > a:last-child { padding-bottom: 16px; }
   .about-page .about-socials > a,
   .about-page .about-wechat { padding: 20px; }
-  .about-page .about-colophon { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
 
 @media (max-width: 479px) {

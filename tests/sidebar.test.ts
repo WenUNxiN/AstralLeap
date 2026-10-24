@@ -170,6 +170,28 @@ test('Debug explicit categories are trimmed and unknown values do not inherit th
   assert.deepEqual(links(groups.find(item => item.text === '其他记录').items), ['/debug/camera/unknown.html'])
 })
 
+test('nested Debug categories use full paths for explicit metadata and directory inheritance', t => {
+  const root = mkdtempSync(join(tmpdir(), 'astralleap-sidebar-'))
+  t.after(() => rmSync(root, { recursive: true, force: true }))
+  write(root, 'debug/camera.md', '---\ntitle: 一级相机\ncategoryPage: true\n---\n')
+  write(root, 'debug/board/camera/index.md', '# 板卡相机\n')
+  write(root, 'debug/host/camera.md', '---\ntitle: 主机相机\ncategoryPage: true\n---\n')
+  write(root, 'debug/board/camera/inherited.md', '# 板卡目录记录\n')
+  write(root, 'debug/host/camera/inherited.md', '# 主机目录记录\n')
+  write(root, 'debug/board-explicit.md', '---\ncategory: " Board/Camera "\n---\n# 板卡显式记录\n')
+  write(root, 'debug/host-explicit.md', '---\ncategory: host/camera\n---\n# 主机显式记录\n')
+  write(root, 'debug/legacy.md', '---\ncategory: camera\n---\n# 原有一级分类\n')
+  const groups = createSidebar(root)['/debug/'][0].items
+  assert.deepEqual(new Set(links(groups.find(item => item.text === '板卡相机').items)), new Set([
+    '/debug/board/camera/inherited.html', '/debug/board-explicit.html',
+  ]))
+  assert.deepEqual(new Set(links(groups.find(item => item.text === '主机相机').items)), new Set([
+    '/debug/host/camera/inherited.html', '/debug/host-explicit.html',
+  ]))
+  assert.deepEqual(links(groups.find(item => item.text === '一级相机').items), ['/debug/legacy.html'])
+  assert.equal(groups.some(item => item.text === '其他记录'), false)
+})
+
 test('new knowledge directories and record files refresh the development sidebar on create, rename and removal', t => {
   const root = mkdtempSync(join(tmpdir(), 'astralleap-sidebar-'))
   t.after(() => rmSync(root, { recursive: true, force: true }))

@@ -12,7 +12,7 @@ const tools = {
   ffmpeg: { icon: 'film', label: 'MEDIA TOOLKIT', scenes: ['格式与编码', '滤镜与截图', '推流与拉流'], command: 'ffmpeg · ffprobe · ffplay' }
 }
 const fallback = { icon: 'book', label: 'QUICK REFERENCE', scenes: [], command: '' }
-function toolFor(slug) { return tools[slug] || fallback }
+function toolFor(slug) { return Object.hasOwn(tools, slug) ? tools[slug] : fallback }
 </script>
 
 <template>

@@ -31,3 +31,26 @@ test('search text preserves internal and trailing spaces while empty filters sta
   assert.equal(readExploreQuery(new URL(href, 'https://example.com').search).query, 'Linux  mmap ')
   assert.equal(writeExploreQuery('/AstralLeap/explore/', { ...filters, query: '   ' }), '/AstralLeap/explore/')
 })
+
+test('escaped all names survive shared URLs and legacy tag links without colliding with defaults', () => {
+  const topics = [
+    { id: '~all', kind: 'theme' as const },
+    { id: '~~all', kind: 'theme' as const },
+    { id: '~~~all', kind: 'tag' as const },
+  ]
+  const filters = { ...readExploreQuery(''), topic: '~all', tag: '~~~all', query: 'all ~all' }
+  const href = writeExploreQuery('/AstralLeap/explore/?from=nav#records', filters)
+  const url = new URL(href, 'https://example.com')
+  assert.deepEqual(resolveExploreQuery(url.search, topics), filters)
+  assert.equal(url.searchParams.get('topic'), '~all')
+  assert.equal(url.searchParams.get('tag'), '~~~all')
+  assert.equal(resolveExploreQuery('?topic=~~all', topics).topic, '~~all')
+  assert.deepEqual(resolveExploreQuery('?topic=~~~all', topics), {
+    ...readExploreQuery(''), topic: 'all', tag: '~~~all',
+  })
+  assert.deepEqual(resolveExploreQuery('?topic=~all', [{ id: '~all', kind: 'tag' }]), {
+    ...readExploreQuery(''), topic: 'all', tag: '~all',
+  })
+  assert.deepEqual(resolveExploreQuery('?topic=all&tag=all', topics), readExploreQuery(''))
+  assert.equal(writeExploreQuery(href, readExploreQuery('')), '/AstralLeap/explore/?from=nav#records')
+})

@@ -127,8 +127,4 @@ onBeforeUnmount(() => clearTimeout(resetTimer))
     </div>
   </section>
 
-  <div class="about-colophon">
-    <div><span class="about-colophon-star" aria-hidden="true">✦</span><span>用 VitePress 2 构建，托管于 GitHub Pages。</span></div>
-    <a href="https://github.com/WenUNxiN/AstralLeap" target="_blank" rel="noopener noreferrer">在 GitHub 上看看 <AboutIcon name="arrow-up" /><span class="about-sr-only">（在新标签页打开）</span></a>
-  </div>
 </main>

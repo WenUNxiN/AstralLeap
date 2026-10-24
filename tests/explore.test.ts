@@ -3,9 +3,20 @@ import assert from 'node:assert/strict'
 import { mkdtempSync, mkdirSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, matchesGlob } from 'node:path'
-import { collectExplore, countExploreFacets, filterExplore, relatedExplore } from '../.vitepress/utils/explore.ts'
+import { collectExplore, countExploreFacets, filterExplore, findExploreArticle, relatedExplore } from '../.vitepress/utils/explore.ts'
 
 const entry = (url: string, frontmatter: Record<string, unknown> = {}, src = '# 正文标题\n记录内容。') => ({ url, frontmatter, src })
+
+test('article context resolves encoded routes without confusing same-name nested notes', () => {
+  const { articles } = collectExplore([
+    entry('/knowledge/linux/显示/屏幕.html', { tags: ['SPI'] }),
+    entry('/knowledge/linux/输入/屏幕.html', { tags: ['Input'] }),
+  ])
+  const note = findExploreArticle(articles, '/knowledge/linux/' + encodeURIComponent('显示') + '/' + encodeURIComponent('屏幕') + '.html?from=recent#setup')
+  assert.equal(note?.url, '/knowledge/linux/显示/屏幕.html')
+  assert.deepEqual(note?.tags, ['SPI'])
+  assert.equal(findExploreArticle(articles, '/knowledge/linux/missing.html'), undefined)
+})
 
 test('exploration recursively collects real records, excludes navigation and keeps full URL identities', () => {
   const data = collectExplore([
@@ -56,6 +67,45 @@ test('exploration filters combine form, dynamic topics and text while keeping so
   assert.deepEqual(filterExplore(articles, { query: 'mmap' }).map(article => article.url), ['/knowledge/linux/mmap.html'])
   assert.deepEqual(filterExplore(articles, { section: 'all', topic: 'unknown' }), [])
   assert.equal(JSON.stringify(articles), original)
+})
+
+test('real all themes and escape-prefixed directories stay distinct from the default filter', () => {
+  const data = collectExplore([
+    entry('/knowledge/all/', { title: '全部协议' }),
+    entry('/knowledge/~all/', { title: '波形记录' }),
+    entry('/knowledge/all/one.html'),
+    entry('/knowledge/~all/two.html'),
+    entry('/experiments/tagged.html', { tags: [' ALL '] }),
+    entry('/debug/tilde-tagged.html', { tags: ['~all'] }),
+    entry('/cheatsheet/plain.html'),
+  ])
+  const topics = new Map(data.topics.map(topic => [topic.id, topic]))
+  assert.equal(topics.get('~all')?.label, '全部协议')
+  assert.equal(topics.get('~~all')?.label, '波形记录')
+  assert.equal(topics.has('all'), false)
+  assert.equal(filterExplore(data.articles, { topic: 'all' }).length, 5)
+  assert.deepEqual(new Set(filterExplore(data.articles, { topic: '~all' }).map(article => article.url)),
+    new Set(['/knowledge/all/one.html', '/experiments/tagged.html']))
+  assert.deepEqual(new Set(filterExplore(data.articles, { topic: '~~all' }).map(article => article.url)),
+    new Set(['/knowledge/~all/two.html', '/debug/tilde-tagged.html']))
+  const counts = countExploreFacets(data.articles, { topic: '~all' })
+  assert.equal(counts.topics.get('~all'), 2)
+  assert.equal(counts.topics.get('~~all'), 2)
+})
+
+test('all detail tags use escaped IDs without changing search text or existing topic IDs', () => {
+  const data = collectExplore([
+    entry('/experiments/one.html', { title: 'All protocols', tags: ['all'] }),
+    entry('/debug/two.html', { title: 'Other records', tags: ['~all', 'Linux'] }),
+    entry('/cheatsheet/plain.html'),
+  ])
+  assert.equal(data.topics.find(topic => topic.id === '~all')?.kind, 'tag')
+  assert.equal(data.topics.find(topic => topic.id === '~~all')?.kind, 'tag')
+  assert.equal(data.topics.find(topic => topic.id === 'linux')?.label, 'Linux')
+  assert.deepEqual(filterExplore(data.articles, { tag: '~all' }).map(article => article.url), ['/experiments/one.html'])
+  assert.deepEqual(filterExplore(data.articles, { tag: '~~all' }).map(article => article.url), ['/debug/two.html'])
+  assert.deepEqual(filterExplore(data.articles, { query: 'all protocols' }).map(article => article.url), ['/experiments/one.html'])
+  assert.deepEqual(filterExplore(data.articles, { query: '~all' }).map(article => article.url), ['/debug/two.html'])
 })
 
 test('recent and oldest sorting keep undated or invalid dates last and title sorting remains available', () => {
