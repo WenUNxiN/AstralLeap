@@ -98,6 +98,20 @@ test('project Markdown without a sidebar configuration is discovered recursively
   ]))
 })
 
+test('a configured directory index does not hide a different article with the same basename', t => {
+  const root = mkdtempSync(join(tmpdir(), 'astralleap-sidebar-'))
+  t.after(() => rmSync(root, { recursive: true, force: true }))
+  write(root, 'projects/project/project.json', JSON.stringify({
+    sidebar: [{ text: '专题首页', link: 'setup/index.html' }],
+  }))
+  write(root, 'projects/project/setup/index.md', '# 专题首页\n')
+  write(root, 'projects/project/setup.md', '# 设置记录\n')
+  const sidebar = createSidebar(root)['/projects/project/']
+  assert.deepEqual(links(sidebar), [
+    '/projects/project/setup/index.html', '/projects/project/setup.html',
+  ])
+})
+
 test('Debug notes inherit their directory group while explicit categories take precedence', t => {
   const root = mkdtempSync(join(tmpdir(), 'astralleap-sidebar-'))
   t.after(() => rmSync(root, { recursive: true, force: true }))
@@ -154,4 +168,48 @@ test('Debug explicit categories are trimmed and unknown values do not inherit th
   ]))
   assert.deepEqual(links(groups.find(item => item.text === '视频').items), ['/debug/camera/trimmed.html'])
   assert.deepEqual(links(groups.find(item => item.text === '其他记录').items), ['/debug/camera/unknown.html'])
+})
+
+test('new knowledge directories and record files refresh the development sidebar on create, rename and removal', t => {
+  const root = mkdtempSync(join(tmpdir(), 'astralleap-sidebar-'))
+  t.after(() => rmSync(root, { recursive: true, force: true }))
+  const site = { themeConfig: { sidebar: createSidebar(root) } }
+  const sent: any[] = []
+  const module = {}
+  const server = {
+    config: { vitepress: { site } },
+    environments: { client: { moduleGraph: { getModuleById: () => module, invalidateModule: () => {} } } },
+    ws: { send: (payload: any) => sent.push(payload) },
+  }
+  const plugin = sidebarContentPlugin(root)
+  const update = (path: string, type = 'update') => plugin.hotUpdate.call(
+    { environment: { name: 'client' } }, { type, file: join(root, path), server }
+  )
+  write(root, 'knowledge/foc/index.md', '# 电机控制探索\n')
+  write(root, 'knowledge/foc/control/first.md', '# 第一次实验\n')
+  update('knowledge/foc/control/first.md', 'create')
+  assert.ok(links(site.themeConfig.sidebar['/knowledge/foc/']).includes('/knowledge/foc/control/first.html'))
+  assert.equal(site.themeConfig.sidebar['/knowledge/foc/'][0].items[0].text, '电机控制探索')
+  write(root, 'knowledge/foc/control/first.md', '---\ntitle: 更新后的标题\n---\n# 第一次实验\n')
+  update('knowledge/foc/control/first.md')
+  assert.equal(site.themeConfig.sidebar['/knowledge/foc/'][0].items[0].items[0].text, '更新后的标题')
+  write(root, 'knowledge/foc/control/first.md', '---\ntitle: 更新后的标题\n---\n# 第一次实验\n新正文\n')
+  const before = sent.length
+  update('knowledge/foc/control/first.md')
+  assert.equal(sent.length, before, 'body-only changes keep normal Markdown HMR without extra sidebar reloads')
+  rmSync(join(root, 'knowledge/foc'), { recursive: true })
+  update('knowledge/foc/index.md', 'delete')
+  assert.equal(site.themeConfig.sidebar['/knowledge/foc/'], undefined)
+
+  for (const section of ['experiments', 'debug', 'cheatsheet']) {
+    const path = `${section}/new-topic/first.md`
+    const link = `/${section}/new-topic/first.html`
+    write(root, path, '# 新主题下的记录\n')
+    update(path, 'create')
+    assert.ok(links(site.themeConfig.sidebar[`/${section}/`]).includes(link))
+    rmSync(join(root, path))
+    update(path, 'delete')
+    assert.ok(!links(site.themeConfig.sidebar[`/${section}/`]).includes(link))
+  }
+  assert.ok(sent.every(payload => payload.type === 'full-reload'))
 })

@@ -6,6 +6,7 @@ import "./style.css"
 import "./sections.css"
 import "./site.css"
 import "./sidebar.css"
+import "./reading.css"
 import StarfieldBackground from "../components/StarfieldBackground.vue"
 import MicroInteractions from "../components/MicroInteractions.vue"
 import Breadcrumb from "../components/Breadcrumb.vue"
@@ -14,6 +15,8 @@ import SiteFooter from "../components/SiteFooter.vue"
 import ArticleContext from "../components/ArticleContext.vue"
 import VisitorCounter from "../components/VisitorCounter.vue"
 import SidebarIntro from "../components/SidebarIntro.vue"
+import ReadingControls from "../components/ReadingControls.vue"
+import RelatedNotes from "../components/RelatedNotes.vue"
 
 const SocialIcons = {
   render() {
@@ -46,7 +49,8 @@ export default {
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
       "layout-top": () => [h(StarfieldBackground), h(MicroInteractions), h(VisitorCounter)],
-      "doc-before": () => [h(Breadcrumb), h(ArticleContext)],
+      "doc-before": () => [h("div", { class: "article-navigation" }, [h(Breadcrumb), h(ReadingControls)]), h(ArticleContext)],
+      "doc-footer-before": () => h(RelatedNotes),
       "doc-after": () => h(SiteFooter, { compact: true }),
       "sidebar-nav-before": () => h(SidebarIntro),
       "nav-bar-content-after": () => h(SocialIcons),
@@ -55,9 +59,13 @@ export default {
     })
   },
   enhanceApp({ app, router }) {
+    let previousPath = typeof window === "undefined" ? "" : window.location.pathname
     router.onAfterRouteChange = (to) => {
-      if (typeof window === "undefined" || to.includes("#")) return
-      window.scrollTo({ top: 0, behavior: "instant" })
+      if (typeof window === "undefined") return
+      const destination = new URL(to, window.location.href)
+      const changedPage = destination.pathname !== previousPath
+      previousPath = destination.pathname
+      if (changedPage && !destination.hash) window.scrollTo({ top: 0, behavior: "instant" })
     }
   }
 } satisfies Theme

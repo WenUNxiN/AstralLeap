@@ -11,7 +11,7 @@ import AboutIcon from './AboutIcon.vue'
     <p class="error-description">这个页面可能已更名或暂时不可用。<br>换个入口，继续探索这座知识花园。</p>
     <div class="error-actions">
       <a class="error-primary" :href="withBase('/')">返回首页 <AboutIcon name="arrow" /></a>
-      <a class="error-secondary" :href="withBase('/knowledge/')">浏览知识库 <AboutIcon name="book" /></a>
+      <a class="error-secondary" :href="withBase('/explore/')">继续探索 <AboutIcon name="book" /></a>
     </div>
     <a class="error-projects" :href="withBase('/projects/')">也可以看看我正在做的项目 <AboutIcon name="arrow-up" /></a>
   </main>

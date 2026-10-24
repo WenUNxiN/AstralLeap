@@ -792,6 +792,11 @@ body {
 
 @media print {
 
+  /* Folding is a reading preference; a printed article includes all its code. */
+  .Layout .vp-doc div[class*="language-"].collapsed pre {
+    display: block !important;
+  }
+
   .Layout .site-footer,
   .Layout .console-bg {
     display: none;

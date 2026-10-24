@@ -36,6 +36,18 @@ test('nested knowledge indexes do not override category metadata or become artic
   assert.ok(data.articles.every(article => article.dir === 'linux'))
 })
 
+test('knowledge categories use Markdown headings and a default icon when metadata is absent', () => {
+  const data = collectKnowledge([
+    { ...entry('/knowledge/foc/'), src: '# 电机控制探索\n' },
+    { ...entry('/knowledge/foc/first.html'), src: '# 第一次记录\n' },
+    { ...entry('/knowledge/ros/'), src: '分类介绍\n' },
+    { ...entry('/knowledge/ros/first.html'), src: '# ROS 记录\n' },
+  ])
+  assert.deepEqual(data.categories.map(({ name, icon }) => ({ name, icon })), [
+    { name: '电机控制探索', icon: '📁' }, { name: 'ros', icon: '📁' },
+  ])
+})
+
 test('actual VitePress loaders discover files placed in nested directories without registration', async t => {
   const root = mkdtempSync(join(tmpdir(), 'astralleap-collections-'))
   t.after(() => rmSync(root, { recursive: true, force: true }))
@@ -73,10 +85,24 @@ test('actual VitePress loaders discover files placed in nested directories witho
     // Repeat after adding a file: no loader/config edits are needed.
     write(`${section}/topic/later.md`, '# 后续文章')
     assert.equal((await loader.load()).length, 3)
+    rmSync(join(root, section, 'topic/later.md'))
+    assert.equal((await loader.load()).length, 2)
   }
   const { default: knowledge } = await import('../.vitepress/data/knowledge.data.ts')
   const data = await knowledge.load()
   assert.equal(data.articles[0].url, '/knowledge/linux/memory/mmap.html')
   assert.equal(data.categories[0].name, '嵌入式 Linux')
   assert.equal(data.categories[0].count, 1)
+  write('knowledge/foc/index.md', '# 电机控制探索')
+  write('knowledge/foc/control/setup.md', '# 控制环境')
+  write('knowledge/foc/hardware/setup.md', '# 硬件环境')
+  const expanded = await knowledge.load()
+  const category = expanded.categories.find((category: any) => category.dir === 'foc')
+  assert.equal(category.name, '电机控制探索')
+  assert.equal(category.count, 2)
+  assert.deepEqual(expanded.articles.filter((article: any) => article.dir === 'foc').map((article: any) => article.url).sort(), [
+    '/knowledge/foc/control/setup.html', '/knowledge/foc/hardware/setup.html',
+  ])
+  rmSync(join(root, 'knowledge/foc'), { recursive: true })
+  assert.equal((await knowledge.load()).categories.length, 1)
 })

@@ -33,41 +33,29 @@
 <script setup>
 import { computed } from 'vue'
 import { withBase } from 'vitepress'
+import { data } from '../data/projects.data.ts'
 
 const props = defineProps({
   limit: { type: Number, default: 0 }
 })
 
-// project.json 非 markdown，无法用 createContentLoader；
-// 改用 eager glob 在构建/SSR 阶段同步读取，避免客户端闪烁。
-const modules = import.meta.glob('../../src/projects/*/project.json', { eager: true, query: '?raw', import: 'default' })
-
-const projects = Object.entries(modules).map(([path, raw]) => {
-  try {
-    const data = typeof raw === 'string' ? JSON.parse(raw.replace(/^\uFEFF/, '')) : raw
-    const linkMatch = path.match(/projects\/(.+?)\/project\.json$/)
-    const slug = linkMatch ? linkMatch[1] : ''
-    const target = data.link || (`/projects/${slug}/${slug}`)
-    const isExternal = /^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(target)
-    // Cards are native anchors: directory routes keep '/', articles need '.html'.
-    const [, pathname, suffix = ''] = target.match(/^([^?#]*)(.*)$/)
-    const pageLink = isExternal || /(?:\/|\.html)$/.test(pathname) ? target : pathname.replace(/\.md$/, '') + '.html' + suffix
-    const link = isExternal ? pageLink : withBase(pageLink)
-    const number = (slug.match(/^(\d+)/) || [null, ''])[1].padStart(2, '0')
-    const statusClass = /完成|发布|已验证/.test(data.status) ? 'complete' : /规划|构思/.test(data.status) ? 'planned' : 'active'
-    return { ...data, folder: slug, number, link, statusClass }
-  } catch (e) {
-    return null
+// Discovery and entry-point resolution happen at build time; only card metadata
+// reaches the browser. Optional presentation fields never block a new project.
+const projects = computed(() => data.map(project => {
+  const isExternal = /^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(project.link)
+  return {
+    ...project,
+    name: typeof project.name === 'string' && project.name.trim() ? project.name : project.folder,
+    icon: typeof project.icon === 'string' && project.icon.trim() ? project.icon : '✦',
+    desc: typeof project.desc === 'string' ? project.desc : '',
+    tech: Array.isArray(project.tech) ? project.tech.filter(item => typeof item === 'string' && item.trim()) : [],
+    link: isExternal ? project.link : withBase(project.link),
+    statusClass: /完成|发布|已验证/.test(project.status) ? 'complete' : /规划|构思/.test(project.status) ? 'planned' : 'active'
   }
-}).filter(Boolean)
+}))
 
 const displayedProjects = computed(() => {
-  const sorted = [...projects].sort((a, b) => {
-    const numA = parseFloat((a.folder.match(/^(\d+)/) || ['0'])[0])
-    const numB = parseFloat((b.folder.match(/^(\d+)/) || ['0'])[0])
-    return numB - numA
-  })
-  return props.limit > 0 ? sorted.slice(0, props.limit) : sorted
+  return props.limit > 0 ? projects.value.slice(0, props.limit) : projects.value
 })
 </script>
 

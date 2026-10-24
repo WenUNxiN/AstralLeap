@@ -1,4 +1,5 @@
 import { sortByDateDesc, toContentItem, type ContentItem, type RawContentEntry } from './content-loader.ts'
+import { getMarkdownTitle } from './frontmatter.ts'
 
 export interface KnowledgeCategory {
   name: string
@@ -35,7 +36,7 @@ export function collectKnowledge(entries: RawContentEntry[]): KnowledgeData {
     // Only the category's own index may supply category metadata. A deeper
     // directory index must never rename the containing category.
     if (!rest) {
-      meta.set(dir, { name: fm.title || dir, icon: fm.icon || '📁', description: fm.description || '' })
+      meta.set(dir, { name: fm.title || getMarkdownTitle(entry.src) || dir, icon: fm.icon || '📁', description: fm.description || '' })
     } else if (isArticle(entry)) {
       articles.push({ ...toContentItem(entry), dir })
     }

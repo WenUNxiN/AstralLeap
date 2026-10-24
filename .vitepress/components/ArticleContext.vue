@@ -2,20 +2,14 @@
 import { computed } from 'vue'
 import { useData } from 'vitepress'
 import AboutIcon from './AboutIcon.vue'
+import { sectionForPath } from '../utils/sections'
 import { normalizeDate, formatDate, firstOf, getStatusClass, getStatusText } from '../utils/content-loader'
 
 const { page, frontmatter } = useData()
-const sections = {
-  knowledge: { label: 'KNOWLEDGE NOTE', icon: 'book' },
-  experiments: { label: 'LAB NOTE', icon: 'flask' },
-  debug: { label: 'DEBUG LOG', icon: 'bug' },
-  cheatsheet: { label: 'QUICK REFERENCE', icon: 'terminal' },
-  projects: { label: 'PROJECT NOTE', icon: 'layers' }
-}
 const section = computed(() => {
   const path = page.value.relativePath || ''
   if (path.endsWith('/index.md') || frontmatter.value.categoryPage) return null
-  return sections[path.split('/')[0]] || null
+  return sectionForPath(path) || null
 })
 const date = computed(() => normalizeDate(frontmatter.value.date))
 </script>

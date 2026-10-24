@@ -2,6 +2,8 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { createMarkdownRenderer, disposeMdItInstance } from 'vitepress'
 import { getMarkdownTitle } from './frontmatter.ts'
+import { projectLink, projectPageKey } from './project-links.mjs'
+import { exploreSections, sectionForPath } from './sections.ts'
 
 // Reuse VitePress's public frontmatter parser, rendering only the YAML block.
 // Release its global cache so the site's actual Markdown options initialize later.
@@ -60,22 +62,6 @@ function leaf(doc, showNumber = false) {
   return { text: number ? `#${number} · ${doc.text}` : doc.text, link: doc.link }
 }
 
-function projectLink(base, target) {
-  if (/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(target)) return target
-  const link = target.startsWith('/') ? target : base + target
-  const [, path, suffix = ''] = link.match(/^([^?#]*)([?#].*)?$/)
-  if (!path || path.endsWith('/') || /\.[a-z\d]+$/i.test(path) && !path.endsWith('.md')) return link
-  return path.replace(/\.md$/, '') + '.html' + suffix
-}
-
-// Compare page identities rather than anchor/query variants or encoded paths.
-function projectPageKey(link) {
-  if (/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(link)) return null
-  let path = new URL(link, 'https://astralleap.invalid').pathname
-  try { path = decodeURIComponent(path) } catch { /* Preserve malformed escapes as-is. */ }
-  return path.replace(/\.(?:md|html)$/, '').replace(/\/index$/, '/').replace(/\/$/, '')
-}
-
 function projectSidebar(srcDir, dir) {
   const root = join(srcDir, 'projects', dir)
   const file = join(root, 'project.json')
@@ -115,7 +101,7 @@ function recordSidebar(srcDir, section, label, showNumber = false) {
   ] }]
 }
 
-function debugSidebar(srcDir) {
+function debugSidebar(srcDir, section) {
   const docs = markdownFiles(join(srcDir, 'debug')).map(file => documentInfo(file, srcDir)).filter(doc => doc.path !== 'debug/index.md')
   const indexes = docs.filter(doc => doc.categoryPage === true || doc.isIndex).sort((a, b) => a.text.localeCompare(b.text, 'zh-CN'))
   const records = docs.filter(doc => doc.categoryPage !== true && !doc.isIndex).sort(byDateAndNumber)
@@ -134,7 +120,7 @@ function debugSidebar(srcDir) {
     if (match) match.records.push(doc)
     else ungrouped.push(doc)
   }
-  return [{ text: 'Debug 记录', link: '/debug/', items: [
+  return [{ text: section.title, link: section.path, items: [
     ...groups.map(group => ({ ...leaf(group.doc), ...(group.records.length ? { collapsed: true, items: group.records.map(doc => leaf(doc)) } : {}) })),
     ...(ungrouped.length ? [{ text: '其他记录', collapsed: false, items: ungrouped.map(doc => leaf(doc)) }] : []),
   ] }]
@@ -151,15 +137,18 @@ export function createSidebar(srcDir) {
     return { dir, home, docs }
   }).sort((a, b) => b.docs.length - a.docs.length || a.home.text.localeCompare(b.home.text, 'zh-CN'))
 
-  const knowledgeSidebar = activeDir => [{ text: '技术知识库', link: '/knowledge/', items: categories.map(category => ({
+  const knowledgeSection = sectionForPath('knowledge/')
+  const knowledgeSidebar = activeDir => [{ text: knowledgeSection.title, link: knowledgeSection.path, items: categories.map(category => ({
     ...leaf(category.home),
     ...(category.docs.length ? { collapsed: category.dir !== activeDir, items: category.docs.map(doc => leaf(doc)) } : {}),
   })) }]
-  sidebar['/knowledge/'] = knowledgeSidebar(null)
+  sidebar[knowledgeSection.path] = knowledgeSidebar(null)
   for (const category of categories) sidebar[`/knowledge/${category.dir}/`] = knowledgeSidebar(category.dir)
-  sidebar['/experiments/'] = recordSidebar(srcDir, 'experiments', '实验记录', true)
-  sidebar['/cheatsheet/'] = recordSidebar(srcDir, 'cheatsheet', '命令速查')
-  sidebar['/debug/'] = debugSidebar(srcDir)
+  for (const section of exploreSections) {
+    if (section.id === 'knowledge') continue
+    sidebar[section.path] = section.id === 'debug' ? debugSidebar(srcDir, section)
+      : recordSidebar(srcDir, section.id, section.title, section.id === 'experiments')
+  }
   return sidebar
 }
 
@@ -173,7 +162,8 @@ export function sidebarContentPlugin(srcDir) {
     hotUpdate({ file, server }) {
       if (this.environment.name !== 'client') return
       const path = relative(root, file).replace(/\\/g, '/')
-      if (!/^(?:knowledge|experiments|debug|cheatsheet)\/.*\.md$/.test(path) && !/^projects\/[^/]+\/(?:project\.json|.*\.md)$/.test(path)) return
+      const section = sectionForPath(path)
+      if (!section || !(path.endsWith('.md') || section.id === 'projects' && /^projects\/[^/]+\/project\.json$/.test(path))) return
       const site = server.config.vitepress?.site
       if (!site) return
       const nextSidebar = createSidebar(root)

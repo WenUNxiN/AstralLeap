@@ -4,6 +4,7 @@ defineProps({ name: { type: String, required: true } })
 // Shared outline icons keep this page consistent without a new dependency.
 const paths = {
   arrow: ['M5 12h14m-6-6 6 6-6 6'],
+  search: ['M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Zm-2 5 6 6'],
   'arrow-up': ['M7 17 17 7M7 7h10v10'],
   camera: ['M14 4h-4L8 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-4l-2-3Z', 'M16 13a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z'],
   sliders: ['M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6'],
@@ -20,6 +21,7 @@ const paths = {
   layers: ['m12 3 10 5-10 5L2 8l10-5ZM2 12l10 5 10-5M2 16l10 5 10-5'],
   message: ['M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-3 3V11.5A8.5 8.5 0 0 1 9.5 3h3a8.5 8.5 0 0 1 8.5 8.5ZM7 10h8m-8 4h5'],
   copy: ['M9 9h12v12H9zM15 9V3H3v12h6'],
+  focus: ['M3 9V3h6m6 0h6v6m0 6v6h-6m-6 0H3v-6'],
   check: ['m5 12 4 4L19 6']
 }
 </script>

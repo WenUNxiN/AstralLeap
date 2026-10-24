@@ -123,6 +123,44 @@
 .collection-empty button { min-height: 44px; margin-top: 16px; padding: 8px 16px; background: var(--vp-c-brand-soft); color: var(--vp-c-brand-1); border-radius: 7px; font-size: 12px; cursor: pointer; }
 .collection-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
+/* Existing collection URLs stay useful as compact, focused views. */
+.collection-compact .collection-shell { max-width: 1040px; padding-top: 30px; }
+.collection-compact .collection-back { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; font-size: 11px; color: var(--collection-muted); }
+.collection-compact .collection-back > .about-icon { width: 13px; height: 13px; transform: rotate(180deg); }
+.collection-compact .collection-back:hover { color: var(--vp-c-brand-1); }
+.collection-compact .collection-compact-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 17px 0 24px; border-bottom: 1px solid var(--collection-border); }
+.collection-compact .collection-compact-header h1 { font-size: 32px; font-weight: 700; line-height: 1.45; }
+.collection-compact .collection-compact-header p { max-width: 640px; margin-top: 10px; font-size: 13px; line-height: 1.9; color: var(--collection-muted); }
+.collection-compact .collection-all-records { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; font-size: 11px; color: var(--vp-c-brand-1); white-space: nowrap; }
+.collection-compact .collection-all-records > .about-icon { width: 14px; height: 14px; }
+.collection-compact .collection-compact-content { padding: 24px 0 8px; }
+.collection-compact .collection-toolbar { gap: 12px; }
+.collection-compact .collection-cards { grid-template-columns: 1fr; gap: 0; }
+.collection-compact .collection-cards .collection-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'top top' 'title footer' 'description footer' 'meta footer' 'tags footer' 'command footer'; gap: 0 28px; padding: 21px 0; border: 0; border-top: 1px solid var(--collection-border); border-radius: 0; background: transparent; }
+.collection-compact .collection-cards .collection-card:hover { transform: none; box-shadow: none; border-color: var(--collection-border); }
+.collection-compact .collection-card > .collection-card-top { grid-area: top; justify-content: flex-start; margin-bottom: 7px; gap: 12px; }
+.collection-compact .collection-card > h3 { grid-area: title; font-size: 17px; }
+.collection-compact .collection-card > .collection-card-description { grid-area: description; margin-top: 6px; max-width: 68ch; }
+.collection-compact .collection-card > .collection-card-meta { grid-area: meta; margin: 10px 0 0; }
+.collection-compact .collection-card > .collection-card-tags { grid-area: tags; margin-top: 10px; }
+.collection-compact .collection-card > .collection-command { grid-area: command; margin: 11px 0 0; }
+.collection-compact .collection-card > .collection-card-footer { grid-area: footer; align-self: center; flex-direction: column; align-items: flex-end; justify-content: center; gap: 12px; margin: 0; padding: 0; border: 0; }
+.collection-compact .collection-card-meta time { margin-left: 0; }
+.collection-compact .collection-tool-icon { width: 23px; height: 23px; border-radius: 6px; }
+.collection-compact .collection-tool-icon > .about-icon { width: 14px; height: 14px; }
+
+@media (max-width: 767px) {
+  .collection-compact .collection-shell { padding-top: 22px; }
+  .collection-compact .collection-compact-header { flex-direction: column; align-items: flex-start; gap: 8px; padding-top: 12px; padding-bottom: 19px; }
+  .collection-compact .collection-compact-header h1 { font-size: 28px; }
+  .collection-compact .collection-compact-header p { margin-top: 9px; font-size: 12px; }
+  .collection-compact .collection-compact-content { padding-top: 20px; }
+}
+@media (max-width: 599px) {
+  .collection-compact .collection-cards .collection-card { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'top' 'title' 'description' 'meta' 'tags' 'command' 'footer'; padding: 18px 0; }
+  .collection-compact .collection-card > .collection-card-footer { flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+}
+
 @media (max-width: 959px) {
   .collection-hero { gap: 32px; }
   .collection-overview { padding: 24px 22px; }

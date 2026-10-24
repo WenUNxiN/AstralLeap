@@ -4,7 +4,7 @@
     <template v-for="(c, i) in crumbs" :key="i">
       <span class="sep" aria-hidden="true">/</span>
       <a v-if="c.url" :href="withBase(c.url)">{{ c.label }}</a>
-      <span v-else class="current" aria-current="page">{{ c.label }}</span>
+      <span v-else class="current" :aria-current="i === crumbs.length - 1 ? 'page' : undefined">{{ c.label }}</span>
     </template>
   </nav>
 </template>
@@ -13,45 +13,15 @@
 import { computed } from 'vue'
 import { useData, withBase } from 'vitepress'
 import { data as knowledgeData } from '../data/knowledge.data.ts'
+import { buildBreadcrumbs } from '../utils/breadcrumb'
 
 const { page, frontmatter, title } = useData()
 
-/* 一级目录 → 名称与索引页 */
-const topMap = {
-  knowledge: { label: '知识库', url: '/knowledge/' },
-  experiments: { label: '实验记录', url: '/experiments/' },
-  debug: { label: 'Debug 记录', url: '/debug/' },
-  cheatsheet: { label: '命令速查', url: '/cheatsheet/' },
-  projects: { label: '项目', url: '/projects/' },
-  doc: { label: '文档', url: null }
-}
-
-const crumbs = computed(() => {
-  const rel = (page.value.relativePath || '').replace(/\\/g, '/')
-  if (!rel || rel === 'index.md') return []
-  const parts = rel.replace(/\.md$/, '').split('/')
-  const isIndex = parts[parts.length - 1] === 'index'
-  const meta = topMap[parts[0]]
-  const pageLabel = frontmatter.value.title || page.value.title || title.value
-  const out = []
-
-  if (meta) {
-    out.push({ label: meta.label, url: isIndex && parts.length === 2 ? null : meta.url })
-    // 知识库二级为分类目录，映射为分类名（分类索引页显示为末级）
-    if (parts[0] === 'knowledge' && parts[1] && parts[1] !== 'index') {
-      const cat = knowledgeData.categories.find(c => c.dir === parts[1])
-      out.push({
-        label: cat?.name || (isIndex ? pageLabel : parts[1]),
-        url: isIndex ? null : cat?.url || `/knowledge/${parts[1]}/`
-      })
-    }
-    if (!isIndex) out.push({ label: pageLabel, url: null })
-    return out
-  }
-
-  // 单页（about 等）：首页 / 页面名
-  return isIndex ? [] : [{ label: pageLabel, url: null }]
-})
+const crumbs = computed(() => buildBreadcrumbs(
+  page.value.relativePath || '',
+  frontmatter.value.title || page.value.title || title.value,
+  knowledgeData.categories
+))
 </script>
 
 <style scoped>

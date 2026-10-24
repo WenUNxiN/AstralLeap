@@ -20,7 +20,7 @@ const showFooter = computed(() => props.compact === isDocument.value)
         </div>
         <nav class="footer-nav" aria-label="页脚导航">
           <a :href="withBase('/projects/')">项目</a>
-          <a :href="withBase('/knowledge/')">知识库</a>
+          <a :href="withBase('/explore/')">探索</a>
           <a :href="withBase('/about.html')">关于我</a>
           <a href="https://github.com/WenUNxiN/AstralLeap" target="_blank" rel="noopener noreferrer" aria-label="GitHub 源码（在新标签页打开）">GitHub <AboutIcon name="arrow-up" /></a>
         </nav>

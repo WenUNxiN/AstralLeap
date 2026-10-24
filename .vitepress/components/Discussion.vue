@@ -1,24 +1,22 @@
 <template>
   <div class="giscus-container">
     <div class="discussion-heading"><span class="discussion-eyebrow">LET’S DISCUSS</span><h3>一起讨论，让想法继续生长。</h3><p>欢迎提问、交流使用心得，或分享你的实践。</p></div>
-    <div id="giscus-comments"></div>
+    <div ref="comments" @load.capture="updateTheme"></div>
     <a class="discussion-fallback" href="https://github.com/WenUNxiN/StellanW-Discussions/discussions" target="_blank" rel="noopener noreferrer">也可以前往 GitHub 参与讨论 ↗<span class="discussion-sr-only">（在新标签页打开）</span></a>
   </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useData } from 'vitepress'
 
 const { isDark } = useData()
+const comments = ref(null)
+let script
 
 const loadGiscus = () => {
-  const existingScript = document.querySelector('script[src*="giscus"]')
-  if (existingScript) {
-    existingScript.remove()
-  }
-
-  const script = document.createElement('script')
+  script?.remove()
+  script = document.createElement('script')
   script.src = 'https://giscus.app/client.js'
   script.setAttribute('data-repo', 'WenUNxiN/StellanW-Discussions')
   script.setAttribute('data-repo-id', 'R_kgDOTFvJVw')
@@ -35,14 +33,17 @@ const loadGiscus = () => {
   script.crossOrigin = 'anonymous'
   script.async = true
 
-  document.getElementById('giscus-comments')?.appendChild(script)
+  comments.value?.appendChild(script)
 }
 
 const updateTheme = () => {
-  const iframe = document.querySelector('iframe.giscus-frame')
+  const theme = isDark.value ? 'dark' : 'light'
+  // The external script and iframe can finish loading after the user switches theme.
+  script?.setAttribute('data-theme', theme)
+  const iframe = comments.value?.querySelector('iframe.giscus-frame')
   if (iframe) {
     iframe.contentWindow?.postMessage(
-      { giscus: { setConfig: { theme: isDark.value ? 'dark' : 'light' } } },
+      { giscus: { setConfig: { theme } } },
       'https://giscus.app'
     )
   }
@@ -53,8 +54,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  const script = document.querySelector('script[src*="giscus"]')
   script?.remove()
+  script = undefined
 })
 
 watch(isDark, () => {

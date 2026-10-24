@@ -11,6 +11,10 @@
 .sidebar-intro > a { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; font-size: 11px; color: var(--vp-c-text-2); text-decoration: none; }
 .sidebar-intro > a:hover { color: var(--vp-c-brand-1); }
 .sidebar-intro > a .about-icon { width: 13px; height: 13px; }
+.sidebar-intro > .sidebar-back { display: flex; gap: 7px; margin-bottom: 16px; font-size: 11px; }
+.sidebar-intro .sidebar-kicker { font: 600 13px/1.8 var(--vp-font-family-base); letter-spacing: 0; color: var(--vp-c-text-1); }
+.sidebar-intro .sidebar-kicker .about-icon { color: var(--vp-c-brand-1); }
+.sidebar-intro .sidebar-intro-note { margin: 7px 0 0; }
 .Layout .VPSidebar .group { padding-top: 8px; }
 .Layout .VPSidebar .group + .group { padding-top: 18px; margin-top: 6px; }
 .Layout .VPSidebar .VPSidebarItem.level-0 { padding-bottom: 14px; }
@@ -39,7 +43,7 @@
 /* The page outline uses the same restrained active state as the section tree. */
 .Layout .VPDocAsideOutline .content { padding-left: 18px; }
 .Layout .VPDocAsideOutline .outline-title { padding-bottom: 8px; font-size: 11px; font-weight: 600; color: var(--vp-c-text-2); letter-spacing: .04em; }
-.Layout .VPDocAsideOutline .outline-link { margin: 2px -8px; padding: 4px 8px; border-radius: 6px; line-height: 1.7; font-size: 12px; transition: color .18s, background-color .18s; }
+.Layout .VPDocAsideOutline .outline-link { margin: 2px -8px; padding: 4px 8px; border-radius: 6px; line-height: 1.7; font-size: 12px; white-space: normal; overflow-wrap: anywhere; text-overflow: clip; transition: color .18s, background-color .18s; }
 .Layout .VPDocAsideOutline .outline-link:hover { color: var(--vp-c-brand-1); background: var(--vp-c-default-soft); }
 .Layout .VPDocAsideOutline .outline-link.active { color: var(--vp-c-brand-1); background: var(--vp-c-brand-soft); font-weight: 500; }
 .Layout .VPDocOutlineItem.nested { padding-left: 12px; padding-right: 0; }

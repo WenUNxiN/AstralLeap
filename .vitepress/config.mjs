@@ -3,6 +3,8 @@ import { writeFileSync } from 'fs'
 import { join } from 'path'
 import { fileURLToPath } from 'node:url'
 import { createSidebar, sidebarContentPlugin } from './utils/sidebar.mjs'
+import { checkSiteLinks } from './utils/site-links.mjs'
+import { exploreSections } from './utils/sections.ts'
 
 const SITE_BASE = '/AstralLeap/'
 const SITE_ORIGIN = 'https://wenunxin.github.io'
@@ -84,6 +86,12 @@ export default defineConfig({
       `Disallow: ${base}404.html`,
       '',
     ].join('\n'))
+    const links = checkSiteLinks(siteConfig.outDir, base)
+    if (links.errors.length) {
+      throw new Error('站内链接检查失败：\n' + links.errors.map(error =>
+        `${error.page}: ${error.link}（${error.reason}）`).join('\n'))
+    }
+    console.log(`✓ checked ${links.checked} internal links across ${links.pages} pages`)
   },
   markdown: {
     // Shiki 没有内置 DTS / Kconfig 语法，映射到相近的内置语法以保留代码高亮并消除回退警告。
@@ -155,11 +163,8 @@ export default defineConfig({
     },
     nav: [
       { text: '主页', link: '/' },
+      { text: '探索', link: '/explore/', activeMatch: `/(?:explore|${exploreSections.map(section => section.id).join('|')})(?:/|$)` },
       { text: '项目', link: '/projects/' },
-      { text: '知识库', link: '/knowledge/' },
-      { text: '实验', link: '/experiments/' },
-      { text: 'Debug', link: '/debug/' },
-      { text: '速查', link: '/cheatsheet/' },
       { text: '关于', link: '/about' },
     ],
     sidebar: createSidebar(SOURCE_DIR),
