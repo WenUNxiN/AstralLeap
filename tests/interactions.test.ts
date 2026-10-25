@@ -3,6 +3,111 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
 
+function backToTopHarness(options: { tabindex?: string; naturallyFocusable?: boolean; hiddenHeading?: boolean; reducedMotion?: boolean } = {}) {
+  const source = readFileSync(new URL('../.vitepress/components/MicroInteractions.vue', import.meta.url), 'utf8')
+    .split('<script setup>')[1].split('</script>')[0].replace(/^import .*$/gm, '')
+  const document = {
+    activeElement: null,
+    documentElement: { scrollHeight: 1200, clientHeight: 600, scrollTop: 500 },
+    getElementById: () => content,
+    querySelector: () => main,
+    body: null,
+    removeEventListener() {}
+  }
+  class FocusTarget {
+    attributes = new Map<string, string>()
+    listeners = new Map<string, () => void>()
+    focusCalls: { preventScroll: boolean }[] = []
+    mutations = 0
+    hidden = false
+    naturallyFocusable = false
+    querySelector() { return null }
+    hasAttribute(name: string) { return this.attributes.has(name) }
+    getAttribute(name: string) { return this.attributes.get(name) ?? null }
+    setAttribute(name: string, value: string) { this.mutations++; this.attributes.set(name, value) }
+    removeAttribute(name: string) { this.attributes.delete(name) }
+    addEventListener(name: string, listener: () => void) { this.listeners.set(name, listener) }
+    removeEventListener(name: string, listener: () => void) {
+      if (this.listeners.get(name) === listener) this.listeners.delete(name)
+    }
+    focus(options: { preventScroll: boolean }) {
+      this.focusCalls.push(options)
+      if (!this.hidden && (this.naturallyFocusable || this.hasAttribute('tabindex'))) document.activeElement = this
+    }
+    blur() { document.activeElement = null; this.listeners.get('blur')?.() }
+  }
+  const heading = new FocusTarget()
+  heading.hidden = !!options.hiddenHeading
+  heading.naturallyFocusable = !!options.naturallyFocusable
+  if (options.tabindex !== undefined) heading.attributes.set('tabindex', options.tabindex)
+  const main = new FocusTarget()
+  const content = new FocusTarget()
+  content.querySelector = selector => selector === 'h1' ? heading : selector === 'main' ? main : null
+  document.body = content
+  const button = new FocusTarget()
+  document.activeElement = button
+  let unmount
+  const scrolls: { top: number; behavior: string }[] = []
+  const context = {
+    ref: value => ({ value }), onMounted() {}, onBeforeUnmount: fn => { unmount = fn },
+    cancelAnimationFrame() {}, document,
+    window: {
+      scrollTo: options => scrolls.push(options),
+      matchMedia: () => ({ matches: !!options.reducedMotion }),
+      removeEventListener() {}
+    },
+    api: undefined
+  }
+  runInNewContext(source + '\nglobalThis.api = { scrollToTop, updateScrollUI, showBackTop }', context)
+  return { ...context.api, document, heading, main, button, scrolls, unmount: () => unmount() }
+}
+
+test('returning to the top moves keyboard focus to the heading and removes its temporary tabindex on blur', () => {
+  const state = backToTopHarness()
+  state.scrollToTop()
+  assert.equal(state.document.activeElement, state.heading)
+  assert.equal(state.heading.getAttribute('tabindex'), '-1')
+  assert.ok(state.heading.focusCalls.every(options => options.preventScroll))
+  assert.equal(state.scrolls[0].top, 0)
+  assert.equal(state.scrolls[0].behavior, 'smooth')
+  state.document.documentElement.scrollTop = 0
+  state.updateScrollUI()
+  assert.equal(state.showBackTop.value, false)
+  assert.notEqual(state.document.activeElement, state.button)
+  state.heading.blur()
+  assert.equal(state.heading.hasAttribute('tabindex'), false)
+  assert.equal(state.heading.listeners.size, 0)
+  state.unmount()
+})
+
+test('back-to-top cleanup handles unmount and preserves existing or naturally focusable targets', () => {
+  const temporary = backToTopHarness()
+  temporary.scrollToTop()
+  temporary.unmount()
+  assert.equal(temporary.heading.hasAttribute('tabindex'), false)
+  assert.equal(temporary.heading.listeners.size, 0)
+  for (const options of [{ tabindex: '0' }, { tabindex: '-1' }, { naturallyFocusable: true }]) {
+    const state = backToTopHarness(options)
+    state.scrollToTop()
+    assert.equal(state.document.activeElement, state.heading)
+    assert.equal(state.heading.getAttribute('tabindex'), options.tabindex ?? null)
+    assert.equal(state.heading.mutations, 0)
+    state.unmount()
+    assert.equal(state.heading.getAttribute('tabindex'), options.tabindex ?? null)
+  }
+})
+
+test('back-to-top falls back from a hidden heading and keeps reduced-motion scrolling instant', () => {
+  const state = backToTopHarness({ hiddenHeading: true, reducedMotion: true })
+  state.scrollToTop()
+  assert.equal(state.document.activeElement, state.main)
+  assert.equal(state.heading.hasAttribute('tabindex'), false)
+  assert.equal(state.heading.listeners.size, 0)
+  assert.equal(state.scrolls[0].behavior, 'instant')
+  state.unmount()
+  assert.equal(state.main.hasAttribute('tabindex'), false)
+})
+
 test('code enhancements scan inserted subtrees, ignore their own controls and cancel pending work', () => {
   const source = readFileSync(new URL('../.vitepress/components/MicroInteractions.vue', import.meta.url), 'utf8')
     .split('<script setup>')[1].split('</script>')[0].replace(/^import .*$/m, '')

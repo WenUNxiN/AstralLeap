@@ -17,3 +17,18 @@ test('short or mismatched fences stay inside code and unclosed examples do not b
   assert.equal(getMarkdownTitle('```md\n# Unclosed example'), '')
   assert.equal(getExcerpt('~~~md\n# Unclosed example'), '暂无摘要')
 })
+
+test('inline code keeps generics, operators and Markdown characters literal in titles and excerpts', () => {
+  const source = '# 使用 `std::vector<int>` 与 `a*b*`\n查看 `[x](path)` 和 `a & b`。'
+  assert.equal(getMarkdownTitle(source), '使用 std::vector<int> 与 a*b*')
+  assert.equal(getExcerpt(source), '使用 std::vector<int> 与 a*b*。查看 [x](path) 和 a & b')
+  assert.equal(getMarkdownTitle('# [使用 `std::vector<int>`](https://example.com) **笔记**'), '使用 std::vector<int> 笔记')
+  assert.equal(getMarkdownTitle('# <em>介绍</em> `std::vector<int>`'), '介绍 std::vector<int>')
+})
+
+test('code spans use matching delimiter lengths and normalize only surrounding code-span spaces', () => {
+  assert.equal(getMarkdownTitle('# `` std::vector<int> `value` `` 笔记'), 'std::vector<int> `value` 笔记')
+  assert.equal(getMarkdownTitle('# `std::vector<int>`` 笔记'), '`std::vector`` 笔记')
+  assert.equal(getExcerpt('# 笔记\n`std::vector<\nint>`'), '笔记。std::vector< int>')
+  assert.equal(getMarkdownTitle('# `&amp;` 与 `<span>`'), '&amp; 与 <span>')
+})

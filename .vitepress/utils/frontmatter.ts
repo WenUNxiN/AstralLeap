@@ -33,12 +33,42 @@ function markdownBody(content: string): string {
 }
 
 function inlineText(content: string): string {
-  return content
+  // Keep code-span contents literal while removing surrounding Markdown/HTML.
+  // Delimiters must have equal lengths, so doubled backticks can quote a `.
+  const runs = [...content.matchAll(/`+/g)]
+  const nextSameLength: number[] = []
+  const nextRun = new Map<number, number>()
+  for (let i = runs.length - 1; i >= 0; i--) {
+    nextSameLength[i] = nextRun.get(runs[i][0].length) ?? -1
+    nextRun.set(runs[i][0].length, i)
+  }
+  const code: string[] = []
+  let marker = '\u0000'
+  while (content.includes(marker)) marker += '\u0000'
+  let protectedText = ''
+  let cursor = 0
+  for (let i = 0; i < runs.length; i++) {
+    const open = runs[i]
+    let before = 0
+    for (let at = open.index! - 1; at >= 0 && content[at] === '\\'; at--) before++
+    if (before % 2) continue
+    const end = nextSameLength[i]
+    if (end < 0) continue
+    const close = runs[end]
+    let literal = content.slice(open.index! + open[0].length, close.index).replace(/\n/g, ' ')
+    if (literal.startsWith(' ') && literal.endsWith(' ') && /[^ ]/.test(literal)) literal = literal.slice(1, -1)
+    protectedText += content.slice(cursor, open.index) + marker + code.length + marker
+    code.push(literal)
+    cursor = close.index! + close[0].length
+    i = end
+  }
+  protectedText += content.slice(cursor)
+  const text = protectedText
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
     .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
-    .replace(/`([^`]+)`/g, '$1')
     .replace(/\*{1,3}([^*]+)\*{1,3}/g, '$1')
-    .replace(/<[^>]+>/g, '').trim()
+    .replace(/<[^>]+>/g, '')
+  return text.replace(new RegExp(`${marker}(\\d+)${marker}`, 'g'), (_, index) => code[Number(index)]).trim()
 }
 
 /** Without a frontmatter title, use the article's first level-one heading. */

@@ -15,6 +15,12 @@ export function cleanSidebarText(value) {
   return String(value || '').replace(/^(?:[\p{Extended_Pictographic}\p{Emoji_Presentation}\uFE0F\uFE0E\u200D]|\s)+/u, '').trim()
 }
 
+// The default theme uses v-html for labels. Discovered document titles are
+// plain text; project.json's intentionally customized text keeps its old rules.
+function documentSidebarText(value) {
+  return cleanSidebarText(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
 function directories(dir) {
   if (!existsSync(dir)) return []
   return readdirSync(dir, { withFileTypes: true }).filter(entry => entry.isDirectory()).map(entry => entry.name)
@@ -40,7 +46,7 @@ function documentInfo(file, srcDir) {
     ...meta,
     path,
     slug,
-    text: cleanSidebarText(meta.title || getMarkdownTitle(source) || slug),
+    text: documentSidebarText(meta.title || getMarkdownTitle(source) || slug),
     link: '/' + path.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '.html'),
     isIndex: slug === 'index',
   }
@@ -111,11 +117,11 @@ function debugSidebar(srcDir, section) {
   for (const doc of records) {
     const rawCategories = Array.isArray(doc.category) ? doc.category : [doc.category]
     const categories = rawCategories.filter(category => typeof category === 'string' && category.trim()).map(category => category.trim())
-    const explicit = categories.map(category => groups.find(group => matchesDebugCategory({ category, url: doc.link }, group.category))).find(Boolean)
+    const explicit = groups.filter(group => categories.some(category => matchesDebugCategory({ category, url: doc.link }, group.category)))
     const directory = groups.filter(group => matchesDebugCategory({ url: doc.link }, group.category))
       .sort((a, b) => b.category.length - a.category.length)[0]
-    const match = categories.length ? explicit : directory
-    if (match) match.records.push(doc)
+    const matches = categories.length ? explicit : directory ? [directory] : []
+    if (matches.length) for (const group of matches) group.records.push(doc)
     else ungrouped.push(doc)
   }
   return [{ text: section.title, link: section.path, items: [

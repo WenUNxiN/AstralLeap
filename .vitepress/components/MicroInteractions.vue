@@ -37,7 +37,35 @@ const onScroll = () => {
   scrollFrame = requestAnimationFrame(updateScrollUI)
 }
 
+let clearFocusTarget = null
+const focusContentStart = () => {
+  clearFocusTarget?.()
+  const content = document.getElementById('VPContent') || document.querySelector('main') || document.body
+  const targets = new Set([content.querySelector('h1'), content.querySelector('main'), content])
+  for (const target of targets) {
+    if (!target) continue
+    target.focus({ preventScroll: true })
+    if (document.activeElement === target) return
+    if (target.hasAttribute('tabindex')) continue
+
+    // Headings and main containers need a temporary focus target. Existing
+    // tabindex values and elements that already accept focus stay untouched.
+    target.setAttribute('tabindex', '-1')
+    const restore = () => {
+      target.removeEventListener('blur', restore)
+      if (target.getAttribute('tabindex') === '-1') target.removeAttribute('tabindex')
+      if (clearFocusTarget === restore) clearFocusTarget = null
+    }
+    clearFocusTarget = restore
+    target.addEventListener('blur', restore)
+    target.focus({ preventScroll: true })
+    if (document.activeElement === target) return
+    restore()
+  }
+}
+
 const scrollToTop = () => {
+  focusContentStart()
   window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
 }
 
@@ -119,6 +147,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  clearFocusTarget?.()
   cancelAnimationFrame(scrollFrame)
   cancelAnimationFrame(codeFrame)
   pendingRoots.clear()

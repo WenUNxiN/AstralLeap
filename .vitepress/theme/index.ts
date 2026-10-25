@@ -17,6 +17,7 @@ import VisitorCounter from "../components/VisitorCounter.vue"
 import SidebarIntro from "../components/SidebarIntro.vue"
 import ReadingControls from "../components/ReadingControls.vue"
 import RelatedNotes from "../components/RelatedNotes.vue"
+import { createExploreNavigation, exploreNavigationKey } from "../utils/explore-navigation"
 
 const SocialIcons = {
   render() {
@@ -58,14 +59,9 @@ export default {
       "not-found": () => h(NotFound)
     })
   },
-  enhanceApp({ app, router }) {
-    let previousPath = typeof window === "undefined" ? "" : window.location.pathname
-    router.onAfterRouteChange = (to) => {
-      if (typeof window === "undefined") return
-      const destination = new URL(to, window.location.href)
-      const changedPage = destination.pathname !== previousPath
-      previousPath = destination.pathname
-      if (changedPage && !destination.hash) window.scrollTo({ top: 0, behavior: "instant" })
-    }
+  enhanceApp({ app, router, siteData }) {
+    app.provide(exploreNavigationKey, createExploreNavigation(
+      router, siteData.value.base, typeof window === "undefined" ? undefined : window
+    ))
   }
 } satisfies Theme

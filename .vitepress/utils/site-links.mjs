@@ -1,7 +1,6 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 
-const origin = 'https://site.invalid'
 const decodeEntities = value => value.replace(/&(?:amp|quot|apos|lt|gt|#\d+|#x[\da-f]+);/gi, entity => {
   const named = { '&amp;': '&', '&quot;': '"', '&apos;': "'", '&lt;': '<', '&gt;': '>' }
   if (!entity.startsWith('&#')) return named[entity.toLowerCase()]
@@ -12,21 +11,64 @@ const isFile = file => { try { return statSync(file).isFile() } catch { return f
 const walk = dir => readdirSync(dir, { withFileTypes: true }).flatMap(entry =>
   entry.isDirectory() ? walk(join(dir, entry.name)) : [join(dir, entry.name)])
 
+const rawTextTags = new Set(['style', 'textarea', 'title', 'xmp', 'iframe', 'noembed', 'noframes', 'noscript'])
+const tagPattern = /<\/?[a-z][\w:-]*\b(?:[^>"']|"[^"]*"|'[^']*')*>/.source
+
+/** Script comments can enter a double-escaped state where </script> is text. */
+function scriptEnd(html, start) {
+  const markers = /<!--|-->|<\/?script(?=[\t\n\f\r />])/gi
+  markers.lastIndex = start
+  let escaped = false
+  let doubleEscaped = false
+  let marker
+  while ((marker = markers.exec(html))) {
+    const text = marker[0].toLowerCase()
+    if (text === '<!--') escaped = true
+    else if (text === '-->') escaped = doubleEscaped = false
+    else if (text === '<script' && escaped) doubleEscaped = true
+    else if (text === '</script') {
+      if (doubleEscaped) doubleEscaped = false
+      else {
+        const close = new RegExp(tagPattern, 'iy')
+        close.lastIndex = marker.index
+        return close.exec(html) ? close.lastIndex : html.length
+      }
+    }
+  }
+  return html.length
+}
+
+/** Ignore literal markup in comments and raw text, retaining the opening attributes. */
+function* openingTags(html) {
+  const tokens = new RegExp('<!--(?:>|->|[\\s\\S]*?(?:--!?>|$))|<![^>]*>|<\\?[^>]*>|' + tagPattern, 'gi')
+  let token
+  while ((token = tokens.exec(html))) {
+    const tag = token[0]
+    const name = tag.match(/^<([a-z][\w:-]*)/i)?.[1]?.toLowerCase()
+    if (!name) continue
+    yield tag
+    if (name === 'script') tokens.lastIndex = scriptEnd(html, tokens.lastIndex)
+    else if (rawTextTags.has(name)) {
+      const close = new RegExp(`</${name}(?=[\\t\\n\\f\\r />])(?:[^>"']|"[^"]*"|'[^']*')*>`, 'gi')
+      close.lastIndex = tokens.lastIndex
+      tokens.lastIndex = close.exec(html) ? close.lastIndex : html.length
+    } else if (name === 'plaintext') return
+  }
+}
+
 /** Inspect rendered HTML, including links emitted by Vue cards and navigation. */
-export function checkSiteLinks(outDir, base = '/') {
+export function checkSiteLinks(outDir, base = '/', siteOrigin = 'https://site.invalid') {
+  const origin = new URL(siteOrigin).origin
   const root = resolve(outDir)
   const pages = walk(root).filter(file => file.endsWith('.html'))
   const errors = []
   const ids = new Map()
   let checked = 0
-  const htmlOf = file => readFileSync(file, 'utf8')
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/(<script\b[^>]*>)[\s\S]*?<\/script>/gi, '$1</script>')
   const attributes = tag => [...tag.matchAll(/\s([\w:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/g)]
     .map(match => [match[1].toLowerCase(), decodeEntities(match[2] ?? match[3] ?? match[4])])
-  const tagsOf = html => html.match(/<[a-z][\w:-]*\b(?:[^>"']|"[^"]*"|'[^']*')*>/gi) || []
+  const tagsOf = file => [...openingTags(readFileSync(file, 'utf8'))]
   const idsOf = file => {
-    if (!ids.has(file)) ids.set(file, new Set(tagsOf(htmlOf(file)).flatMap(tag => attributes(tag)
+    if (!ids.has(file)) ids.set(file, new Set(tagsOf(file).flatMap(tag => attributes(tag)
       .filter(([name]) => name === 'id' || /^<a\b/i.test(tag) && name === 'name').map(([, value]) => value))))
     return ids.get(file)
   }
@@ -34,7 +76,7 @@ export function checkSiteLinks(outDir, base = '/') {
   for (const file of pages) {
     const page = relative(root, file).replaceAll('\\', '/')
     const pageUrl = new URL(base + page, origin)
-    for (const tag of tagsOf(htmlOf(file))) {
+    for (const tag of tagsOf(file)) {
       for (const [name, value] of attributes(tag)) {
         if (!['href', 'src'].includes(name) || !value || /^(?:data:|mailto:|tel:|javascript:)/i.test(value)) continue
         let url

@@ -124,6 +124,45 @@ test('Debug notes inherit their directory group while explicit categories take p
   assert.deepEqual(links(groups.find(item => item.text === '视频').items), ['/debug/camera/explicit.html'])
 })
 
+test('Debug explicit multi-category notes appear once in every matching group while directory inheritance stays deepest', t => {
+  const root = mkdtempSync(join(tmpdir(), 'astralleap-sidebar-'))
+  t.after(() => rmSync(root, { recursive: true, force: true }))
+  write(root, 'debug/camera.md', '---\ntitle: 相机\ncategoryPage: true\n---\n')
+  write(root, 'debug/v4l2.md', '---\ntitle: V4L2\ncategoryPage: true\n---\n')
+  write(root, 'debug/camera/sensor/index.md', '# 传感器\n')
+  write(root, 'debug/multi.md', '---\ncategory: [V4L2, " Camera ", camera, missing]\n---\n# 多分类问题\n')
+  write(root, 'debug/camera/sensor/plain.md', '# 按目录继承\n')
+  write(root, 'debug/camera/unknown.md', '---\ncategory: missing\n---\n# 未知显式分类\n')
+  const groups = createSidebar(root)['/debug/'][0].items
+  assert.deepEqual(links(groups.find(item => item.text === '相机').items), ['/debug/multi.html'])
+  assert.deepEqual(links(groups.find(item => item.text === 'V4L2').items), ['/debug/multi.html'])
+  assert.deepEqual(links(groups.find(item => item.text === '传感器').items), ['/debug/camera/sensor/plain.html'])
+  assert.deepEqual(links(groups.find(item => item.text === '其他记录').items), ['/debug/camera/unknown.html'])
+})
+
+test('discovered sidebar titles escape literal HTML once while retaining emoji cleanup and custom project text', t => {
+  const root = mkdtempSync(join(tmpdir(), 'astralleap-sidebar-'))
+  t.after(() => rmSync(root, { recursive: true, force: true }))
+  write(root, 'knowledge/types/index.md', '# 📚 C++ & 类型\n')
+  write(root, 'knowledge/types/vector.md', '# 📦 `std::vector<int>` 与 `a & b`\n')
+  write(root, 'experiments/types.md', '---\ntitle: "📦 vector<int> & array<double>"\n---\n# 正文标题\n')
+  write(root, 'projects/project/project.json', JSON.stringify({
+    name: '项目', sidebar: [{ text: '📋 <strong>自定介绍</strong> &amp; 资料', link: 'intro' }],
+  }))
+  write(root, 'projects/project/intro.md', '# 介绍\n')
+  write(root, 'projects/project/types.md', '# 📦 `std::vector<int>`\n')
+  const sidebar = createSidebar(root)
+  const category = sidebar['/knowledge/types/'][0].items[0]
+  assert.equal(category.text, 'C++ &amp; 类型')
+  assert.equal(category.items[0].text, 'std::vector&lt;int&gt; 与 a &amp; b')
+  assert.equal(sidebar['/experiments/'][0].items[0].text, 'vector&lt;int&gt; &amp; array&lt;double&gt;')
+  const project = sidebar['/projects/project/'][0].items
+  assert.equal(project[0].text, '<strong>自定介绍</strong> &amp; 资料')
+  assert.equal(project[1].text, 'std::vector&lt;int&gt;')
+  assert.ok(!category.items[0].text.includes('&amp;lt;'))
+  assert.equal(createSidebar(root)['/knowledge/types/'][0].items[0].items[0].text, category.items[0].text)
+})
+
 test('project note creation and deletion refresh the development sidebar', t => {
   const root = mkdtempSync(join(tmpdir(), 'astralleap-sidebar-'))
   t.after(() => rmSync(root, { recursive: true, force: true }))

@@ -87,7 +87,7 @@ export default defineConfig({
       `Disallow: ${base}404.html`,
       '',
     ].join('\n'))
-    const links = checkSiteLinks(siteConfig.outDir, base)
+    const links = checkSiteLinks(siteConfig.outDir, base, SITE_ORIGIN)
     if (links.errors.length) {
       throw new Error('站内链接检查失败：\n' + links.errors.map(error =>
         `${error.page}: ${error.link}（${error.reason}）`).join('\n'))
