@@ -61,7 +61,26 @@ npm run docs:preview
 | 命令速查 | `src/cheatsheet/` | 常用命令和简短说明 |
 | 项目展示 | `src/projects/<项目>/` | 项目介绍、实现资料与进展 |
 
-已有分类和示例比空模板更有参考价值。拿不准放哪里时，先按内容的主要用途选择目录；一篇笔记不必为了凑齐栏目而拆成多篇。
+拿不准放哪里时，先按内容的主要用途选择目录；一篇笔记不必为了凑齐栏目而拆成多篇。
+
+## 可以直接复制的示例
+
+仓库根目录的 `templates/` 提供了各类 Markdown 示例，详细用法见 `templates/README.md`。复制到对应的 `src/` 目录，改名并填写自己的内容即可。
+
+`templates/已填写示例/知识笔记示例.md` 展示了一篇填写后的笔记，可以先看它，再按下面的类型选择模板。
+
+| 示例文件 | 使用位置 |
+| --- | --- |
+| `templates/最简笔记.md` | 知识分类下的普通笔记，不需要 frontmatter |
+| `templates/知识笔记.md` | `src/knowledge/<分类>/` |
+| `templates/实验记录.md` | `src/experiments/` |
+| `templates/Debug记录.md` | `src/debug/` |
+| `templates/命令速查.md` | `src/cheatsheet/` |
+| `templates/项目文档.md` | `src/projects/<项目>/` |
+| `templates/知识分类首页.md` | 新分类目录中的 `index.md` |
+| `templates/新项目示例/` | 新项目目录，包含 `project.json` 和 `index.md` |
+
+模板目录不参与站点文章统计。章节与元信息都可按实际情况删减，模板日期需要改成自己的记录日期，未完成的内容可以保留未完成状态。
 
 ## 写一篇笔记
 
