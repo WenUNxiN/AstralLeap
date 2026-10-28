@@ -34,9 +34,11 @@
 import { computed } from 'vue'
 import { withBase } from 'vitepress'
 import { data } from '../data/projects.data.ts'
+import { orderProjectPreview, projectStatusClass } from '../utils/project-presentation.ts'
 
 const props = defineProps({
-  limit: { type: Number, default: 0 }
+  limit: { type: Number, default: 0 },
+  preferActive: { type: Boolean, default: false }
 })
 
 // Discovery and entry-point resolution happen at build time; only card metadata
@@ -50,12 +52,13 @@ const projects = computed(() => data.map(project => {
     desc: typeof project.desc === 'string' ? project.desc : '',
     tech: Array.isArray(project.tech) ? project.tech.filter(item => typeof item === 'string' && item.trim()) : [],
     link: isExternal ? project.link : withBase(project.link),
-    statusClass: /完成|发布|已验证/.test(project.status) ? 'complete' : /规划|构思/.test(project.status) ? 'planned' : 'active'
+    statusClass: projectStatusClass(project.status)
   }
 }))
 
 const displayedProjects = computed(() => {
-  return props.limit > 0 ? projects.value.slice(0, props.limit) : projects.value
+  const ordered = orderProjectPreview(projects.value, props.preferActive)
+  return props.limit > 0 ? ordered.slice(0, props.limit) : ordered
 })
 </script>
 

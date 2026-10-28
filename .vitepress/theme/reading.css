@@ -7,11 +7,14 @@
 .article-context-topics .about-icon { width: 11px; height: 11px; }
 .article-context-topics a:hover { color: var(--vp-c-brand-1); }
 .article-context-topics a:focus-visible { outline: 2px solid var(--vp-c-brand-1); outline-offset: 3px; border-radius: 2px; }
-.reading-controls { flex: none; margin: -5px 0 20px; }
+.reading-controls { position: relative; display: flex; align-items: center; gap: 6px; flex: none; margin: -5px 0 20px; white-space: nowrap; }
 .reading-controls button { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 5px 9px; border: 1px solid var(--vp-c-divider); border-radius: 6px; background: var(--vp-c-bg); color: var(--vp-c-text-2); font-size: 10px; line-height: 1.8; }
 .reading-controls button:hover, .reading-controls button[aria-pressed='true'] { color: var(--vp-c-brand-1); border-color: var(--vp-c-brand-1); background: var(--vp-c-brand-soft); }
 .reading-controls .about-icon { width: 13px; height: 13px; }
 .reading-controls kbd { font: 9px/1.6 var(--vp-font-family-mono); opacity: .7; }
+.reading-controls button:disabled { cursor: progress; opacity: .65; }
+.reading-copy-feedback { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.reading-copy-feedback.is-error { top: calc(100% + 6px); right: 0; z-index: 30; width: max-content; max-width: min(260px, calc(100vw - 40px)); height: auto; padding: 8px 10px; overflow: visible; clip-path: none; border: 1px solid var(--vp-c-divider); border-radius: 6px; background: var(--vp-c-bg); color: var(--vp-c-text-1); font-size: 11px; line-height: 1.7; white-space: normal; box-shadow: 0 3px 18px rgb(30 35 70 / 8%); }
 .Layout .VPDoc .vp-doc h1 { font-size: 34px; line-height: 1.45; }
 .Layout .VPDoc .vp-doc h2 { margin-top: 36px; padding-top: 0; border-top: 0; --vp-extra-scroll-margin: 1.5rem; }
 .Layout .VPDoc .vp-doc h2 .header-anchor { top: 0; }
@@ -47,7 +50,9 @@
 }
 @media (max-width: 767px) {
   .article-navigation { gap: 12px; }
-  .reading-controls button { font-size: 10px; min-height: 34px; }
+  .reading-controls button { font-size: 10px; min-height: 40px; }
+  .reading-controls .reading-copy { justify-content: center; min-width: 40px; padding: 8px; }
+  .reading-copy-label { display: none; }
   .Layout .VPDoc .vp-doc h1 { font-size: 28px; }
   .Layout .VPDoc .vp-doc p:not([class]), .Layout .VPDoc .vp-doc li:not([class]) { font-size: 15px; }
   .Layout .VPDoc .vp-doc h2 { margin-top: 30px; }

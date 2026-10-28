@@ -50,6 +50,66 @@ test('new project configuration supplies its own sidebar without central registr
   assert.deepEqual(links(sidebar), ['/projects/6-new-project/overview.html'])
 })
 
+test('malformed optional project navigation never prevents automatic note discovery', t => {
+  const root = mkdtempSync(join(tmpdir(), 'astralleap-sidebar-'))
+  t.after(() => rmSync(root, { recursive: true, force: true }))
+  write(root, 'projects/project/first.md', '# 第一篇\n')
+  write(root, 'projects/project/second.md', '# 第二篇\n')
+  for (const sidebar of [{}, 'legacy', 42, [null, false, 12, 'label', [],
+    { link: 12 }, { text: '无效分组', items: {} },
+    { text: '有效分组', items: [null, { text: '<strong>自定义名称</strong>', link: 'second' }] },
+  ]]) {
+    write(root, 'projects/project/project.json', JSON.stringify({ sidebar }))
+    const navigation = createSidebar(root)['/projects/project/']
+    assert.deepEqual(new Set(links(navigation)), new Set([
+      '/projects/project/first.html', '/projects/project/second.html',
+    ]))
+    assert.equal(links(navigation).length, 2, 'valid and discovered entries must not duplicate')
+    if (Array.isArray(sidebar)) {
+      const group = navigation[0].items.find(item => item.text === '有效分组')
+      assert.equal(group.items[0].text, '<strong>自定义名称</strong>')
+    }
+  }
+})
+
+test('link-only project entries inherit document titles and keep configured ordering', t => {
+  const root = mkdtempSync(join(tmpdir(), 'astralleap-sidebar-'))
+  t.after(() => rmSync(root, { recursive: true, force: true }))
+  write(root, 'projects/project/project.json', JSON.stringify({ sidebar: [
+    { link: 'zulu.md#details' },
+    { items: [{ link: 'alpha' }] },
+    { link: 'missing' },
+  ] }))
+  write(root, 'projects/project/alpha.md', '# 第一篇\n')
+  write(root, 'projects/project/middle.md', '# 自动发现\n')
+  write(root, 'projects/project/zulu.md', '---\ntitle: 最后一篇 <Buffer>\n---\n# 最后一篇\n')
+  const items = createSidebar(root)['/projects/project/'][0].items
+  assert.deepEqual(links(items), [
+    '/projects/project/zulu.html#details', '/projects/project/alpha.html', '/projects/project/middle.html',
+  ])
+  assert.equal(items[0].text, '最后一篇 &lt;Buffer&gt;')
+  assert.equal(items[1].text, '第一篇')
+})
+
+test('knowledge category ordering counts articles while retaining nested navigation pages', t => {
+  const root = mkdtempSync(join(tmpdir(), 'astralleap-sidebar-'))
+  t.after(() => rmSync(root, { recursive: true, force: true }))
+  write(root, 'knowledge/small/index.md', '# 较少笔记\n')
+  write(root, 'knowledge/small/first.md', '# 一篇笔记\n')
+  write(root, 'knowledge/larger/index.md', '# 较多笔记\n')
+  write(root, 'knowledge/larger/first.md', '# 第一篇\n')
+  write(root, 'knowledge/larger/second.md', '# 第二篇\n')
+  const order = () => createSidebar(root)['/knowledge/'][0].items.map(item => item.link)
+  assert.deepEqual(order(), ['/knowledge/larger/', '/knowledge/small/'])
+
+  write(root, 'knowledge/small/nested/index.md', '# 嵌套导航\n')
+  write(root, 'knowledge/small/navigation.md', '---\ncategoryPage: true\n---\n# 专题导航\n')
+  assert.deepEqual(order(), ['/knowledge/larger/', '/knowledge/small/'])
+  const sidebarLinks = links(createSidebar(root)['/knowledge/small/'])
+  assert.ok(sidebarLinks.includes('/knowledge/small/nested/'))
+  assert.ok(sidebarLinks.includes('/knowledge/small/navigation.html'))
+})
+
 test('new cheatsheet notes appear by adding Markdown files alone', t => {
   const root = mkdtempSync(join(tmpdir(), 'astralleap-sidebar-'))
   t.after(() => rmSync(root, { recursive: true, force: true }))

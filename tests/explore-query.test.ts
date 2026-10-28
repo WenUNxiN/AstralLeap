@@ -3,16 +3,35 @@ import assert from 'node:assert/strict'
 import { readExploreQuery, resolveExploreQuery, writeExploreQuery } from '../.vitepress/utils/explore-query.ts'
 
 test('exploration filters survive a URL round trip with Unicode and nested topic IDs', () => {
-  const filters = { query: '电机 FOC & ROS', section: 'knowledge', topic: 'topic/电机控制', tag: '电流环', sort: 'oldest' as const }
+  const filters = { query: '电机 FOC & ROS', section: 'knowledge', topic: 'topic/电机控制', tag: '电流环', state: 'doing' as const, sort: 'oldest' as const }
   const href = writeExploreQuery('/AstralLeap/explore/', filters)
   assert.deepEqual(readExploreQuery(new URL(href, 'https://example.com').search), filters)
 })
 
 test('clearing exploration filters retains unrelated URL parameters and anchors', () => {
   const defaults = readExploreQuery('')
-  assert.equal(writeExploreQuery('/AstralLeap/explore/?q=Linux&type=debug&topic=camera&tag=mmap&sort=title&from=nav#records', defaults),
+  assert.equal(writeExploreQuery('/AstralLeap/explore/?q=Linux&type=debug&topic=camera&tag=mmap&state=done&sort=title&from=nav#records', defaults),
     '/AstralLeap/explore/?from=nav#records')
-  assert.deepEqual(readExploreQuery('?type=&topic=&sort=invalid'), defaults)
+  assert.deepEqual(readExploreQuery('?type=&topic=&state=invalid&sort=invalid'), defaults)
+})
+
+test('progress selection restores from shared and history URLs while old links keep all states', () => {
+  const defaults = readExploreQuery('')
+  assert.equal(readExploreQuery('?q=Linux&type=debug').state, 'all')
+  const doing = { ...defaults, query: '内存', topic: 'linux', state: 'doing' as const }
+  const done = { ...doing, state: 'done' as const }
+  const first = writeExploreQuery('/AstralLeap/explore/?from=nav#records', doing)
+  const second = writeExploreQuery(first, done)
+  for (const [href, filters] of [[first, doing], [second, done], [first, doing]] as const) {
+    const url = new URL(href, 'https://example.com')
+    assert.deepEqual(resolveExploreQuery(url.search, []), filters)
+    assert.equal(url.searchParams.get('from'), 'nav')
+    assert.equal(url.hash, '#records')
+  }
+  const cleared = new URL(writeExploreQuery(second, { ...done, state: 'all' }), 'https://example.com')
+  assert.equal(cleared.searchParams.has('state'), false)
+  assert.equal(cleared.searchParams.get('topic'), 'linux')
+  assert.equal(readExploreQuery(cleared.search).state, 'all')
 })
 
 test('legacy detail-topic links restore a visible tag while broad themes and unknown values stay removable', () => {

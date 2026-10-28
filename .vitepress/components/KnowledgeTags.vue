@@ -11,7 +11,7 @@
 
     <div v-if="categories.length" class="knowledge-preview-grid">
       <a v-for="cat in categories" :key="cat.dir" :href="withBase(cat.url)" class="knowledge-preview-card">
-        <span class="knowledge-topic-icon"><AboutIcon :name="categoryIcon(cat.dir)" /></span>
+        <span class="knowledge-topic-icon" aria-hidden="true"><span v-if="knowledgeIcon(cat).emoji" class="knowledge-custom-icon">{{ knowledgeIcon(cat).emoji }}</span><AboutIcon v-else :name="knowledgeIcon(cat).name" /></span>
         <h3>{{ cat.name }}</h3>
         <p v-if="cat.description">{{ cat.description }}</p>
         <div class="knowledge-preview-footer"><span>{{ cat.count }} 篇笔记</span><AboutIcon name="arrow" /></div>
@@ -24,6 +24,7 @@
 <script setup>
 import { withBase } from 'vitepress'
 import { data } from '../data/knowledge.data.ts'
+import { knowledgeIcon } from '../utils/knowledge-icons'
 import AboutIcon from './AboutIcon.vue'
 import '../theme/knowledge.css'
 
@@ -33,6 +34,4 @@ defineProps({
 })
 
 const categories = data.categories
-const icons = { linux: 'terminal', driver: 'chip', camera: 'camera', video: 'film', audio: 'radio', ai: 'sparkles', network: 'radio', thoughts: 'book' }
-const categoryIcon = dir => icons[dir] || 'book'
 </script>

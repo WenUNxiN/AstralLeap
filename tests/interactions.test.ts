@@ -2,6 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
+import { orderProjectPreview, projectStatusClass } from '../.vitepress/utils/project-presentation.ts'
 
 function backToTopHarness(options: { tabindex?: string; naturallyFocusable?: boolean; hiddenHeading?: boolean; reducedMotion?: boolean } = {}) {
   const source = readFileSync(new URL('../.vitepress/components/MicroInteractions.vue', import.meta.url), 'utf8')
@@ -203,6 +204,7 @@ test('project cards render optional metadata defaults while keeping resolved int
       { folder: '9-new-project', number: '09', link: '/projects/9-new-project/' },
       { folder: '8-external', number: '08', link: 'https://example.com/project', name: '自定义名称', icon: '⚙', desc: '说明', tech: ['C', '', null] }
     ],
+    orderProjectPreview, projectStatusClass,
     computed: getter => ({ get value() { return getter() } }),
     defineProps: () => ({ limit: 0 }),
     withBase: link => '/AstralLeap' + link,

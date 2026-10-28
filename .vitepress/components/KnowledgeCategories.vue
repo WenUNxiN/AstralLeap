@@ -8,7 +8,7 @@
     <div v-if="categories.length" class="knowledge-category-grid">
       <a v-for="(cat, index) in categories" :key="cat.dir" :href="withBase(cat.url)" class="knowledge-category-card">
         <div class="knowledge-card-top">
-          <span class="knowledge-topic-icon"><AboutIcon :name="categoryIcon(cat.dir)" /></span>
+          <span class="knowledge-topic-icon" aria-hidden="true"><span v-if="knowledgeIcon(cat).emoji" class="knowledge-custom-icon">{{ knowledgeIcon(cat).emoji }}</span><AboutIcon v-else :name="knowledgeIcon(cat).name" /></span>
           <span class="knowledge-card-number" aria-hidden="true">{{ String(index + 1).padStart(2, '0') }}</span>
         </div>
         <h3>{{ cat.name }}</h3>
@@ -33,11 +33,10 @@
 import { computed } from 'vue'
 import { withBase } from 'vitepress'
 import { data } from '../data/knowledge.data.ts'
+import { knowledgeIcon } from '../utils/knowledge-icons'
 import AboutIcon from './AboutIcon.vue'
 import '../theme/knowledge.css'
 
 const categories = data.categories
 const totalCount = computed(() => categories.reduce((sum, category) => sum + category.count, 0))
-const icons = { linux: 'terminal', driver: 'chip', camera: 'camera', video: 'film', audio: 'radio', ai: 'sparkles', network: 'radio', thoughts: 'book' }
-const categoryIcon = dir => icons[dir] || 'book'
 </script>

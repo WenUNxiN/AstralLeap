@@ -31,14 +31,14 @@ import '../.vitepress/theme/home.css'
     <RecentNotes />
   </section>
 
-  <section class="home-section" aria-labelledby="home-projects-title">
-    <div class="home-section-heading"><div><p class="home-eyebrow">01 / PROJECTS</p><h2 id="home-projects-title">项目与作品<a class="header-anchor home-heading-anchor" href="#home-projects-title" aria-label="项目展示的永久链接">#</a></h2><p class="home-section-description">项目资料、实现过程与当前进展。</p></div><a class="home-section-link" :href="withBase('/projects/')">全部项目 <AboutIcon name="arrow" /></a></div>
-    <ProjectShowcase :limit="4" />
+  <section class="home-section" aria-labelledby="home-knowledge-title">
+    <div class="home-section-heading"><div><p class="home-eyebrow">01 / KNOWLEDGE</p><h2 id="home-knowledge-title">知识笔记<a class="header-anchor home-heading-anchor" href="#home-knowledge-title" aria-label="技术知识库的永久链接">#</a></h2><p class="home-section-description">按主题整理学过的原理、方法与备忘。</p></div><a class="home-section-link" :href="withBase('/knowledge/')">进入知识库 <AboutIcon name="arrow" /></a></div>
+    <KnowledgeTags :showMore="false" />
   </section>
 
-  <section class="home-section" aria-labelledby="home-knowledge-title">
-    <div class="home-section-heading"><div><p class="home-eyebrow">02 / KNOWLEDGE</p><h2 id="home-knowledge-title">知识笔记<a class="header-anchor home-heading-anchor" href="#home-knowledge-title" aria-label="技术知识库的永久链接">#</a></h2><p class="home-section-description">按主题整理学过的原理、方法与备忘。</p></div><a class="home-section-link" :href="withBase('/knowledge/')">进入知识库 <AboutIcon name="arrow" /></a></div>
-    <KnowledgeTags :showMore="false" />
+  <section class="home-section" aria-labelledby="home-projects-title">
+    <div class="home-section-heading"><div><p class="home-eyebrow">02 / PROJECTS</p><h2 id="home-projects-title">项目与作品<a class="header-anchor home-heading-anchor" href="#home-projects-title" aria-label="项目展示的永久链接">#</a></h2><p class="home-section-description">项目资料、实现过程与当前进展。</p></div><a class="home-section-link" :href="withBase('/projects/')">全部项目 <AboutIcon name="arrow" /></a></div>
+    <ProjectShowcase :limit="2" preferActive />
   </section>
 
   <section class="home-section" aria-labelledby="home-experiments-title">

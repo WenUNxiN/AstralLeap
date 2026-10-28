@@ -1,5 +1,5 @@
 import { isArticle } from './content-collections.ts'
-import { toContentItem, type ContentItem, type RawContentEntry } from './content-loader.ts'
+import { getStatusClass, toContentItem, type ContentItem, type RawContentEntry } from './content-loader.ts'
 import { getMarkdownTitle } from './frontmatter.ts'
 import { sectionForPath, type ExploreSectionId } from './sections.ts'
 
@@ -23,6 +23,7 @@ export interface ExploreFilters {
   topic?: string
   tag?: string
   status?: string
+  state?: 'all' | 'doing' | 'done'
   sort?: 'recent' | 'oldest' | 'title'
 }
 
@@ -48,16 +49,17 @@ function urlPath(url: string): string {
 export function collectExplore(entries: RawContentEntry[]): ExploreData {
   const supported = entries.filter(entry => sectionForPath(urlPath(entry.url))?.explore)
   const aliases = new Map<string, string>()
+  const aliasCandidates = new Map<string, Set<string>>()
   const labels = new Map<string, string>()
   const themeIds = new Set<string>()
-  const register = (label: string, preferredId?: string): ArticleTopic => {
-    const id = preferredId || aliases.get(topicId(label)) || topicId(label)
+  const register = (label: string): ArticleTopic => {
+    const key = topicId(label)
+    const id = themeIds.has(key) ? key : aliases.get(key) || key
     if (!labels.has(id)) labels.set(id, label)
-    aliases.set(topicId(label), id)
     return { id, label: labels.get(id)! }
   }
-  // Resolve category aliases before processing cross-column tags such as
-  // "Linux" and "linux", so the same topic has one identity and count.
+  // Directory identities take priority over display names. Gather every one
+  // before resolving aliases so category order cannot change article ownership.
   for (const entry of supported) {
     const match = urlPath(entry.url).match(/^\/knowledge\/([^/]+)\/$/)
     if (!match) continue
@@ -65,8 +67,11 @@ export function collectExplore(entries: RawContentEntry[]): ExploreData {
     const title = textList(entry.frontmatter?.title)[0] || getMarkdownTitle(entry.src) || dir
     const id = topicId(dir)
     themeIds.add(id)
-    aliases.set(id, id)
-    register(title, id)
+    if (!labels.has(id)) labels.set(id, title)
+    const key = topicId(title)
+    const candidates = aliasCandidates.get(key) || new Set<string>()
+    candidates.add(id)
+    aliasCandidates.set(key, candidates)
   }
   // Directories establish broad themes. Free-form metadata remains a detail
   // unless it matches an existing theme; adding tags must not grow the sidebar.
@@ -74,7 +79,16 @@ export function collectExplore(entries: RawContentEntry[]): ExploreData {
     const path = urlPath(entry.url)
     if (!isArticle({ ...entry, url: path })) continue
     const dir = path.split('/').slice(2, -1)[0]
-    if (dir) themeIds.add(register(dir).id)
+    if (dir) {
+      const id = topicId(dir)
+      themeIds.add(id)
+      if (!labels.has(id)) labels.set(id, dir)
+    }
+  }
+  // A shared display name cannot identify one category. Keep it as a detail
+  // tag rather than assigning it to whichever index happened to load last.
+  for (const [key, candidates] of aliasCandidates) {
+    if (!themeIds.has(key) && candidates.size === 1) aliases.set(key, [...candidates][0])
   }
   for (const entry of supported) {
     for (const label of [...textList(entry.frontmatter?.category), ...textList(entry.frontmatter?.tags)]) register(label)
@@ -118,6 +132,7 @@ export function filterExplore(articles: ExploreArticle[], filters: ExploreFilter
   const matches = articles.filter(article => {
     if (active(filters.section) && article.section !== filters.section) return false
     if (active(filters.status) && article.status !== filters.status) return false
+    if (active(filters.state) && getStatusClass(article.status) !== filters.state) return false
     if (active(filters.topic) && !article.topics.some(topic => topic.id === normalizeText(filters.topic!))) return false
     if (active(filters.tag) && !article.topics.some(topic => topic.id === normalizeText(filters.tag!))) return false
     if (!terms.length) return true
@@ -144,6 +159,7 @@ export function countExploreFacets(articles: ExploreArticle[], filters: ExploreF
   const topicsBase = filterExplore(articles, { ...filters, topic: 'all' })
   const tagsBase = filterExplore(articles, { ...filters, tag: 'all' })
   const sectionsBase = filterExplore(articles, { ...filters, section: 'all' })
+  const statesBase = filterExplore(articles, { ...filters, state: 'all' })
   const countTopics = (items: ExploreArticle[]) => {
     const counts = new Map<string, number>()
     for (const article of items) {
@@ -153,9 +169,14 @@ export function countExploreFacets(articles: ExploreArticle[], filters: ExploreF
   }
   const sections = new Map<string, number>()
   for (const article of sectionsBase) sections.set(article.section, (sections.get(article.section) || 0) + 1)
+  const states = new Map<string, number>()
+  for (const article of statesBase) {
+    const state = getStatusClass(article.status)
+    if (state) states.set(state, (states.get(state) || 0) + 1)
+  }
   return {
-    topics: countTopics(topicsBase), tags: countTopics(tagsBase), sections,
-    allTopics: topicsBase.length, allSections: sectionsBase.length,
+    topics: countTopics(topicsBase), tags: countTopics(tagsBase), sections, states,
+    allTopics: topicsBase.length, allSections: sectionsBase.length, allStates: statesBase.length,
   }
 }
 

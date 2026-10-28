@@ -54,6 +54,53 @@ test('topics unify knowledge categories and cross-column metadata without requir
   assert.deepEqual(data.articles.find(article => article.url === '/cheatsheet/plain.html')?.topics, [])
 })
 
+test('category display names cannot override directory identities or cross-form directory tags', () => {
+  const entries = [
+    entry('/knowledge/linux/', { title: '系统' }),
+    entry('/knowledge/tools/', { title: 'Linux' }),
+    entry('/knowledge/linux/one.html'),
+    entry('/knowledge/tools/two.html'),
+    entry('/experiments/by-directory.html', { tags: ['Linux'] }),
+    entry('/debug/by-name.html', { category: ['系统'] }),
+    entry('/cheatsheet/by-directory.html', { tags: ['TOOLS'] }),
+  ]
+  for (const input of [entries, [...entries].reverse()]) {
+    const data = collectExplore(input)
+    assert.equal(data.topics.find(topic => topic.id === 'linux')?.label, '系统')
+    assert.equal(data.topics.find(topic => topic.id === 'tools')?.label, 'Linux')
+    assert.deepEqual(new Set(filterExplore(data.articles, { topic: 'linux' }).map(article => article.url)), new Set([
+      '/knowledge/linux/one.html', '/experiments/by-directory.html', '/debug/by-name.html',
+    ]))
+    assert.deepEqual(new Set(filterExplore(data.articles, { topic: 'tools' }).map(article => article.url)), new Set([
+      '/knowledge/tools/two.html', '/cheatsheet/by-directory.html',
+    ]))
+  }
+})
+
+test('duplicate category display names stay ambiguous while their directory memberships remain stable', () => {
+  const entries = [
+    entry('/knowledge/linux/', { title: '系统' }),
+    entry('/knowledge/rtos/', { title: '系统' }),
+    entry('/knowledge/linux/one.html'),
+    entry('/knowledge/rtos/two.html'),
+    entry('/experiments/ambiguous.html', { tags: ['系统'] }),
+    entry('/debug/by-directory.html', { tags: ['LINUX'] }),
+    entry('/cheatsheet/by-directory.html', { category: ['RTOS'] }),
+  ]
+  for (const input of [entries, [...entries].reverse()]) {
+    const data = collectExplore(input)
+    assert.deepEqual(new Set(filterExplore(data.articles, { topic: 'linux' }).map(article => article.url)), new Set([
+      '/knowledge/linux/one.html', '/debug/by-directory.html',
+    ]))
+    assert.deepEqual(new Set(filterExplore(data.articles, { topic: 'rtos' }).map(article => article.url)), new Set([
+      '/knowledge/rtos/two.html', '/cheatsheet/by-directory.html',
+    ]))
+    assert.equal(data.topics.find(topic => topic.id === '系统')?.kind, 'tag')
+    assert.deepEqual(filterExplore(data.articles, { tag: '系统' }).map(article => article.url), ['/experiments/ambiguous.html'])
+    assert.deepEqual(data.articles.find(article => article.url === '/experiments/ambiguous.html')?.topics.map(topic => topic.id), ['系统'])
+  }
+})
+
 test('exploration filters combine form, dynamic topics and text while keeping source data unchanged', () => {
   const { articles } = collectExplore([
     entry('/knowledge/linux/', { title: '嵌入式 Linux' }),
@@ -161,6 +208,47 @@ test('facet counts ignore only their own selection and keep search, other facets
   assert.equal(countExploreFacets(articles, { section: 'debug' }).topics.get('linux'), 1)
   assert.equal(countExploreFacets(articles, { query: '无匹配词' }).allTopics, 0)
   assert.equal(JSON.stringify(articles), original)
+})
+
+test('progress combines equivalent article statuses and leaves unclassified notes in all records', () => {
+  const statuses = ['learning', 'doing', 'in-progress', 'debugging', 'done', 'verified', 'solved', '', 'planned']
+  const { articles } = collectExplore(statuses.map((status, index) => entry(`/experiments/${index}.html`, { status })))
+  const original = JSON.stringify(articles)
+  assert.deepEqual(new Set(filterExplore(articles, { state: 'doing' }).map(article => article.status)), new Set(['learning', 'doing', 'in-progress', 'debugging']))
+  assert.deepEqual(new Set(filterExplore(articles, { state: 'done' }).map(article => article.status)), new Set(['done', 'verified', 'solved']))
+  assert.equal(filterExplore(articles, { state: 'all' }).length, 9)
+  assert.equal(filterExplore(articles, { state: 'done', status: 'verified' }).length, 1)
+  const counts = countExploreFacets(articles, { state: 'done' })
+  assert.equal(counts.states.get('doing'), 4)
+  assert.equal(counts.states.get('done'), 3)
+  assert.equal(counts.allStates, 9)
+  assert.equal(JSON.stringify(articles), original)
+})
+
+test('progress counts retain other filters while topic, form and tag counts follow the selected progress', () => {
+  const { articles } = collectExplore([
+    entry('/knowledge/linux/verified.html', { title: '内存', tags: ['mmap'], status: 'done' }),
+    entry('/experiments/linux/learning.html', { title: '内存', tags: ['mmap'], status: 'learning' }),
+    entry('/experiments/linux/done.html', { title: '内存', tags: ['mmap'], status: 'solved' }),
+    entry('/experiments/linux/unclassified.html', { title: '内存', tags: ['mmap'], status: 'planned' }),
+    entry('/experiments/video/done.html', { title: '内存', tags: ['mmap'], status: 'done' }),
+    entry('/experiments/linux/i2c.html', { title: '内存', tags: ['I2C'], status: 'doing' }),
+    entry('/experiments/linux/other.html', { title: '其他', tags: ['mmap'], status: 'learning' }),
+    entry('/debug/linux/doing.html', { title: '内存', tags: ['mmap'], status: 'debugging' }),
+  ])
+  const filters = { topic: 'linux', section: 'experiments', tag: 'mmap', query: '内存', state: 'doing' as const }
+  assert.deepEqual(filterExplore(articles, filters).map(article => article.url), ['/experiments/linux/learning.html'])
+  const counts = countExploreFacets(articles, filters)
+  assert.equal(counts.states.get('doing'), 1)
+  assert.equal(counts.states.get('done'), 1)
+  assert.equal(counts.allStates, 3)
+  assert.equal(counts.topics.get('linux'), 1)
+  assert.equal(counts.topics.get('video') || 0, 0)
+  assert.equal(counts.sections.get('experiments'), 1)
+  assert.equal(counts.sections.get('debug'), 1)
+  assert.equal(counts.sections.get('knowledge') || 0, 0)
+  assert.equal(counts.tags.get('mmap'), 1)
+  assert.equal(counts.tags.get('i2c'), 1)
 })
 
 test('related notes rank real shared topics, then prefer another record form and recency', () => {

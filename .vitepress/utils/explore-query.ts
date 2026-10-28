@@ -3,6 +3,7 @@ export interface ExploreQuery {
   section: string
   topic: string
   tag: string
+  state: 'all' | 'doing' | 'done'
   sort: 'recent' | 'oldest' | 'title'
 }
 
@@ -10,11 +11,13 @@ export interface ExploreQuery {
 export function readExploreQuery(search: string): ExploreQuery {
   const params = new URLSearchParams(search)
   const sort = params.get('sort')
+  const state = params.get('state')
   return {
     query: params.get('q') || '',
     section: params.get('type')?.trim() || 'all',
     topic: params.get('topic')?.trim() || 'all',
     tag: params.get('tag')?.trim() || 'all',
+    state: state === 'doing' || state === 'done' ? state : 'all',
     sort: sort === 'oldest' || sort === 'title' ? sort : 'recent'
   }
 }
@@ -27,6 +30,7 @@ export function writeExploreQuery(href: string, filters: ExploreQuery): string {
     type: filters.section === 'all' ? '' : filters.section,
     topic: filters.topic === 'all' ? '' : filters.topic,
     tag: filters.tag === 'all' ? '' : filters.tag,
+    state: filters.state === 'all' ? '' : filters.state,
     sort: filters.sort === 'recent' ? '' : filters.sort
   }
   for (const [key, value] of Object.entries(values)) {

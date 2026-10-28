@@ -74,23 +74,29 @@ function projectSidebar(srcDir, dir) {
   const file = join(root, 'project.json')
   const project = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8').replace(/^\uFEFF/, '')) : {}
   const base = `/projects/${dir}/`
+  const docs = markdownFiles(root).map(file => documentInfo(file, srcDir)).sort(byDateAndNumber)
+  const documents = new Map(docs.map(doc => [projectPageKey(doc.link), doc]))
   const configuredPages = new Set()
-  const mapItems = items => items.map(item => {
-    const link = item.link ? projectLink(base, item.link) : null
-    if (link) {
-      const key = projectPageKey(link)
-      if (key) configuredPages.add(key)
-    }
+  const mapItems = items => !Array.isArray(items) ? [] : items.flatMap(item => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return []
+    const { text: rawText, link: rawLink, items: rawItems, ...options } = item
+    const link = typeof rawLink === 'string' && rawLink.trim() ? projectLink(base, rawLink.trim()) : null
+    const key = link ? projectPageKey(link) : null
+    const text = (typeof rawText === 'string' ? cleanSidebarText(rawText) : '') || documents.get(key)?.text || ''
+    const children = mapItems(rawItems)
+    // Unnamed groups can still provide ordering. A link-only item inherits its
+    // document's title; unusable optional entries never hide discovered notes.
+    if (!text) return children
+    if (key) configuredPages.add(key)
     return {
-      ...item,
-      text: cleanSidebarText(item.text),
+      ...options,
+      text,
       ...(link ? { link } : {}),
-      ...(item.items ? { items: mapItems(item.items) } : {}),
+      ...(Array.isArray(rawItems) ? { items: children } : {}),
     }
   })
-  const items = mapItems(project.sidebar || [])
-  const discovered = markdownFiles(root).map(file => documentInfo(file, srcDir)).sort(byDateAndNumber)
-    .filter(doc => !configuredPages.has(projectPageKey(doc.link)))
+  const items = mapItems(project.sidebar)
+  const discovered = docs.filter(doc => !configuredPages.has(projectPageKey(doc.link)))
   return [{
     text: cleanSidebarText(project.name || dir),
     collapsed: false,
@@ -138,8 +144,9 @@ export function createSidebar(srcDir) {
   const categories = directories(join(srcDir, 'knowledge')).filter(dir => existsSync(join(srcDir, 'knowledge', dir, 'index.md'))).map(dir => {
     const home = documentInfo(join(srcDir, 'knowledge', dir, 'index.md'), srcDir)
     const docs = markdownFiles(join(srcDir, 'knowledge', dir)).filter(file => file !== join(srcDir, 'knowledge', dir, 'index.md')).map(file => documentInfo(file, srcDir)).sort(byDateAndNumber)
-    return { dir, home, docs }
-  }).sort((a, b) => b.docs.length - a.docs.length || a.home.text.localeCompare(b.home.text, 'zh-CN'))
+    const count = docs.filter(doc => !doc.isIndex && doc.categoryPage !== true).length
+    return { dir, home, docs, count }
+  }).sort((a, b) => b.count - a.count || a.home.text.localeCompare(b.home.text, 'zh-CN'))
 
   const knowledgeSection = sectionForPath('knowledge/')
   const knowledgeSidebar = activeDir => [{ text: knowledgeSection.title, link: knowledgeSection.path, items: categories.map(category => ({
